@@ -438,7 +438,7 @@
                   :key="index"
                 >
                   <label class="col-lg-4 fw-light">{{
-                      (item[1] as any).join(", ")
+                    (item[1] as any).join(", ")
                   }}</label>
                   <label class="col-lg-8 fw-bold fs-6 text-dark">
                     {{ item[0] }}
@@ -625,7 +625,7 @@
 
 <script lang="ts">
 import { useProductStore } from "@/stores/product";
-import {defineComponent, onBeforeUnmount, ref, watch} from "vue";
+import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import Copy from "@/components/core/buttons/Copy.vue";
 import Search from "@/components/core/buttons/Search.vue";
 import Notice from "@/components/core/Notice.vue";
@@ -821,7 +821,6 @@ export default defineComponent({
 
     const dt = transformDtSource(dtSource, columnOptions);
 
-
     onBeforeUnmount(() => {
       pWatcher();
     });
@@ -886,13 +885,20 @@ export default defineComponent({
     },
     onSelect(e, dt, type, indexes) {
       const rowData = handleSelect(dt, indexes);
-      const { grouping, orderid } = rowData[0];
+      const { grouping, orderid, return_id } = rowData[0];
       if (!orderid || !grouping) return;
-      this.$router.push({
-        name: `document-view`,
-        params: { type: grouping, documentId: orderid },
-        query: { enableBack: 1 },
-      });
+      if (return_id) {
+        this.$router.push({
+          name: "return-view",
+          params: { returnId: return_id, documentId: orderid },
+        });
+      } else {
+        this.$router.push({
+          name: `document-view`,
+          params: { type: grouping, documentId: orderid },
+          query: { enableBack: 1 },
+        });
+      }
     },
     toPhone(event) {
       if (!this.p) return;

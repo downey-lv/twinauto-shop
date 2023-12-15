@@ -156,14 +156,15 @@ export default defineComponent({
       const rowData = handleSelect(dt, indexes);
       const documentId = rowData[0].orderid;
 
-      if (this.$props.returnId) {
-        // Route to document edit in return
+      const returnId = this.$props.returnId ?? rowData[0].return_id;
+      if (returnId) {
+        // Route to return view for document
         this.$router.push({
           name: "return-view",
-          params: { returnId: this.$props.returnId, documentId: documentId },
+          params: { returnId: returnId, documentId: documentId },
         });
       } else {
-        // Route to standard document edit
+        // Route to standard document view
         this.$router.push({
           name: "document-view",
           params: { type: this.$route.params.type, documentId: documentId },
