@@ -24,7 +24,7 @@ export class ProductService {
     this.returnDocument = returnDocument;
   }
 
-  searchProduct(type, idx) {
+  searchProduct(type, idx, extendedHistory = false) {
     const product = this.document.value.products[idx];
     if (!product) return;
 
@@ -43,6 +43,7 @@ export class ProductService {
     };
 
     if (this.returnDocument) queryParams["autoshop"] = 1;
+    if (extendedHistory) queryParams["extendedHistory"] = 1;
 
     this.stateRefs.loadingProduct.value[idx] = true;
     ApiService.get("product/find", `${type}/${query}`, queryParams)

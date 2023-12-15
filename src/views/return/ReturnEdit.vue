@@ -86,7 +86,7 @@
       <div
         class="card mb-5"
         v-loading="loading"
-        v-if="document.internal === 'true'"
+        v-if="document.internal === 'true' && document.return_type"
       >
         <div class="card-body">
           <div class="d-none d-lg-block d-xl-block">
@@ -581,7 +581,11 @@ export default defineComponent({
       true
     );
     const searchProduct = (type, idx) =>
-      productService.searchProduct(type, idx);
+      productService.searchProduct(
+        type,
+        idx,
+        document.value.return_type !== "1"
+      );
 
     const selectMatch = (product, match) =>
       productService.selectMatch(product, match);
