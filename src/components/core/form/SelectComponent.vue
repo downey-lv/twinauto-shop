@@ -33,11 +33,9 @@ export default defineComponent({
   name: "SelectComponent",
   props: {
     options: {
-      type: Array as () => OptionItem[],
       required: false,
     },
     modelValue: {
-      type: [String, Array],
       required: true,
       default: "",
     },
