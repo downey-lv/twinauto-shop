@@ -1,0 +1,79 @@
+import { createApp } from "vue";
+import { createPinia } from "pinia";
+import { Tooltip } from "bootstrap";
+import App from "./App.vue";
+
+import i18n from "@/core/plugins/i18n";
+
+//imports for app initialization
+import ApiService from "@/core/services/ApiService";
+import { initApexCharts } from "@/core/plugins/apexcharts";
+import { initInlineSvg } from "@/core/plugins/inline-svg";
+import { initVeeValidate } from "@/core/plugins/vee-validate";
+import { initKtIcon } from "@/core/plugins/keenthemes";
+
+const app = createApp(App);
+app.use(createPinia());
+
+// Import router
+import router from "./router";
+app.use(router);
+
+// Import element plus
+import ElementPlus from "element-plus";
+import lv from "element-plus/dist/locale/lv.mjs";
+import "dayjs/locale/lv";
+app.use(ElementPlus, {
+  locale: lv,
+});
+
+// import datatable
+import DataTable from "datatables.net-vue3";
+import DataTablesLib from "datatables.net-bs5";
+import "datatables.net-select-bs5";
+DataTable.use(DataTablesLib);
+app.component("DataTable", DataTable);
+
+// Import clipboard
+import Clipboard from "v-clipboard";
+app.use(Clipboard);
+
+// Import Notivue notifications
+import { createNotivue } from "notivue";
+import "notivue/notifications.css";
+import "notivue/animations.css";
+
+// Import primevue
+import PrimeVue from "primevue/config";
+import "primevue/resources/themes/saga-blue/theme.css";
+import "primevue/resources/primevue.min.css";
+app.use(PrimeVue);
+
+// Import labelService
+import { labelService } from "@/core/services/LabelService";
+app.provide("labelService", labelService);
+
+// Import Tour
+import Vue3Tour from "vue3-tour";
+import "vue3-tour/dist/vue3-tour.css";
+app.use(Vue3Tour);
+
+// Import prismjs (REMOVE)
+import "@/core/plugins/prismjs";
+
+ApiService.init(app);
+initApexCharts(app);
+initInlineSvg(app);
+initKtIcon(app);
+initVeeValidate();
+
+app.use(i18n);
+
+// Set up tooltip
+app.directive("tooltip", (el) => {
+  new Tooltip(el);
+});
+
+// Place it at THE END of the app.use() chain, just right before app.mount()
+export const push = createNotivue(app);
+app.mount("#app");

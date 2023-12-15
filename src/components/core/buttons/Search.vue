@@ -1,0 +1,39 @@
+<template>
+  <button
+    class="btn btn-flush"
+    :class="buttonClass"
+    @click="codeSearch(`${value}`)"
+  >
+    <KTIcon icon-name="magnifier" :icon-class="`fs-${fontSize} text-primary`" />
+  </button>
+</template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "search-button",
+  props: {
+    value: String,
+    fontSize: {
+      type: String,
+      default: "1",
+    },
+    buttonClass: {
+      type: String,
+      default: "",
+    },
+  },
+  methods: {
+    codeSearch(value: string) {
+      this.$router.push({
+        name: "search-parts",
+        params: {
+          type: "code",
+          query: value,
+        },
+      });
+    },
+  },
+});
+</script>

@@ -1,0 +1,30 @@
+.hover-container {
+    position: relative;
+    height: 23px; /* Ensure the container has a set height */
+}
+
+/* Position both elements absolutely within the container */
+.element-to-hide,
+.element-to-show {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: opacity 0.5s linear;
+}
+
+/* Initially hide the element-to-show */
+.element-to-show {
+    visibility: hidden;
+    opacity: 0;
+}
+
+/* When the container is hovered, toggle visibility */
+.hover-container:hover .element-to-hide {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.hover-container:hover .element-to-show {
+    visibility: visible;
+    opacity: 1;
+}
