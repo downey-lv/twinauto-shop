@@ -128,11 +128,11 @@
         <div class="col-lg">
           <div class="row">
             <div class="col-5 fw-bold">Datums</div>
-            <div class="col">{{ document.orderdate }}</div>
+            <div class="col">{{ document.orderdate.split("T")[0] }}</div>
           </div>
           <div class="row">
             <div class="col-5 fw-bold">Apmaksas termiņš</div>
-            <div class="col">{{ document.payterm }}</div>
+            <div class="col">{{ document.payterm.split("T")[0] }}</div>
           </div>
           <div class="row">
             <div class="col-5 fw-bold">Apmaksāts</div>
@@ -246,10 +246,16 @@ import {
 } from "@/components/documents/calculations";
 import { useBreadcrumbStore } from "@/stores/breadcrumb";
 import { removeTooltip } from "@/core/helpers/dom";
+import { DateTime } from "luxon";
 
 const breadcrumbStore = useBreadcrumbStore();
 
 export default defineComponent({
+  computed: {
+    DateTime() {
+      return DateTime;
+    },
+  },
   components: { DocumentLabelsModal },
   setup() {
     const loading = ref<boolean>(false);
@@ -258,7 +264,7 @@ export default defineComponent({
     const blankDocument: Document = {
       companyid: "",
       companyname: "",
-      orderdate: new Date().toISOString(),
+      orderdate: "",
       payterm: "",
       ordertypeid: "",
       ordertypename: "",
@@ -356,7 +362,6 @@ export default defineComponent({
     onBeforeUnmount(() => {
       idWatcher();
     });
-
 
     // Set back button
     const lastBreadcrumb = breadcrumbStore.getLastEntry();
