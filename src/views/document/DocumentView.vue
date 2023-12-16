@@ -128,11 +128,11 @@
         <div class="col-lg">
           <div class="row">
             <div class="col-5 fw-bold">Datums</div>
-            <div class="col">{{ document.orderdate.split("T")[0] }}</div>
+            <div class="col">{{ String(document.orderdate).split("T")[0] }}</div>
           </div>
           <div class="row">
             <div class="col-5 fw-bold">Apmaksas termiņš</div>
-            <div class="col">{{ document.payterm.split("T")[0] }}</div>
+            <div class="col">{{ String(document.payterm).split("T")[0] }}</div>
           </div>
           <div class="row">
             <div class="col-5 fw-bold">Apmaksāts</div>
@@ -264,8 +264,8 @@ export default defineComponent({
     const blankDocument: Document = {
       companyid: "",
       companyname: "",
-      orderdate: "",
-      payterm: "",
+      orderdate: null,
+      payterm: null,
       ordertypeid: "",
       ordertypename: "",
       waybillno: "",

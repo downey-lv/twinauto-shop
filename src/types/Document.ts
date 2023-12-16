@@ -35,8 +35,8 @@ export interface Document {
   islocked: boolean;
   companyid: string;
   companyname?: string;
-  orderdate: string;
-  payterm: string;
+  orderdate: Date | null;
+  payterm: Date | null;
   ordertypeid: string;
   ordertypename?: string;
   waybillno: string;

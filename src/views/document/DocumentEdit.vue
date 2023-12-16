@@ -465,7 +465,7 @@ export default defineComponent({
     const blankDocument: Document = {
       companyid: "",
       orderdate: DateTime.now().toJSDate(),
-      payterm: "",
+      payterm: null,
       ordertypeid: "",
       waybillno: "",
       comment: "",
@@ -874,7 +874,7 @@ export default defineComponent({
 
     // Update payterm
     const updatePayterm = () => {
-      if (!document.value.orderdate && document.value.payterm !== "") return;
+      if (!document.value.orderdate || document.value.payterm) return;
 
       const company = companies.value.find(
         (company) => company.id === document.value.companyid
@@ -1029,14 +1029,15 @@ export default defineComponent({
 
       (this.$refs.formRef as FormInstance).validate((valid: boolean) => {
         if (valid) {
-          this.loading = true;
 
-          const data = { ...this.document };
+          const data = { ...this.document } as any;
 
           // Format dates
+          if (!data.orderdate || !data.payterm) return
           data.orderdate = DateTime.fromJSDate(data.orderdate).toISODate();
           data.payterm = DateTime.fromJSDate(data.payterm).toISODate();
 
+          this.loading = true;
           ApiService.post("document/", data)
             .then((response) => {
               push.success("Dokuments saglabāts");

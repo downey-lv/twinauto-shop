@@ -37,7 +37,6 @@ export default defineComponent({
     },
     modelValue: {
       required: true,
-      default: "",
     },
     multiple: {
       type: Boolean,
