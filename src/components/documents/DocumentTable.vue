@@ -105,7 +105,7 @@ export default defineComponent({
         waybillno: "Dokumenta nr.",
         comment: "Komentārs",
         amountwithvat: "Summa",
-        paid: "Apmaksāts",
+        is_paid: "Apmaksāts",
       },
     };
 
@@ -123,7 +123,7 @@ export default defineComponent({
         ordertypename: {
           width: "180px",
         },
-        paid: {
+        is_paid: {
           render: function (data, type, row) {
             if (data) {
               return '<span class="badge badge-light-success">Jā</span>';

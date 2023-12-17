@@ -35,6 +35,15 @@
         <div class="btn-group me-2" role="group">
           <button
             type="button"
+            class="btn btn-sm btn-info"
+            title="Maksājumi"
+            v-tooltip
+            @click="showPayments()"
+          >
+            <i class="fa-solid fa-cash-register"></i>
+          </button>
+          <button
+            type="button"
             class="btn btn-sm"
             :class="document.islocked ? 'btn-warning' : 'btn-light'"
             :title="document.islocked ? 'Atslēgt dokumentu' : 'Slēgt dokumentu'"
@@ -46,6 +55,8 @@
               :class="document.islocked ? 'fa-lock' : 'fa-lock-open'"
             ></i>
           </button>
+        </div>
+        <div class="btn-group me-2" role="group">
           <button
             type="button"
             class="btn btn-sm btn-light"
@@ -128,7 +139,9 @@
         <div class="col-lg">
           <div class="row">
             <div class="col-5 fw-bold">Datums</div>
-            <div class="col">{{ String(document.orderdate).split("T")[0] }}</div>
+            <div class="col">
+              {{ String(document.orderdate).split("T")[0] }}
+            </div>
           </div>
           <div class="row">
             <div class="col-5 fw-bold">Apmaksas termiņš</div>
@@ -140,12 +153,17 @@
               <span
                 class="badge"
                 :class="{
-                  'badge-success': document.paid,
-                  'badge-danger': !document.paid,
+                  'badge-success': document.is_paid,
+                  'badge-danger': !document.is_paid,
                 }"
               >
-                {{ document.paid ? "Jā" : "Nē" }}
+                {{ document.is_paid ? "Jā" : "Nē" }}
               </span>
+              <span
+                class="ms-2"
+                v-if="document.is_paid && document.paid_date"
+                >{{ String(document.paid_date).split("T")[0] }}</span
+              >
             </div>
           </div>
         </div>
@@ -227,7 +245,8 @@
     </div>
   </div>
 
-  <DocumentLabelsModal ref="modalComponent" :pData="document.products" />
+  <DocumentLabelsModal ref="modalLabels" :pData="document.products" />
+  <PaymentModal ref="modalPayment" :pData="document" />
 </template>
 
 <script lang="ts">
@@ -247,6 +266,7 @@ import {
 import { useBreadcrumbStore } from "@/stores/breadcrumb";
 import { removeTooltip } from "@/core/helpers/dom";
 import { DateTime } from "luxon";
+import PaymentModal from "@/components/documents/PaymentModal.vue";
 
 const breadcrumbStore = useBreadcrumbStore();
 
@@ -256,7 +276,7 @@ export default defineComponent({
       return DateTime;
     },
   },
-  components: { DocumentLabelsModal },
+  components: { PaymentModal, DocumentLabelsModal },
   setup() {
     const loading = ref<boolean>(false);
     const route = useRoute();
@@ -387,7 +407,10 @@ export default defineComponent({
       if (data) productStore.setProduct([data]);
     },
     printLabels() {
-      (this.$refs.modalComponent as any).show();
+      (this.$refs.modalLabels as any).show();
+    },
+    showPayments() {
+      (this.$refs.modalPayment as any).show();
     },
     indexMethod(index: number) {
       return index + 1;

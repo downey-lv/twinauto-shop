@@ -44,7 +44,8 @@ export interface Document {
   vat: number;
   products: DocumentProduct[];
   deletedItems: string[];
-  paid?: boolean;
+  is_paid?: boolean;
+  paid_date?: Date;
   grouping?: string;
   links?: DocumentLinks;
   returnid?: string;
