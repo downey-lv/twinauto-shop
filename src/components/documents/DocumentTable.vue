@@ -134,20 +134,23 @@ export default defineComponent({
 
     const columnOptions = {
       documents: {
+        orderid: {
+          width: "60px",
+        },
         orderdate: {
           width: "100px",
         },
         amountwithvat: {
           width: "85px",
         },
-        client: {
-          width: "250px",
+        companyname: {
+          width: "300px",
         },
         ordertypename: {
           width: "180px",
         },
         is_paid: {
-          render: function (data, type, row) {
+          render: function (data) {
             if (data) {
               return '<span class="badge badge-light-success">Jā</span>';
             } else {
