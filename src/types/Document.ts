@@ -54,6 +54,7 @@ export interface Document {
 interface DocumentLinks {
   invoice: string | null;
   repair: string | null;
+  prepaid: string | null;
 }
 
 export interface Header {

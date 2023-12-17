@@ -12,24 +12,54 @@
           <i class="fa-solid fa-car-wrench"></i> Atvērt remontu
         </a>
         <template v-else>
-          <a
-            v-if="document.links?.invoice"
-            :href="`https://vide.twinauto.lv/shop/invoice/${document.links.invoice}`"
-            target="_blank"
-            class="btn btn-sm btn-light me-2"
-          >
-            <i class="fa-solid fa-file-invoice"></i> Atvērt pavadzīmi
-          </a>
-          <a
-            v-else-if="
-              [2, 3, 7, 9, 10, 11].includes(Number(document.ordertypeid))
-            "
-            :href="`https://vide.twinauto.lv/shop/invoice/new_${$route.params.documentId}`"
-            target="_blank"
-            class="btn btn-sm btn-light me-2"
-          >
-            <i class="fa-solid fa-file-invoice"></i> Sagatavot pavadzīmi
-          </a>
+          <div class="btn-group me-2" role="group">
+            <a
+              v-if="document.links?.invoice"
+              :href="`https://vide.twinauto.lv/shop/invoice/${document.links.invoice}`"
+              target="_blank"
+              class="btn btn-sm btn-light"
+            >
+              Pavadzīme
+            </a>
+            <a
+              v-if="document.links?.prepaid"
+              :href="`https://vide.twinauto.lv/shop/documents/?document_id=${$route.params.documentId}`"
+              target="_blank"
+              class="btn btn-sm btn-light"
+            >
+              Priekšapmaksas rēķins
+            </a>
+            <a
+              v-if="
+                !document.links?.invoice &&
+                [2, 3, 7, 9, 10, 11].includes(Number(document.ordertypeid))
+              "
+              class="btn btn-sm btn-light dropdown-toggle"
+              data-bs-toggle="dropdown"
+            >
+              <i class="fa-solid fa-file-invoice"></i> Jauns
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a
+                  v-if="!document.links?.invoice"
+                  class="dropdown-item"
+                  :href="`https://vide.twinauto.lv/shop/invoice/new_${$route.params.documentId}`"
+                  target="_blank"
+                  >Pavadzīme</a
+                >
+              </li>
+              <li>
+                <a
+                  v-if="!document.links?.invoice && !document.links?.prepaid"
+                  class="dropdown-item"
+                  :href="`https://vide.twinauto.lv/shop/documents/?document_id=${$route.params.documentId}`"
+                  target="_blank"
+                  >Rēķins</a
+                >
+              </li>
+            </ul>
+          </div>
         </template>
 
         <div class="btn-group me-2" role="group">
