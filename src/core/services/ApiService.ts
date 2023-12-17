@@ -19,8 +19,14 @@ class ApiService {
   public static init(app: App<Element>) {
     ApiService.vueInstance = app;
     ApiService.vueInstance.use(VueAxios, axios);
-    ApiService.vueInstance.axios.defaults.baseURL =
-      import.meta.env.VITE_APP_API_URL;
+
+    // Check environment mode and set the baseURL accordingly
+    if (import.meta.env.MODE === "development") {
+      ApiService.vueInstance.axios.defaults.baseURL = "http://localhost:8080"; // replace with your local server's URL
+    } else {
+      ApiService.vueInstance.axios.defaults.baseURL =
+        import.meta.env.VITE_APP_API_URL;
+    }
   }
 
   public static getUrl(): string {
@@ -76,7 +82,11 @@ class ApiService {
    * @param params: AxiosRequestConfig
    * @returns Promise<AxiosResponse>
    */
-  public static post(resource: string, params: any, headers: any = {}): Promise<AxiosResponse> {
+  public static post(
+    resource: string,
+    params: any,
+    headers: any = {}
+  ): Promise<AxiosResponse> {
     return ApiService.vueInstance.axios.post(`${resource}`, params, {
       headers,
     });
@@ -112,7 +122,10 @@ class ApiService {
    * @param resource: string
    * @returns Promise<AxiosResponse>
    */
-  public static delete(resource: string, params: any = {}): Promise<AxiosResponse> {
+  public static delete(
+    resource: string,
+    params: any = {}
+  ): Promise<AxiosResponse> {
     return ApiService.vueInstance.axios.delete(resource, { data: params });
   }
 }
