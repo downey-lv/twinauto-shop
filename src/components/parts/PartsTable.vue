@@ -159,6 +159,9 @@ export default defineComponent({
 
     const columnOptions = {
       parts: {
+        name: {
+          width: "350px",
+        },
         priceSell: {
           width: "90px",
         },
