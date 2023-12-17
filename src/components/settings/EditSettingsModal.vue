@@ -191,6 +191,7 @@ import { push } from "@/main";
 import { Plus } from "@element-plus/icons-vue";
 import "@/assets/uploader.css";
 import { Modal } from "bootstrap";
+import type { FormInstance } from "element-plus";
 
 export default defineComponent({
   name: "edit-settings-modal",
@@ -308,7 +309,7 @@ export default defineComponent({
         return;
       }
 
-      (this.$refs.formRef as any).validate((valid: boolean) => {
+      (this.$refs.formRef as FormInstance).validate((valid: boolean) => {
         if (valid) {
           this.loading = true;
           ApiService.post(this.type + "/", this.formData)
