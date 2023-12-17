@@ -71,7 +71,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/document",
         name: "document",
-        redirect: { name: "document-list", params: { type: "all" } },
+        redirect: { name: "document-list", params: { type: "out" } },
         meta: {
           breadcrumbStore: "document",
         },

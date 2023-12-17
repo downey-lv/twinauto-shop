@@ -175,3 +175,21 @@ export const transformDtSource = (source: any, options = {}): any => {
 export const handleSelect = (dt: any, indexes: any[]): any[] => {
     return dt.rows(indexes).data().toArray();
 };
+
+export const serverSide = (loadData) => {
+    return async function (data, callback, settings) {
+        const queryInfo = {
+            draw: data.draw,
+            start: data.start,
+            length: data.length,
+            search: data.search,
+            order: data.order,
+            columns: data.columns,
+            dtServerSide: true
+        };
+
+        const result = await loadData(queryInfo);
+
+        callback(result);
+    };
+}

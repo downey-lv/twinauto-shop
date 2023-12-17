@@ -3,6 +3,7 @@
   <DocumentTable
     v-if="documentType && documentType !== 'all'"
     :type="documentType"
+    :server-side="true"
   />
 </template>
 

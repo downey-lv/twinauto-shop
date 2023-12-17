@@ -27,11 +27,12 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import { defineComponent, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import {
   getDtOptions,
   handleSelect,
   transformDtSource,
+  serverSide,
 } from "@/assets/ts/layout/dtOptions";
 import ApiService from "@/core/services/ApiService";
 
@@ -50,42 +51,59 @@ export default defineComponent({
       type: Boolean,
       required: false,
     },
+    serverSide: {
+      type: Boolean,
+      required: false,
+    },
   },
   setup(props) {
     const loading = ref<boolean>(false);
     const documents = ref();
     const tabsKey = ref(0);
+    const table = ref();
 
     // Setup data load
-    const loadData = async () => {
-      if (props.type) {
-        loading.value = true;
-        ApiService.get("document/list", props.type, {
-          returnId: props.returnId,
-          returnClient: props.returnClient,
-        })
-          .then((response) => {
-            documents.value = response.data;
-            tabsKey.value += 1;
+    const loadData = (queryInfo = {} as any) => {
+      return new Promise((resolve, reject) => {
+        if (props.type) {
+          loading.value = true;
+          ApiService.get("document/list", props.type, {
+            returnId: props.returnId,
+            returnClient: props.returnClient,
+            ...queryInfo,
           })
-          .catch((error) => {
-            console.error("Error fetching data:", error);
-          })
-          .finally(() => {
-            loading.value = false;
-          });
-      }
+            .then((response) => {
+              if (queryInfo.dtServerSide) {
+                resolve(response.data);
+              } else {
+                documents.value = response.data;
+                tabsKey.value += 1;
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching data:", error);
+              reject(error);
+            })
+            .finally(() => {
+              loading.value = false;
+            });
+        }
+      });
     };
 
     // Fetch data when the component is first loaded
-    onMounted(loadData);
+    if (!props.serverSide) onMounted(loadData);
 
     // React to changes in URL
     const pWatcher = watch(
       () => props.type, // watching the URL prop
       (newType, prevType) => {
         if (newType !== prevType) {
-          loadData();
+          if (props.serverSide) {
+            table.value.dt.draw();
+          } else {
+            loadData();
+          }
         }
       }
     );
@@ -95,6 +113,11 @@ export default defineComponent({
     let dtOptions = getDtOptions(1, saveState);
     dtOptions["select"] = true;
     dtOptions["order"] = [[0, "desc"]];
+    if (props.serverSide) {
+      dtOptions["ajax"] = serverSide(loadData);
+      dtOptions["processing"] = true;
+      dtOptions["serverSide"] = true;
+    }
 
     let dtSource = {
       documents: {
@@ -148,6 +171,7 @@ export default defineComponent({
       dt,
       loading,
       tabsKey,
+      table,
     };
   },
   methods: {
