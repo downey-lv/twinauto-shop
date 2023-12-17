@@ -225,7 +225,6 @@ export default defineComponent({
     );
 
     onBeforeUnmount(() => {
-      modal.hide();
       idWatcher();
     });
 
