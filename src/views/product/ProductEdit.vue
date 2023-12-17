@@ -178,7 +178,7 @@
                     <el-input-number
                       v-model="product.volume"
                       :min="0"
-                      :step="0.1"
+                      :step="0.001"
                     ></el-input-number>
                   </el-form-item>
                 </div>
