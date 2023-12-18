@@ -5,7 +5,7 @@
       <div class="text-gray-700 fw-bold fs-6 me-2">CSDD</div>
     </div>
   </template>
-  <template v-for="(item, key) in carData" :key="key">
+  <template v-for="(item, key) in carData.csdd" :key="key">
     <div class="d-flex flex-stack">
       <div class="text-gray-700 fw-semibold fs-6 me-2">{{ key }}</div>
       <div class="d-flex align-items-center">
@@ -17,9 +17,19 @@
           trim-spaces
           font-size="3"
         />
+        <a
+          v-if="key === 'VIN' && carData.pl24"
+          :href="carData.pl24"
+          target="_blank"
+          title="Atvērt partslink24"
+          v-tooltip
+        >
+          <i class="fa-solid fa-car-garage text-warning"></i>
+        </a>
       </div>
     </div>
   </template>
+
 </template>
 
 <script lang="ts">
@@ -40,7 +50,7 @@ export default defineComponent({
     const carStore = useCarStore();
 
     if (Object.keys(carStore.data).length == 0 && props.altDetails)
-      carStore.data = props.altDetails;
+      carStore.data = { csdd: props.altDetails };
 
     const carData = ref(carStore.data);
 
@@ -49,7 +59,7 @@ export default defineComponent({
       () => carStore.data,
       (newVal) => {
         if (newVal) carData.value = carStore.data;
-      },
+      }
     );
 
     onBeforeUnmount(() => {

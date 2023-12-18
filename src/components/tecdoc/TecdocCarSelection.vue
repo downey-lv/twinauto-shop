@@ -256,7 +256,7 @@ export default defineComponent({
         .then((response) => {
           const data = response.data;
 
-          if ("csdd" in data) carStore.setVehicle(data["csdd"]);
+          if ("csdd" in data) carStore.setVehicle(data);
 
           if (data["car"].length == 0) {
             this.vinError = "Nav TecDoc rezultātu";
