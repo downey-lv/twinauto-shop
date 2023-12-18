@@ -19,7 +19,7 @@
           class="d-flex align-items-center py-2 cursor-pointer"
           v-for="(item, index) in searchHistory"
           :key="index"
-          @click="usePreviousSearch(item)"
+          @click="usePreviousSearch(index, item)"
         >
           <span class="bullet me-5"></span>
           {{ item.label }}
@@ -56,7 +56,12 @@ export default defineComponent({
     };
   },
   methods: {
-    usePreviousSearch(item) {
+    usePreviousSearch(index, item) {
+      // Set as latest search
+      this.searchHistory.splice(index, 1);
+      this.searchHistory.push(item);
+      localStorage.setItem("searchHistory", JSON.stringify(this.searchHistory));
+
       this.$router.push({
         name: "tecdoc-groups",
         params: item.params,
