@@ -51,7 +51,6 @@ export default defineComponent({
       (newVal) => {
         if (newVal) carData.value = carStore.data;
       },
-      { immediate: true }
     );
 
     onBeforeUnmount(() => {

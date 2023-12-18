@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 export const useCarStore = defineStore({
   id: "car",
   state: () => ({
-    data: [] as object,
+    data: {},
   }),
   actions: {
     setVehicle(data: any) {
@@ -12,7 +12,7 @@ export const useCarStore = defineStore({
     },
     unsetVehicle() {
       console.log("unsetVehicle");
-      this.data = [];
+      this.data = {};
     },
   },
 });
