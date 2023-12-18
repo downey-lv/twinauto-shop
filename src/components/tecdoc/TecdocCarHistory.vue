@@ -57,11 +57,6 @@ export default defineComponent({
   },
   methods: {
     usePreviousSearch(index, item) {
-      // Set as latest search
-      this.searchHistory.splice(index, 1);
-      this.searchHistory.push(item);
-      localStorage.setItem("searchHistory", JSON.stringify(this.searchHistory));
-
       this.$router.push({
         name: "tecdoc-groups",
         params: item.params,

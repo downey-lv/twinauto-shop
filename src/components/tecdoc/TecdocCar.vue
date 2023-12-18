@@ -104,11 +104,11 @@ export default defineComponent({
           "tecdoc-parts",
         ]);
 
-        // Function to check if the object exists in the array
-        function objectExistsInArray(array, dictionary) {
+        // Get object index
+        function objectIndexInArray(array, dictionary) {
           // Check if 'array' is actually an array first
           if (Array.isArray(array)) {
-            return array.some(
+            return array.findIndex(
               (item) =>
                 item.label === dictionary.label &&
                 item.params.makeId === dictionary.params.makeId &&
@@ -116,7 +116,7 @@ export default defineComponent({
                 item.params.carId === dictionary.params.carId
             );
           } else {
-            return false;
+            return -1;
           }
         }
 
@@ -136,12 +136,18 @@ export default defineComponent({
           },
         };
 
-        if (!objectExistsInArray(searchHistory, searchQuery)) {
+        const idx = objectIndexInArray(searchHistory, searchQuery);
+        if (idx === -1) {
           searchHistory.push(searchQuery);
 
           // Limit to 25 items
           searchHistory = searchHistory.slice(-25);
 
+          // Save the search history to localStorage
+          localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+        } else {
+          // Set item as the latest search
+          searchHistory.push(searchHistory.splice(idx, 1)[0]);
           // Save the search history to localStorage
           localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
         }
