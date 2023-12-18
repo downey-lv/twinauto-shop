@@ -119,6 +119,7 @@ export default defineComponent({
 
     onBeforeUnmount(() => {
       tdWatcher();
+      valueWatcher();
     });
 
     return {
