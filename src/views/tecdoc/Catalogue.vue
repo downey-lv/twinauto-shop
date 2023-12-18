@@ -5,7 +5,19 @@
     </div>
 
     <div class="col-xl-9">
-      <PartsTable resource="tecdoc/catalogue" :slug="url" />
+      <PartsTable resource="tecdoc/catalogue" :slug="url">
+        <template v-slot:header>
+          <h3 class="card-title"></h3>
+          <div class="card-toolbar">
+            <router-link
+              :to="{ name: 'tecdoc-groups' }"
+              class="btn btn-sm btn-light me-3"
+            >
+              Atpakaļ
+            </router-link>
+          </div>
+        </template>
+      </PartsTable>
     </div>
   </div>
 </template>
@@ -34,12 +46,6 @@ export default defineComponent({
       }
       return "";
     });
-
-    breadcrumbStore.setBreadcrumbs("tecdoc-groups", { carId: "Kategorijas" }, [
-      "tecdoc-car",
-      "tecdoc-groups",
-      "tecdoc-parts",
-    ]);
 
     return { url };
   },
