@@ -122,8 +122,6 @@ export default defineComponent({
   },
   data() {
     return {
-      selectedModel: "",
-      selectedMake: "",
       limited: { make: "", model: "", car: "" },
       vinError: "",
       vinData: { vin: "", registration: "" },
@@ -131,12 +129,18 @@ export default defineComponent({
     };
   },
   mounted() {
-    this.selectedMake = (this.$route.params.makeId || "").toString();
-    this.selectedModel = (this.$route.params.modelId || "").toString();
+    this.list["make"]["selected"] = (
+      this.$route.params.makeId || ""
+    ).toString();
+
+    this.list["model"]["selected"] = (
+      this.$route.params.modelId || ""
+    ).toString();
+
     this.loadData("make");
 
     // Unset CSDD data if starting from scratch
-    if (this.values.makeId === "") {
+    if (this.list["make"]["selected"] === "" && this.values.makeId === "") {
       const carStore = useCarStore();
       carStore.unsetVehicle();
     }
