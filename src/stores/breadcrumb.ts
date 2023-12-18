@@ -22,15 +22,17 @@ export const useBreadcrumbStore = defineStore({
       const preparedBreadcrumbs: Breadcrumb[] = [];
       const params: string[] = [];
 
+      console.log(this.breadcrumbs);
+
       for (const [name, values] of Object.entries(this.breadcrumbs)) {
         for (const [paramKey, value] of Object.entries(values)) {
           if (value) {
+            params.push(paramKey);
             const b = {
               name: name,
               params: [...params],
               title: String(value),
             };
-            params.push(paramKey);
             preparedBreadcrumbs.push(b);
           }
         }
@@ -70,9 +72,6 @@ export const useBreadcrumbStore = defineStore({
       // Remove dropped names
       const names = breadcrumbs.map((b) => b.name);
       this.filterBreadcrumbs(names);
-
-      console.log(breadcrumbs);
-      console.log(this.breadcrumbs);
 
       // Merge breadcrumbs by name and params arrays
       const mergedBreadcrumbs = breadcrumbs.reduce((acc, b) => {

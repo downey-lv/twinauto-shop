@@ -79,8 +79,6 @@ export default defineComponent({
     };
   },
   mounted() {
-    this.updateBreadcrumbs();
-
     this.loading = true;
     ApiService.get(`tecdoc/catalogue`, String(this.$route.params.carId))
       .then((response) => {
@@ -107,20 +105,12 @@ export default defineComponent({
         query: this.$route.query,
       });
     },
-    updateBreadcrumbs(selectedCategoryName = null) {
-      if (selectedCategoryName) {
-        breadcrumbStore.setBreadcrumbs(
-          "tecdoc-parts",
-          { groupId: selectedCategoryName },
-          ["tecdoc-car", "tecdoc-groups"]
-        );
-      } else {
-        breadcrumbStore.setBreadcrumbs(
-          "tecdoc-groups",
-          { carId: "Kategorijas" },
-          ["tecdoc-car"]
-        );
-      }
+    updateBreadcrumbs(selectedCategoryName: string) {
+      breadcrumbStore.setBreadcrumbs(
+        "tecdoc-parts",
+        { groupId: selectedCategoryName },
+        ["tecdoc-car", "tecdoc-groups"]
+      );
     },
   },
 });

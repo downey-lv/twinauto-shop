@@ -76,15 +76,33 @@ export default defineComponent({
         this.list = d;
 
         const breadcrumbStore = useBreadcrumbStore();
+
+        // Add group breadcrumb
+        breadcrumbStore.setBreadcrumbs(
+          "tecdoc-groups",
+          {
+            carId: d["Modifikācija"],
+          },
+          ["tecdoc-groups", "tecdoc-parts"]
+        );
+
+        // Add car breadcrumbs
         breadcrumbStore.setBreadcrumbs(
           "tecdoc-car",
           {
             makeId: d["Marka"],
             modelId: d["Modelis"],
-            carId: d["Modifikācija"],
           },
           ["tecdoc-car", "tecdoc-groups", "tecdoc-parts"]
         );
+
+        // Add start page to breadcrumbs
+        breadcrumbStore.setBreadcrumbs("tecdoc", { null: "TecDoc" }, [
+          "tecdoc",
+          "tecdoc-car",
+          "tecdoc-groups",
+          "tecdoc-parts",
+        ]);
 
         // Function to check if the object exists in the array
         function objectExistsInArray(array, dictionary) {
