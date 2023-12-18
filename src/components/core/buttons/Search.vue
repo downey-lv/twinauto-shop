@@ -3,6 +3,8 @@
     class="btn btn-flush"
     :class="buttonClass"
     @click="codeSearch(`${value}`)"
+    title="Meklēt"
+    v-tooltip
   >
     <KTIcon icon-name="magnifier" :icon-class="`fs-${fontSize} text-primary`" />
   </button>

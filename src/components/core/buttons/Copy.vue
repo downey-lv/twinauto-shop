@@ -2,6 +2,8 @@
   <button
     class="btn btn-flush"
     :class="buttonClass"
+    title="Kopēt"
+    v-tooltip
     v-clipboard="() => copy_value"
     v-clipboard:success="clipboardSuccessHandler"
     v-clipboard:error="clipboardErrorHandler"
