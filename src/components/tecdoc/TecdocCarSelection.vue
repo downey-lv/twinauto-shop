@@ -134,6 +134,12 @@ export default defineComponent({
     this.selectedMake = (this.$route.params.makeId || "").toString();
     this.selectedModel = (this.$route.params.modelId || "").toString();
     this.loadData("make");
+
+    // Unset CSDD data if starting from scratch
+    if (this.values.makeId === "") {
+      const carStore = useCarStore();
+      carStore.unsetVehicle();
+    }
   },
   methods: {
     setValue(field: string, value: string, dropdown: boolean = true) {
@@ -222,8 +228,8 @@ export default defineComponent({
     },
     findVIN() {
       const carStore = useCarStore();
-
       carStore.unsetVehicle();
+
       this.vinError = "";
       const vin = this.selectedVIN;
 
