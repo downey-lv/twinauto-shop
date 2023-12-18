@@ -22,8 +22,6 @@ export const useBreadcrumbStore = defineStore({
       const preparedBreadcrumbs: Breadcrumb[] = [];
       const params: string[] = [];
 
-      console.log(this.breadcrumbs);
-
       for (const [name, values] of Object.entries(this.breadcrumbs)) {
         for (const [paramKey, value] of Object.entries(values)) {
           if (value) {
