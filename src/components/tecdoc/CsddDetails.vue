@@ -1,5 +1,11 @@
 <template>
   <template v-if="Object.keys(carData).length > 0">
+    <Notice
+      v-if="carData.warning"
+      :body="carData.warning"
+      classes="rounded-3 mb-3"
+      color="warning"
+    ></Notice>
     <div class="separator separator-dashed my-3"></div>
     <div class="d-flex justify-content-center">
       <div class="text-gray-700 fw-bold fs-6 me-2">CSDD</div>
@@ -29,17 +35,17 @@
       </div>
     </div>
   </template>
-
 </template>
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import Copy from "@/components/core/buttons/Copy.vue";
 import { useCarStore } from "@/stores/car";
+import Notice from "@/components/core/Notice.vue";
 
 export default defineComponent({
   name: "csdd-details",
-  components: { Copy },
+  components: { Notice, Copy },
   props: {
     altDetails: {
       type: Object,
