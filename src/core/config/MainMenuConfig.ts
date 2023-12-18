@@ -17,7 +17,7 @@ const MainMenuConfig: Array<MenuItem> = [
   },
   {
     heading: "TecDoc",
-    route: "/tecdoc/",
+    route: "/tecdoc",
     faIcon: "garage-car",
   },
   {

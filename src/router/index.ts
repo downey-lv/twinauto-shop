@@ -24,31 +24,38 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/tecdoc/:makeId?/:modelId?",
-        name: "tecdoc-car",
-        component: () => import("@/views/tecdoc/Car.vue"),
-        meta: {
-          pageTitle: "Automašīna",
-          breadcrumbStore: "tecdoc",
-        },
-      },
-      {
-        path: "/tecdoc/groups/:makeId/:modelId/:carId",
-        name: "tecdoc-groups",
-        component: () => import("@/views/tecdoc/Categories.vue"),
-        meta: {
-          pageTitle: "Produktu kategorijas",
-          breadcrumbStore: "tecdoc",
-        },
-      },
-      {
-        path: "/tecdoc/parts/:makeId/:modelId/:carId/:groupId",
-        name: "tecdoc-parts",
-        component: () => import("@/views/tecdoc/Catalogue.vue"),
-        meta: {
-          pageTitle: "Produkti",
-          breadcrumbStore: "tecdoc",
-        },
+        path: "/tecdoc",
+        name: "tecdoc",
+        redirect: {name: "tecdoc-car"},
+        children: [
+          {
+            path: "car/:makeId?/:modelId?",
+            name: "tecdoc-car",
+            component: () => import("@/views/tecdoc/Car.vue"),
+            meta: {
+              pageTitle: "Automašīna",
+              breadcrumbStore: "tecdoc",
+            },
+          },
+          {
+            path: "groups/:makeId/:modelId/:carId",
+            name: "tecdoc-groups",
+            component: () => import("@/views/tecdoc/Categories.vue"),
+            meta: {
+              pageTitle: "Produktu kategorijas",
+              breadcrumbStore: "tecdoc",
+            },
+          },
+          {
+            path: "parts/:makeId/:modelId/:carId/:groupId",
+            name: "tecdoc-parts",
+            component: () => import("@/views/tecdoc/Catalogue.vue"),
+            meta: {
+              pageTitle: "Produkti",
+              breadcrumbStore: "tecdoc",
+            },
+          },
+        ],
       },
       {
         path: "/product/search/:type?/:query?",
