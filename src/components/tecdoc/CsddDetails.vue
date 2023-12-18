@@ -38,12 +38,11 @@ export default defineComponent({
   },
   setup(props) {
     const carStore = useCarStore();
-    let initialData = carStore.data;
 
-    if (Object.keys(initialData).length == 0 && props.altDetails)
-      initialData = props.altDetails;
+    if (Object.keys(carStore.data).length == 0 && props.altDetails)
+      carStore.data = props.altDetails;
 
-    const carData = ref({ ...initialData });
+    const carData = ref(carStore.data);
 
     // Setup data watcher
     const dataWatcher = watch(
