@@ -7,11 +7,9 @@ export const useCarStore = defineStore({
   }),
   actions: {
     setVehicle(data: any) {
-      console.log("setVehicle");
       this.data = data;
     },
     unsetVehicle() {
-      console.log("unsetVehicle");
       this.data = {};
     },
   },
