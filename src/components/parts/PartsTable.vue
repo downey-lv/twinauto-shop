@@ -114,10 +114,10 @@ export default defineComponent({
     let dtOptions = getDtOptions(1);
     dtOptions["select"] = true;
     dtOptions["order"] = [
-      [10, "desc"],
-      [6, "desc"],
-      [0, "desc"],
-      [5, "desc"],
+      [10, "desc"], // Exact match
+      [6, "desc"], // Rest
+      [0, "desc"], // ID
+      [7, "desc"], // Rest supplier
     ];
 
     let existingFunction = dtOptions["initComplete"];
