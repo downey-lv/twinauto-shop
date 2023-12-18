@@ -54,7 +54,7 @@ import { useBreadcrumbStore } from "@/stores/breadcrumb";
 
 interface SelectedValue {
   selected: string;
-  options: Array<{value: number, label: string}>;
+  options: Array<{ value: number; label: string }>;
 }
 
 export default defineComponent({
@@ -144,22 +144,31 @@ export default defineComponent({
       this.selectValue(tableType, rowData[0][this.dtId[tableType]]);
     },
     updateBreadcrumbs(selectedValues) {
-
       const data = {};
       // Loop selectedValues
-      for (const [key, value] of Object.entries(selectedValues as {[key: string]: SelectedValue})) {
+      for (const [key, value] of Object.entries(
+        selectedValues as { [key: string]: SelectedValue }
+      )) {
         if (value.selected === "") continue;
 
         // Find selected in options
-        const selected = value.options.find((item) => item.value === parseInt(value.selected));
+        const selected = value.options.find(
+          (item) => item.value === parseInt(value.selected)
+        );
         if (selected) {
-          data[key + 'Id'] = selected.label;
+          data[key + "Id"] = selected.label;
         }
       }
 
       const breadcrumbStore = useBreadcrumbStore();
       breadcrumbStore.setBreadcrumbs("tecdoc-car", data);
-    }
+
+      // Add start page to breadcrumbs
+      breadcrumbStore.setBreadcrumbs("tecdoc", { null: "TecDoc" }, [
+        "tecdoc",
+        "tecdoc-car",
+      ]);
+    },
   },
 });
 </script>
