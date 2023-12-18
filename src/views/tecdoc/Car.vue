@@ -80,12 +80,12 @@ export default defineComponent({
       model: {
         favoured: "",
         modelname: "Modelis",
-        construction: "Ražošanas laiks",
+        construction: "Izlaiduma gads",
       },
       car: {
         favoured: "",
         carName: "Tips",
-        construction: "Ražošanas laiks",
+        construction: "Izlaiduma gads",
         power: "Jauda",
         cylinderCapacity: "Tilpums",
         motorCodes: "Motora kods",
