@@ -59,5 +59,41 @@ export const useBreadcrumbStore = defineStore({
       const entries = this.getBreadcrumbs();
       return entries[entries.length - 1];
     },
+    trimBreadcrumbs(index) {
+      // Do nothing if clicked on the last one
+      if (index === this.getBreadcrumbs().length - 1) return;
+
+      // Remove all breadcrumbs after the clicked one
+      const breadcrumbs = this.getBreadcrumbs();
+      breadcrumbs.splice(index + 1, breadcrumbs.length - index);
+
+      // Remove dropped names
+      const names = breadcrumbs.map((b) => b.name);
+      this.filterBreadcrumbs(names);
+
+      console.log(breadcrumbs);
+      console.log(this.breadcrumbs);
+
+      // Merge breadcrumbs by name and params arrays
+      const mergedBreadcrumbs = breadcrumbs.reduce((acc, b) => {
+        const key = b.name;
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key] = [...acc[key], ...b.params];
+        return acc;
+      }, {});
+
+      // Loop this.breadcrumbs (object of objects), match by keys and remove all params that are not in mergedBreadcrumbs
+      for (const [name, values] of Object.entries(this.breadcrumbs)) {
+        if (name in mergedBreadcrumbs) {
+          for (const [paramKey, value] of Object.entries(values)) {
+            if (!mergedBreadcrumbs[name].includes(paramKey)) {
+              delete this.breadcrumbs[name][paramKey];
+            }
+          }
+        }
+      }
+    },
   },
 });

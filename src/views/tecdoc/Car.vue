@@ -4,6 +4,7 @@
       <TecdocCarSelection
         widget-classes="mb-xl-8"
         @update:tecDocData="handleTecDocDataUpdate"
+        @update:selectedValues="updateBreadcrumbs"
         ref="tecdocRef"
       />
       <TecdocCarHistory widget-classes="mb-xl-8" />
@@ -49,6 +50,12 @@ import {
   transformDtSource,
 } from "@/assets/ts/layout/dtOptions";
 import TecdocCarHistory from "@/components/tecdoc/TecdocCarHistory.vue";
+import { useBreadcrumbStore } from "@/stores/breadcrumb";
+
+interface SelectedValue {
+  selected: string;
+  options: Array<{value: number, label: string}>;
+}
 
 export default defineComponent({
   name: "car-selection",
@@ -136,6 +143,23 @@ export default defineComponent({
       const tableType = dt.table().node().id;
       this.selectValue(tableType, rowData[0][this.dtId[tableType]]);
     },
+    updateBreadcrumbs(selectedValues) {
+
+      const data = {};
+      // Loop selectedValues
+      for (const [key, value] of Object.entries(selectedValues as {[key: string]: SelectedValue})) {
+        if (value.selected === "") continue;
+
+        // Find selected in options
+        const selected = value.options.find((item) => item.value === parseInt(value.selected));
+        if (selected) {
+          data[key + 'Id'] = selected.label;
+        }
+      }
+
+      const breadcrumbStore = useBreadcrumbStore();
+      breadcrumbStore.setBreadcrumbs("tecdoc-car", data);
+    }
   },
 });
 </script>

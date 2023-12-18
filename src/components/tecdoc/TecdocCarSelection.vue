@@ -109,6 +109,14 @@ export default defineComponent({
       emit("update:tecDocData", newValue); // Emitting the update to parent.
     });
 
+    const valueWatcher = watch(
+      list.value,
+      (newValue) => {
+        emit("update:selectedValues", newValue); // Emitting the update to parent.
+      },
+      { deep: true }
+    );
+
     onBeforeUnmount(() => {
       tdWatcher();
     });

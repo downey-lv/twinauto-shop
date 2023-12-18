@@ -42,6 +42,7 @@
               v-if="item.name && typeof item.name !== 'function'"
               :to="{ name: item.name, params: replaceParams(item) }"
               class="text-muted text-hover-primary"
+              @click="trimBreadcrumbs(i)"
             >
               {{ item.title }}
             </router-link>
@@ -119,6 +120,15 @@ export default defineComponent({
       }
     );
 
+    // Reset breadcrumbs when route changes
+    watch(
+        () => route.params,
+        (newValue) => {
+          if (Object.keys(newValue).length === 0)
+            breadcrumbStore.breadcrumbs = {};
+        }
+    )
+
     return {
       pageTitle,
       breadcrumbs,
@@ -137,6 +147,10 @@ export default defineComponent({
         }
       }
       return formattedParams;
+    },
+    trimBreadcrumbs(index) {
+      const breadcrumbStore = useBreadcrumbStore();
+      breadcrumbStore.trimBreadcrumbs(index);
     },
   },
 });
