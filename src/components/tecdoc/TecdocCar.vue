@@ -17,22 +17,14 @@
         </div>
         <div class="separator separator-dashed my-3"></div>
       </div>
+
       <template v-for="(item, index) in list" :key="index">
         <div class="d-flex flex-stack">
           <div class="text-gray-700 fw-semibold fs-6 me-2">{{ index }}</div>
           <div class="d-flex align-items-center">{{ item }}</div>
         </div>
       </template>
-      <div class="separator separator-dashed my-3"></div>
-      <template v-for="(item, index) in details" :key="index">
-        <div class="d-flex flex-stack">
-          <div class="text-gray-700 fw-semibold fs-6 me-2">{{ index }}</div>
-          <div class="d-flex align-items-center">
-            {{ item }}
-            <Copy :value="item" buttonClass="ms-2" trim-spaces font-size="3" />
-          </div>
-        </div>
-      </template>
+      <csddDetails :altDetails="details" />
     </div>
     <!--end::Body-->
   </div>
@@ -42,9 +34,9 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useRoute } from "vue-router";
-import Copy from "@/components/core/buttons/Copy.vue";
 import { useBreadcrumbStore } from "@/stores/breadcrumb";
 import ApiService from "@/core/services/ApiService";
+import csddDetails from "@/components/tecdoc/CsddDetails.vue";
 
 export default defineComponent({
   name: "tecdoc-car",
@@ -52,7 +44,7 @@ export default defineComponent({
     widgetClasses: String,
   },
   components: {
-    Copy,
+    csddDetails,
   },
   setup() {
     const loading = ref<boolean>(false);

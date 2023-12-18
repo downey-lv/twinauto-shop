@@ -53,19 +53,25 @@
           </div>
         </template>
       </el-form>
+      <csddDetails />
     </div>
     <!--end::Body-->
   </div>
   <!--end::List Widget 4-->
+  <csddModal ref="modalcsdd" />
 </template>
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import type { ElTable } from "element-plus";
 import ApiService from "@/core/services/ApiService";
+import { useCarStore } from "@/stores/car";
+import csddModal from "@/components/tecdoc/CsddModal.vue";
+import csddDetails from "@/components/tecdoc/CsddDetails.vue";
 
 export default defineComponent({
   name: "tecdoc-car-selection",
+  components: { csddDetails, csddModal },
   props: {
     widgetClasses: String,
     useDropdown: Boolean,
@@ -134,13 +140,18 @@ export default defineComponent({
       this.list[field]["selected"] = String(value);
       if (value !== "") this.handleDropdownChange(field, dropdown);
     },
-    setOptions(
-      field: string,
-      data: any = [],
-      selected: any = "",
-      dropdown: boolean = true
-    ) {
+    setOptions(field: string, data: any = [], dropdown: boolean = true) {
       this.list[field]["options"] = data.dropdown;
+
+      let selected = this.list[field]["selected"];
+      // If selected value is not in the list, set it to empty
+      if (
+        selected !== "" &&
+        !data.dropdown.some((item) => item.value === parseInt(selected))
+      ) {
+        selected = "";
+      }
+
       this.tecDocData = { type: field, data: data };
       this.setValue(field, selected, dropdown);
     },
@@ -210,6 +221,9 @@ export default defineComponent({
       }
     },
     findVIN() {
+      const carStore = useCarStore();
+
+      carStore.unsetVehicle();
       this.vinError = "";
       const vin = this.selectedVIN;
 
@@ -223,8 +237,11 @@ export default defineComponent({
         .then((response) => {
           const data = response.data;
 
+          if ("csdd" in data) carStore.setVehicle(data["csdd"]);
+
           if (data["car"].length == 0) {
-            this.vinError = "Nav rezultātu";
+            this.vinError = "Nav TecDoc rezultātu";
+            this.showcsdd();
           } else {
             let values = {};
 
@@ -254,12 +271,17 @@ export default defineComponent({
           }
         })
         .catch((error) => {
-          this.vinError = "Neizdevās ielādēt";
+          if (error.response?.data?.error)
+            this.vinError = error.response.data.error;
+          else this.vinError = "Neizdevās ielādēt";
           console.error("Error fetching data:", error);
         })
         .finally(() => {
           this.loading = false;
         });
+    },
+    showcsdd() {
+      (this.$refs.modalcsdd as any).show();
     },
   },
 });
