@@ -29,7 +29,6 @@ A15,130,0,e,1,1,N,"-Skaidra: {kase}"
 A15,165,0,e,1,1,N,"-Karte: {karte}"
 A15,200,0,e,1,1,N,"Atlikums: {cash}"
 A15,235,0,a,1,1,N,"{total}"
-P2,1
 `;
 
 export const labelService = {
@@ -111,7 +110,9 @@ export const labelService = {
       });
     };
 
-    return replacePlaceholders(revenue_template, data);
+    let result = replacePlaceholders(revenue_template, data);
+    result += "\nP1,2\n "; // Print - number of label sets, number of copies
+    return [result];
   },
   labelProduct: async function (data, params) {
     const replacePlaceholders = (template, data) => {
