@@ -111,7 +111,7 @@ export const labelService = {
     };
 
     let result = replacePlaceholders(revenue_template, data);
-    result += "\nP1,2\n "; // Print - number of label sets, number of copies
+    result += "\nP2,1\n "; // Print - number of label sets, number of copies
     return [result];
   },
   labelProduct: async function (data, params) {
