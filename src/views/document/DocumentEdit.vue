@@ -874,7 +874,7 @@ export default defineComponent({
 
     // Update payterm
     const updatePayterm = () => {
-      if (!document.value.orderdate || document.value.payterm) return;
+      if (!document.value.orderdate) return;
 
       const company = companies.value.find(
         (company) => company.id === document.value.companyid
