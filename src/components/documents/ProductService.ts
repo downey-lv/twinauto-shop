@@ -71,7 +71,7 @@ export class ProductService {
           name: "product-edit",
           params: { id: "new" },
           query: {
-            purchase: 1,
+            purchase: this.route.params.editId,
             productcode: match.code,
             producer: match.producer,
             producerid: match.producerId,

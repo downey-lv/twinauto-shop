@@ -775,6 +775,14 @@ export default defineComponent({
       this.loadTecDoc();
     }
   },
+  data() {
+    return {
+      lastPath: null as any,
+    };
+  },
+  created() {
+    this.lastPath = this.$router.options.history.state.back;
+  },
   methods: {
     submit() {
       if (!this.product) {
@@ -896,9 +904,25 @@ export default defineComponent({
       const windowStore = useWindowStore();
       windowStore.closeWindow(this.$route.path);
     },
+    removeImport() {
+      if (!this.lastPath) return null;
+
+      const url = new URL(this.lastPath, "https://as.twinauto.lv");
+      const params = new URLSearchParams(url.search);
+
+      // Remove 'import' parameter
+      params.delete("import");
+
+      // Return the modified path
+      return url.pathname + (params.toString() ? "?" + params.toString() : "");
+    },
     closeProduct() {
       this.destroyWindow();
-      this.$router.go(-1);
+
+      // Avoid reseting import in purchase
+      const modifiedPath = this.removeImport();
+      if (modifiedPath) this.$router.replace(modifiedPath);
+      else this.$router.go(-1);
     },
     loadTecDoc(ean = false) {
       let productCode = this.product.productcode;
