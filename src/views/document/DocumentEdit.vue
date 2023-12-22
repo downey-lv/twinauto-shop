@@ -127,6 +127,21 @@
                     />
                   </el-form-item>
                 </div>
+                <div class="fv-row" v-if="$route.params.type === 'in' && $route.params.editId === 'new'">
+                  <label class="fs-6">Piegādes izdevumi, bez PVN</label>
+                  <el-form-item>
+                    <el-input-number
+                        v-model="document.deliveryCost"
+                        :controls="false"
+                        :precision="4"
+                        @keydown.enter.prevent
+                        class="w-100"
+                    />
+                    <div class="fs-7 fw-semibold text-muted">
+                      Pēc saglabāšanas pārbaudi kopsummu
+                    </div>
+                  </el-form-item>
+                </div>
               </div>
               <div class="col-lg">
                 <div class="fv-row">
@@ -641,7 +656,7 @@ export default defineComponent({
 
     // Calculate document totals
     const totalPrice = computed(() =>
-      calculateTotalPrice(document.value.products)
+      calculateTotalPrice(document.value.products, document.value.deliveryCost)
     );
     const totalPriceVAT = computed(() =>
       calculateTotalPriceVAT(totalPrice.value, vatDecimal.value)

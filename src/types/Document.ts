@@ -49,6 +49,7 @@ export interface Document {
   grouping?: string;
   links?: DocumentLinks;
   returnid?: string;
+  deliveryCost?: number;
 }
 
 interface DocumentLinks {

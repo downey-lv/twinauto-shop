@@ -6,13 +6,20 @@ function customRounding(value) {
   return new Decimal(rounded).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
 }
 
-export const calculateTotalPrice = (products) => {
-  return products.reduce((sum, product) => {
+export const calculateTotalPrice = (products, deliveryCost: number | undefined = undefined) => {
+  const total = products.reduce((sum, product) => {
     const productTotal = new Decimal(product.price ?? 0).times(
       product.quantity ?? 0
     );
     return sum.plus(productTotal);
-  }, new Decimal(0)); // Keep as Decimal until you need to display it
+  }, new Decimal(0));
+
+  console.log(deliveryCost);
+  if (deliveryCost) {
+    console.log("calculate");
+    return total.plus(deliveryCost);
+  }
+  return total;
 };
 
 export const calculateTotalPriceVAT = (
@@ -33,7 +40,7 @@ export const calculatePriceVAT = (product, vatDecimal) => {
   return computed({
     get: () => {
       return customRounding(
-        new Decimal(product.price).times(vatDecimal.value)
+        new Decimal(product.price ?? 0).times(vatDecimal.value)
       ).toNumber();
     },
     set: (newValue) => {
@@ -49,7 +56,7 @@ export const calculateTotal = (product, vatDecimal) => {
   return computed({
     get: () => {
       return customRounding(
-        new Decimal(product.price)
+        new Decimal(product.price ?? 0)
           .times(vatDecimal.value)
           .times(product.quantity)
       ).toNumber();
