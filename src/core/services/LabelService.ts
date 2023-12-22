@@ -3,6 +3,7 @@ import { push } from "@/main";
 
 const shop_template = `
 N
+ZB
 q464
 Q320,16
 GG50,0,"twin"
@@ -17,6 +18,7 @@ B290,240,0,1,2,6,42,B,"{productidstr}"
 
 const revenue_template = `
 N
+ZB
 q464
 Q320,16
 A15,5,0,a,1,1,N,"{workstation}"
