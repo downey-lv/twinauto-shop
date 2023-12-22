@@ -158,7 +158,7 @@
                   @keydown.enter.prevent="loadTecDoc(true)"
                 />
                 <div class="fs-7 fw-semibold text-muted">
-                  Lai meklētu, ievadi EAN svītrkodu un nospiediet Enter
+                  Lai meklētu, ievadi EAN svītrkodu un nospied Enter
                 </div>
               </el-form-item>
             </div>
