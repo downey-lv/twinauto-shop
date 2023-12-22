@@ -1,8 +1,5 @@
-import qz from "qz-tray";
-import axios from "axios";
-
-let qzInstance: typeof qz;
-const API_URL = import.meta.env.VITE_APP_API_URL;
+import ApiService from "@/core/services/ApiService";
+import { push } from "@/main";
 
 const shop_template = `
 N
@@ -32,61 +29,9 @@ A15,235,0,a,1,1,N,"{total}"
 `;
 
 export const labelService = {
-  connect: function () {
-    if (!qzInstance) {
-      // Set signing
-      qz.security.setCertificatePromise(function (resolve, reject) {
-        axios
-          .get(API_URL + "/qz/certificate")
-          .then(function (response) {
-            resolve(response.data);
-          })
-          .catch(function (error) {
-            reject(error);
-          });
-      });
-
-      qz.security.setSignatureAlgorithm("SHA512"); // Since 2.1
-      qz.security.setSignaturePromise(function (toSign) {
-        return function (resolve, reject) {
-          fetch(API_URL + "/qz/sign?request=" + toSign, {
-            cache: "no-store",
-            headers: { "Content-Type": "text/plain" },
-          }).then(function (data) {
-            data.ok ? resolve(data.text()) : reject(data.text());
-          });
-        };
-      });
-
-      return qz.websocket.connect().then(() => {
-        qzInstance = qz; // Storing the connected instance
-        return qzInstance;
-      });
-    } else {
-      return Promise.resolve(qzInstance); // If already connected, use the existing instance
-    }
-  },
-  getPrinter: function (printerName) {
-    return this.connect().then(() => {
-      if (qzInstance) {
-        return qzInstance.printers.find(printerName);
-      } else {
-        throw new Error("Failed to establish connection with QZ.");
-      }
-    });
-  },
   print: async function (type, data, params = {}) {
-    // Set printer
-    const printerName = "ZDesigner ZD420";
-    const printer = await this.getPrinter(printerName);
-
-    // Check if QZ is connected
-    if (!qzInstance) throw new Error("QZ is not connected.");
-
-    // Create print config
-    const config = qzInstance.configs.create(printer);
-
     let label;
+    let labelsPerRow = 1;
     // Set label
     switch (type) {
       case "product":
@@ -94,13 +39,26 @@ export const labelService = {
         break;
       case "revenue":
         label = await this.labelRevenue(data);
+        labelsPerRow = 2;
         break;
       default:
         throw new Error("Unknown label type.");
     }
 
+    const count = label.length * labelsPerRow;
+
+    // Send to print server
+    await ApiService.post("api/print", { data: label })
+      .then(() => {
+        push.info(`Izdrukātas ${count} uzlīmes`);
+      })
+      .catch((error) => {
+        console.error(error);
+        push.error("Neizdevās izdrukāt uzlīmes");
+      });
+
     // Print
-    return qzInstance.print(config, label);
+    // return qzInstance.print(config, label);
   },
   labelRevenue: async function (data) {
     const replacePlaceholders = (template, data) => {

@@ -875,10 +875,6 @@ export default defineComponent({
 
       try {
         await labelService.print("product", [this.p.shop], params);
-        push.info("Uzlīme izdrukāta");
-      } catch (e) {
-        console.error(e);
-        push.error("Neizdevās izdrukāt");
       } finally {
         this.toggleButtonState(el, false);
       }

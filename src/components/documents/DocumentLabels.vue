@@ -137,7 +137,6 @@ export default defineComponent({
         }
 
         await labelService.print("product", products, params);
-        push.info(`Izdrukātas ${products.length} uzlīmes`);
         this.hide();
       } catch (e) {
         console.error(e);

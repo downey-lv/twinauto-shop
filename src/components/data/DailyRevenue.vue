@@ -155,10 +155,6 @@ export default defineComponent({
 
       try {
         await labelService.print("revenue", this.data);
-        push.info("Uzlīme izdrukāta");
-      } catch (e) {
-        console.error(e);
-        push.error("Neizdevās izdrukāt uzlīmes");
       } finally {
         el.innerHTML = value;
       }

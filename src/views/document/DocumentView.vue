@@ -297,6 +297,7 @@ import { useBreadcrumbStore } from "@/stores/breadcrumb";
 import { removeTooltip } from "@/core/helpers/dom";
 import { DateTime } from "luxon";
 import PaymentModal from "@/components/documents/PaymentModal.vue";
+import { useAuthStore } from "@/stores/auth";
 
 const breadcrumbStore = useBreadcrumbStore();
 
@@ -415,6 +416,10 @@ export default defineComponent({
 
     // Set back button
     const lastBreadcrumb = breadcrumbStore.getLastEntry();
+
+    // Set permissions
+    const auth = useAuthStore();
+    console.log(auth.user);
 
     return {
       loading,
