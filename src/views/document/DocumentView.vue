@@ -280,7 +280,11 @@
   </div>
 
   <DocumentLabelsModal ref="modalLabels" :pData="document.products" />
-  <PaymentModal ref="modalPayment" :pData="document" />
+  <PaymentModal
+    ref="modalPayment"
+    :pData="document"
+    @refresh="fetchDocument()"
+  />
 </template>
 
 <script lang="ts">
