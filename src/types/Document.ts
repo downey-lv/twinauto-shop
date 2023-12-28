@@ -50,6 +50,7 @@ export interface Document {
   links?: DocumentLinks;
   returnid?: string;
   deliveryCost?: number;
+  balance_due?: number;
 }
 
 interface DocumentLinks {
