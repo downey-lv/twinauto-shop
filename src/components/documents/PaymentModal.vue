@@ -182,6 +182,7 @@ export default defineComponent({
     const payments = ref([]);
     function loadData() {
       formData.value = { ...blankForm };
+
       // Load payments
       ApiService.get("payment", props.pData.orderid)
         .then((response) => {
@@ -191,6 +192,16 @@ export default defineComponent({
         .catch((error) => {
           console.error(`Error fetching data from payments:`, error);
           push.error(`Neizdevās ielādēt maksājumus`);
+        });
+
+      // Load balance
+      ApiService.get("payment/balance", props.pData.orderid)
+        .then((response) => {
+          formData.value.amount = response.data[0]?.balance_due ?? 0;
+        })
+        .catch((error) => {
+          console.error(`Error fetching data from balance:`, error);
+          push.error(`Neizdevās ielādēt atlikumu`);
         });
     }
 
