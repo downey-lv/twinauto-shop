@@ -75,42 +75,47 @@
 
             <div class="separator separator-dashed my-6"></div>
             <h4 class="mb-5">Pievienot maksājumu</h4>
-            <el-form
-              @submit.prevent="submit()"
-              :model="formData"
-              :rules="rules"
-              @keydown.enter.prevent
-              ref="formRef"
-              label-width="120px"
-            >
-              <el-form-item prop="amount" label="Maksājums, €">
-                <el-input-number
-                  v-model="formData.amount"
-                  :step="0.01"
-                  class="w-75"
-                />
-              </el-form-item>
-              <el-form-item prop="amount" label="Apmaksas veids">
-                <SelectComponent
-                  :options="paymentTypes"
-                  v-model="formData.type"
-                  prop="type"
-                  class="w-75"
-                />
-              </el-form-item>
-              <el-form-item prop="amount" label="Darba vieta">
-                <SelectComponent
-                  :options="paymentRecipients"
-                  v-model="formData.recipient"
-                  prop="recipient"
-                  class="w-75"
-                />
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click="submit">Pievienot</el-button>
-                <el-button @click="hide()">Atcelt</el-button>
-              </el-form-item>
-            </el-form>
+            <template v-if="allowEdit">
+              <el-form
+                @submit.prevent="submit()"
+                :model="formData"
+                :rules="rules"
+                @keydown.enter.prevent
+                ref="formRef"
+                label-width="120px"
+              >
+                <el-form-item prop="amount" label="Maksājums, €">
+                  <el-input-number
+                    v-model="formData.amount"
+                    :step="0.01"
+                    class="w-75"
+                  />
+                </el-form-item>
+                <el-form-item prop="amount" label="Apmaksas veids">
+                  <SelectComponent
+                    :options="paymentTypes"
+                    v-model="formData.type"
+                    prop="type"
+                    class="w-75"
+                  />
+                </el-form-item>
+                <el-form-item prop="amount" label="Darba vieta">
+                  <SelectComponent
+                    :options="paymentRecipients"
+                    v-model="formData.recipient"
+                    prop="recipient"
+                    class="w-75"
+                  />
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click="submit"
+                    >Pievienot</el-button
+                  >
+                  <el-button @click="hide()">Atcelt</el-button>
+                </el-form-item>
+              </el-form>
+            </template>
+            <p v-else class="mb-5">Apmaksa jāpievieno VIDe</p>
           </div>
           <!--end::Modal body-->
         </el-form>
@@ -121,7 +126,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
+import { computed, defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
@@ -178,6 +183,14 @@ export default defineComponent({
         modal.hide();
       }
     };
+
+    // Allow edit
+    const allowEdit = computed(() => {
+      return (
+        !props.pData.links ||
+        !Object.values(props.pData.links).some((value) => value !== null)
+      );
+    });
 
     const payments = ref([]);
     function loadData() {
@@ -268,6 +281,7 @@ export default defineComponent({
       formData,
       paymentTypes,
       paymentRecipients,
+      allowEdit,
     };
   },
 
