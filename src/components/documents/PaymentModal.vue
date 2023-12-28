@@ -220,7 +220,7 @@ export default defineComponent({
 
     function loadHelpers() {
       // Load types
-      ApiService.get("payment", "types")
+      ApiService.get("payment", `types?ordertypeid=${props.pData.ordertypeid}`)
         .then((response) => {
           paymentTypes.value = response.data;
         })
