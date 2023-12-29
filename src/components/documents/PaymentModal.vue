@@ -223,6 +223,13 @@ export default defineComponent({
       ApiService.get("payment", `types?ordertypeid=${props.pData.ordertypeid}`)
         .then((response) => {
           paymentTypes.value = response.data;
+
+          // Pre-select type
+          if (props.pData.ordertypeid === "3") {
+            // Atgriešana piegādātājam
+            formData.value.type = "5"; // Pārskaitījums
+            formData.value.recipient = "3"; // Ofiss
+          }
         })
         .catch((error) => {
           console.error(`Error fetching data from types:`, error);
