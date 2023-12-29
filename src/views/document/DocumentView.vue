@@ -216,7 +216,7 @@
             <div class="col-5 fw-bold">Summa ar PVN</div>
             <div class="col">{{ totalPriceVAT }} €</div>
           </div>
-          <div class="row" v-if="document.balance_due > 0">
+          <div class="row" v-if="(document.balance_due ?? 0) > 0">
             <div class="col-5 fw-bold">Apmaksai</div>
             <div class="col">{{ document.balance_due }} €</div>
           </div>
