@@ -252,11 +252,33 @@ export default defineComponent({
       idWatcher();
     });
 
+    const typeValidator = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(""));
+      } else if (formData.value.recipient !== "") {
+        ApiService.get("payment", "validate/", {
+          type: value,
+          recipient: formData.value.recipient,
+        })
+          .then((response) => {
+            if (response.data.allowed) callback();
+            else
+              callback(
+                new Error("Apmaksas veids nav atļauts šai darba vietai")
+              );
+          })
+          .catch(() => {
+            callback(new Error("Neizdevās pārbaudīt apmaksas veidu"));
+          });
+      } else {
+        callback();
+      }
+    };
+
     const rules = ref({
       type: [
         {
-          required: true,
-          message: "",
+          validator: typeValidator,
           trigger: "change",
         },
       ],
