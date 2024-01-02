@@ -132,7 +132,7 @@ export default defineComponent({
         ordertypename: "Veids",
         waybillno: "Dokumenta nr.",
         comment: "Komentārs",
-        amountwithvat: "Summa",
+        amount_payable: "Summa",
         is_paid: "Apmaksāts",
       },
     };
@@ -145,7 +145,7 @@ export default defineComponent({
         orderdate: {
           width: "100px",
         },
-        amountwithvat: {
+        amount_payable: {
           width: "85px",
         },
         companyname: {
