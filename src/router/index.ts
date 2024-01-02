@@ -167,7 +167,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/client",
         name: "client",
-        redirect: { name: "client-list" },
+        redirect: { name: "client-list", params: { clientType: "suppliers" } },
         children: [
           {
             path: "list/:clientType?",
