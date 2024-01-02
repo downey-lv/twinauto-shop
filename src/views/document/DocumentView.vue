@@ -219,7 +219,7 @@
         <div class="col-lg">
           <div class="row">
             <div class="col-5 fw-bold">Summa bez PVN</div>
-            <div class="col">{{ totalPrice.toNumber() }} €</div>
+            <div class="col">{{ totalPrice.toNumber().toFixed(2) }} €</div>
           </div>
           <div class="row">
             <div class="col-5 fw-bold">PVN, {{ document.vat }}%</div>
@@ -229,10 +229,13 @@
             <div class="col-5 fw-bold">Summa ar PVN</div>
             <div class="col">{{ totalPriceVAT }} €</div>
           </div>
-          <div class="row" v-if="(document.balance_due ?? 0) > 0">
+          <template v-if="(document.balance_due ?? 0) > 0">
+            <div class="separator my-2"></div>
+          <div class="row">
             <div class="col-5 fw-bold">Apmaksai</div>
             <div class="col">{{ document.balance_due }} €</div>
           </div>
+          </template>
         </div>
       </div>
     </div>
