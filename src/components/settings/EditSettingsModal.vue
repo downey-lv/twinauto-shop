@@ -54,6 +54,23 @@
                 />
               </div>
 
+              <div class="d-flex flex-stack mb-8">
+                <div class="me-5">
+                  <label class="fs-6">Rādīt e-veikalā</label>
+                </div>
+                <label
+                  class="form-check form-switch form-check-custom form-check-solid"
+                >
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    value="1"
+                    v-model="formData.enabled_in_web"
+                  />
+                </label>
+                <!--end::Switch-->
+              </div>
+
               <div class="d-flex flex-column align-items-center">
                 <el-upload
                   accept="image/*"
