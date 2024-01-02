@@ -23,7 +23,9 @@
       </div>
       <div class="card-body pt-3 pb-5 d-flex flex-column">
         <span class="p-2">Datums: {{ returnDoc.date }}</span>
-        <span class="p-2" v-if="returnDoc.companyname">Klients: {{ returnDoc.companyname }}</span>
+        <span class="p-2" v-if="returnDoc.companyname"
+          >Klients: {{ returnDoc.companyname }}</span
+        >
         <span class="p-2"
           >Statuss:
           <span :class="'ms-2 badge badge-' + returnDoc.status.bg">{{
