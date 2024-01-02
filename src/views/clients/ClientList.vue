@@ -1,9 +1,6 @@
 <template>
   <ClientHeader />
-  <ClientTable
-    v-if="clientType && clientType !== 'all'"
-    :type="clientType"
-  />
+  <ClientTable v-if="clientType && clientType !== 'all'" :type="clientType" />
 </template>
 
 <script lang="ts">
@@ -21,7 +18,7 @@ export default defineComponent({
     const route = useRoute();
 
     const clientType = computed(() => {
-      return String(route.params.type) || "";
+      return String(route.params.clientType || "");
     });
 
     return { clientType };

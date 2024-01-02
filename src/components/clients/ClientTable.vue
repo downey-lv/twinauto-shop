@@ -9,6 +9,7 @@
         :options="dtOptions"
         class="table table-sm table-hover table-row-bordered gy-5 align-middle"
         :key="tabsKey"
+        @select="onSelect"
       >
         <thead>
           <tr class="fw-bolder text-dark p-4">
@@ -24,7 +25,11 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { getDtOptions, transformDtSource } from "@/assets/ts/layout/dtOptions";
+import {
+  getDtOptions,
+  handleSelect,
+  transformDtSource,
+} from "@/assets/ts/layout/dtOptions";
 import ApiService from "@/core/services/ApiService";
 
 export default defineComponent({
@@ -76,6 +81,7 @@ export default defineComponent({
 
     // Define datatable
     let dtOptions = getDtOptions(1);
+    dtOptions["select"] = true;
     dtOptions["order"] = [[0, "desc"]];
 
     let dtSource = {
@@ -97,6 +103,18 @@ export default defineComponent({
       loading,
       tabsKey,
     };
+  },
+  methods: {
+    onSelect(e, dt, type, indexes) {
+      this.loading = true;
+      const rowData = handleSelect(dt, indexes);
+      const clientId = rowData[0].companyid;
+
+      this.$router.push({
+        name: "client-view",
+        params: { clientId: clientId },
+      });
+    },
   },
 });
 </script>

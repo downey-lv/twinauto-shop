@@ -26,7 +26,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/tecdoc",
         name: "tecdoc",
-        redirect: {name: "tecdoc-car"},
+        redirect: { name: "tecdoc-car" },
         children: [
           {
             path: "car/:makeId?/:modelId?",
@@ -165,13 +165,29 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/clients/:type?",
-        name: "clients",
-        component: () => import("@/views/clients/ClientList.vue"),
-        meta: {
-          pageTitle: "Klienti",
-          breadcrumbs: [],
-        },
+        path: "/client",
+        name: "client",
+        redirect: { name: "client-list" },
+        children: [
+          {
+            path: "list/:clientType?",
+            name: "client-list",
+            component: () => import("@/views/clients/ClientList.vue"),
+            meta: {
+              pageTitle: "Klienti",
+              breadcrumbs: [],
+            },
+          },
+          {
+            path: ":clientId",
+            name: "client-view",
+            component: () => import("@/views/clients/ClientView.vue"),
+            meta: {
+              pageTitle: "Klienti",
+              breadcrumbs: [],
+            },
+          },
+        ],
       },
       {
         path: "/purchase/",

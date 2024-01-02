@@ -37,7 +37,7 @@ const MainMenuConfig: Array<MenuItem> = [
   },
   {
     heading: "Klienti",
-    route: "/clients/",
+    route: "/client/",
     faIcon: "users",
   },
   {

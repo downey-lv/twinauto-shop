@@ -159,7 +159,20 @@
           </div>
           <div class="row">
             <div class="col-5 fw-bold">Klients</div>
-            <div class="col">{{ document.companyname }}</div>
+            <div class="col">
+              {{ document.companyname }}
+              <router-link
+                v-if="document.companyid"
+                :to="{
+                  name: 'client-view',
+                  params: { clientId: document.companyid },
+                }"
+                title="Atvērt klientu"
+                v-tooltip
+              >
+                <i class="fa-solid fa-eye"></i>
+              </router-link>
+            </div>
           </div>
           <div class="row">
             <div class="col-5 fw-bold">Dokumenta numurs</div>

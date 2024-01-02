@@ -55,6 +55,10 @@ export default defineComponent({
       type: Boolean,
       required: false,
     },
+    clientId: {
+      type: String,
+      required: false,
+    },
   },
   setup(props) {
     const loading = ref<boolean>(false);
@@ -70,6 +74,7 @@ export default defineComponent({
           ApiService.get("document/list", props.type, {
             returnId: props.returnId,
             returnClient: props.returnClient,
+            clientId: props.clientId,
             ...queryInfo,
           })
             .then((response) => {
@@ -181,6 +186,7 @@ export default defineComponent({
     onSelect(e, dt, type, indexes) {
       this.loading = true;
       const rowData = handleSelect(dt, indexes);
+      const grouping = rowData[0].grouping;
       const documentId = rowData[0].orderid;
 
       const returnId = this.$props.returnId ?? rowData[0].return_id;
@@ -192,10 +198,18 @@ export default defineComponent({
         });
       } else {
         // Route to standard document view
-        this.$router.push({
+        const route = {
           name: "document-view",
-          params: { type: this.$route.params.type, documentId: documentId },
-        });
+          params: { type: grouping, documentId: documentId },
+          query: {},
+        };
+
+        // Enable back button for client view
+        if (this.$props.clientId) {
+          route.query = { enableBack: 1 };
+        }
+
+        this.$router.push(route);
       }
     },
   },

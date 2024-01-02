@@ -9,7 +9,7 @@
         >
           <li class="nav-item" v-for="(item, index) in menu" :key="index">
             <router-link
-              :to="item.path"
+              :to="`/client/list/${item.path}`"
               class="nav-link text-active-primary me-6"
               active-class="active"
             >
@@ -35,11 +35,11 @@ export default defineComponent({
     const menu = [
       {
         title: "Piegādātāji",
-        path: "/clients/suppliers",
+        path: "suppliers",
       },
       {
         title: "Pircēji",
-        path: "/clients/buyers",
+        path: "buyers",
       },
     ];
 
