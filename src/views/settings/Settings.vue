@@ -267,6 +267,26 @@ export default defineComponent({
             return data;
           },
         },
+        tecdoc_name: {
+          render: function (data, type, row) {
+            if (!row.enabled_in_web) {
+              const value = data ?? "";
+              return `${value} <span class="badge badge-danger ms-2">nerādīt e-veikalā</span>`;
+            }
+
+            if (!data) return data;
+
+            if (data.includes("(nav TecDoc)")) {
+              const parts = data.split("(nav TecDoc)");
+              return `${parts[0]} <span class="badge badge-primary ms-2">nav TecDoc ražotājs</span>`;
+            } else if (data.includes("(nav TecDoc licence)")) {
+              const parts = data.split("(nav TecDoc licence)");
+              return `${parts[0]} <span class="badge badge-info ms-2">nav TecDoc licence</span>`;
+            }
+
+            return data;
+          },
+        },
       },
       location: {},
       group: {},
