@@ -1,4 +1,5 @@
 import ApiService from "@/core/services/ApiService";
+import axios from "axios";
 
 export class ProductService {
   document: any;
@@ -7,6 +8,7 @@ export class ProductService {
   route: any;
   router: any;
   returnDocument: boolean;
+  cancelToken: any;
 
   constructor(
     document,
@@ -22,9 +24,18 @@ export class ProductService {
     this.route = route;
     this.router = router;
     this.returnDocument = returnDocument;
+    this.cancelToken = null;
   }
 
   searchProduct(type, idx, extendedHistory = false) {
+    // Cancel the previous request if it exists
+    if (this.cancelToken) {
+      this.cancelToken.cancel("Canceled due to new request");
+    }
+
+    // Create a new cancel token for this request
+    this.cancelToken = axios.CancelToken.source();
+
     const product = this.document.value.products[idx];
     if (!product) return;
 
@@ -46,12 +57,18 @@ export class ProductService {
     if (extendedHistory) queryParams["extendedHistory"] = 1;
 
     this.stateRefs.loadingProduct.value[idx] = true;
-    ApiService.get("product/find", `${type}/${query}`, queryParams)
+    ApiService.get("product/find", `${type}/${query}`, queryParams, {
+      cancelToken: this.cancelToken.token,
+    })
       .then((response) => {
         this.addMatch(product, response.data);
       })
       .catch((error) => {
-        console.error("Error fetching data:", error);
+        if (axios.isCancel(error)) {
+          console.log(error.message);
+        } else {
+          console.error("Error fetching data:", error);
+        }
       })
       .finally(() => {
         this.stateRefs.loadingProduct.value[idx] = false;
