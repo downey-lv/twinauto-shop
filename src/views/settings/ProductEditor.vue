@@ -45,16 +45,16 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column property="productidstr" label="ID" />
-        <el-table-column property="productcode" label="Kods" />
-        <el-table-column property="producer" label="Ražotājs" />
-        <el-table-column label="Nosaukums" width="350">
+        <el-table-column property="productidstr" label="ID" sortable />
+        <el-table-column property="productcode" label="Kods" sortable />
+        <el-table-column property="producer" label="Ražotājs" sortable />
+        <el-table-column label="Nosaukums" width="350" sortable>
           <template #default="scope">
             <span v-html="scope.row.productname.replace(/\n/g, '<br/>')"></span>
           </template>
         </el-table-column>
-        <el-table-column property="productgroup" label="Grupa" />
-        <el-table-column property="locations" label="Novietnes" />
+        <el-table-column property="productgroup" label="Grupa" sortable />
+        <el-table-column property="locations" label="Novietnes" sortable />
       </el-table>
     </div>
   </div>
