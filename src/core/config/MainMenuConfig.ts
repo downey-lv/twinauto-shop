@@ -63,7 +63,9 @@ const MainMenuConfig: Array<MenuItem> = [
       },
     ],
   },
+];
 
+const devMenu: Array<MenuItem> = [
   {
     sectionTitle: "craft",
     route: "/crafted",
@@ -357,5 +359,9 @@ const MainMenuConfig: Array<MenuItem> = [
     ],
   },
 ];
+
+if (import.meta.env.MODE === "development") {
+  MainMenuConfig.push(...devMenu);
+}
 
 export default MainMenuConfig;
