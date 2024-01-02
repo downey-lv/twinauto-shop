@@ -3,16 +3,16 @@
     <div class="card-body">
       <DataTable
         ref="table"
-        id="documents"
-        :columns="dt.documents.columns"
-        :data="documents"
+        id="clients"
+        :columns="dt.clients.columns"
+        :data="clients"
         :options="dtOptions"
         class="table table-sm table-hover table-row-bordered gy-5 align-middle"
         :key="tabsKey"
       >
         <thead>
           <tr class="fw-bolder text-dark p-4">
-            <th v-for="(header, index) in dt.documents.headers" :key="index">
+            <th v-for="(header, index) in dt.clients.headers" :key="index">
               {{ header }}
             </th>
           </tr>
@@ -36,16 +36,16 @@ export default defineComponent({
   },
   setup(props) {
     const loading = ref<boolean>(false);
-    const documents = ref();
+    const clients = ref();
     const tabsKey = ref(0);
 
     // Setup data load
     const loadData = async () => {
       if (props.type) {
         loading.value = true;
-        ApiService.get("document/list", props.type)
+        ApiService.get("company/list", props.type)
           .then((response) => {
-            documents.value = response.data;
+            clients.value = response.data;
             tabsKey.value += 1;
           })
           .catch((error) => {
@@ -79,39 +79,18 @@ export default defineComponent({
     dtOptions["order"] = [[0, "desc"]];
 
     let dtSource = {
-      documents: {
-        orderid: "ID",
-        orderdate: "Datums",
-        client: "Klients",
-        ordertypename: "Veids",
-        waybillno: "Dokumenta nr.",
-        comment: "Komentārs",
-        countsum: "Preču skaits",
-        amountwithvat: "Summa",
+      clients: {
+        companyid: "ID",
+        companyname: "Nosaukums",
+        nmrno: "Reģ. nr.",
+        pvnno: "PVN nr.",
       },
     };
 
-    const columnOptions = {
-      documents: {
-        orderdate: {
-          width: "100px",
-        },
-        amountwithvat: {
-          width: "85px",
-        },
-        client: {
-          width: "250px",
-        },
-        ordertypename: {
-          width: "180px",
-        },
-      },
-    };
-
-    const dt = transformDtSource(dtSource, columnOptions);
+    const dt = transformDtSource(dtSource);
 
     return {
-      documents,
+      clients,
       dtSource,
       dtOptions,
       dt,
