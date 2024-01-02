@@ -231,10 +231,10 @@
           </div>
           <template v-if="(document.balance_due ?? 0) > 0">
             <div class="separator my-2"></div>
-          <div class="row">
-            <div class="col-5 fw-bold">Apmaksai</div>
-            <div class="col">{{ document.balance_due }} €</div>
-          </div>
+            <div class="row">
+              <div class="col-5 fw-bold">Apmaksai</div>
+              <div class="col">{{ document.balance_due }} €</div>
+            </div>
           </template>
         </div>
       </div>
