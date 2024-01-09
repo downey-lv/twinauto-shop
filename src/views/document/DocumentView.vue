@@ -441,10 +441,6 @@ export default defineComponent({
     // Set back button
     const lastBreadcrumb = breadcrumbStore.getLastEntry();
 
-    // Set permissions
-    const auth = useAuthStore();
-    console.log(auth.user);
-
     return {
       loading,
       document,
@@ -497,6 +493,13 @@ export default defineComponent({
     },
     lockDocument(isLocked: boolean) {
       removeTooltip();
+
+      // Check permissions
+      const auth = useAuthStore();
+      if (!auth.user?.permissions?.includes("unlocking")) {
+        push.error("Nav atļaujas mainīt dokumenta statusu");
+        return;
+      }
 
       const id = this.$route.params.documentId;
       const action = isLocked ? "unlock" : "lock";

@@ -7,8 +7,10 @@
           <TecdocCarSelection widget-classes="card-xl-stretch" use-dropdown />
         </div>
         <div class="col-xl-6">
-          <DailyRevenue type="V1" />
-          <DailyRevenue type="V2" />
+          <template v-if="revenueAllowed">
+            <DailyRevenue type="V1" />
+            <DailyRevenue type="V2" />
+          </template>
         </div>
       </div>
     </div>
@@ -24,6 +26,8 @@ import TecdocCarSelection from "@/components/tecdoc/TecdocCarSelection.vue";
 import SearchBox from "@/components/parts/SearchBox.vue";
 import DailyRevenue from "@/components/data/DailyRevenue.vue";
 import OnlineOrders from "@/components/data/OnlineOrders.vue";
+import { useAuthStore } from "@/stores/auth";
+import { push } from "@/main";
 
 export default defineComponent({
   name: "dashboard-main",
@@ -32,6 +36,14 @@ export default defineComponent({
     TecdocCarSelection,
     DailyRevenue,
     OnlineOrders,
+  },
+  setup() {
+    const auth = useAuthStore();
+    const revenueAllowed = auth.user?.permissions?.includes("daily_revenue");
+
+    return {
+      revenueAllowed,
+    };
   },
 });
 </script>
