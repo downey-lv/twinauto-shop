@@ -61,7 +61,7 @@ export const useAuthStore = defineStore("auth", () => {
         .catch(({ response }) => {
           if (response?.data?.errors) setError(response.data.errors);
           else setError(["Nav savienojuma ar serveri"]);
-          purgeAuth();
+          purgeAuth(true);
         });
     } else {
       purgeAuth();
