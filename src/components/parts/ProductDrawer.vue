@@ -220,6 +220,14 @@
                           >Kopēt</a
                         >
                       </li>
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          @click.prevent="showLog()"
+                          >Izmaiņas</a
+                        >
+                      </li>
                     </ul>
                   </div>
 
@@ -593,6 +601,13 @@
     <!--end::Card-->
   </div>
   <!--end::Help drawer-->
+
+  <LogModal
+    v-if="p?.productid"
+    ref="modalLog"
+    logType="product"
+    :logID="String(p?.productid)"
+  />
 </template>
 
 <style scoped>
@@ -638,9 +653,11 @@ import { labelService } from "@/core/services/LabelService";
 import { push } from "@/main";
 import ApiService from "@/core/services/ApiService";
 import type { Product } from "@/types/Product";
+import LogModal from "@/components/data/LogModal.vue";
 
 export default defineComponent({
   components: {
+    LogModal,
     Notice,
     Copy,
     Search,
@@ -917,6 +934,9 @@ export default defineComponent({
         .finally(() => {
           this.toggleButtonState(el, false);
         });
+    },
+    showLog() {
+      (this.$refs.modalLog as any).show();
     },
   },
 });
