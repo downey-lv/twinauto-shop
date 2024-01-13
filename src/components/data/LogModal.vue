@@ -173,7 +173,11 @@ export default defineComponent({
       return row[property] === value;
     },
     getChanges(item) {
-      return diffChars(item.from || "", item.to || "");
+      try {
+        return diffChars(item.from || "", item.to || "");
+      } catch (e) {
+        return `${item.from} -> ${item.to}`;
+      }
     },
   },
 });
