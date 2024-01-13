@@ -50,19 +50,7 @@
           </div>
         </div>
 
-        <div class="col-md-1 align-middle">
-          <div
-            class="form-check form-switch form-check-custom form-check-solid mb-2"
-          >
-            <input
-              class="form-check-input h-20px w-30px"
-              type="checkbox"
-              v-model="searchData.analogues"
-              @change="search('code')"
-            />
-            <label class="form-check-label"> Analogi </label>
-          </div>
-
+        <div class="col-md-1 d-flex align-items-center justify-content-center">
           <div
             class="form-check form-switch form-check-custom form-check-solid"
           >
@@ -72,7 +60,7 @@
               v-model="searchData.oe"
               @change="search('code')"
             />
-            <label class="form-check-label"> OE </label>
+            <label class="form-check-label"> OE analogi </label>
           </div>
         </div>
 
