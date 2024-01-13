@@ -65,26 +65,43 @@
         </div>
 
         <div class="col-md-3">
-          <div class="input-group">
-            <div class="form-floating">
-              <Field
-                type="text"
-                class="form-control form-control-solid"
-                name="code"
-                v-model="searchData.text"
-                @keyup.enter="search('text')"
-                placeholder="Teksts"
-                autocomplete="off"
-              />
-              <label>Teksts</label>
+          <div class="row">
+            <div class="col-9">
+              <div class="input-group">
+                <div class="form-floating">
+                  <Field
+                    type="text"
+                    class="form-control form-control-solid"
+                    name="code"
+                    v-model="searchData.text"
+                    @keyup.enter="search('text')"
+                    placeholder="Teksts"
+                    autocomplete="off"
+                  />
+                  <label>Teksts</label>
+                </div>
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  @click="search('text')"
+                >
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+              </div>
             </div>
-            <button
-              class="btn btn-outline-secondary"
-              type="button"
-              @click="search('text')"
-            >
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
+            <div class="col-3 d-flex align-items-center justify-content-center">
+              <div
+                class="form-check form-switch form-check-custom form-check-solid"
+              >
+                <input
+                  class="form-check-input h-20px w-30px"
+                  type="checkbox"
+                  v-model="searchData.partialText"
+                  @change="search('text')"
+                />
+                <label class="form-check-label"> Daļējs teksts </label>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -140,6 +157,7 @@ export default defineComponent({
       analogues: false,
       oe: false,
       groups: null,
+      partialText: false,
     });
 
     const setParams = () => {
@@ -152,7 +170,7 @@ export default defineComponent({
             params.type && params.type.toString() === key
               ? params.query?.toString() || ""
               : "";
-        } else if (["analogues", "oe"].includes(key)) {
+        } else if (["analogues", "oe", "partialText"].includes(key)) {
           searchData[key] = Boolean(query[key]);
         } else if (["groups"].includes(key)) {
           const groupsFromQuery = query[key];
@@ -229,6 +247,8 @@ export default defineComponent({
         if (field === "code") {
           if (this.searchData.analogues) query["analogues"] = 1;
           if (this.searchData.oe) query["oe"] = 1;
+        } else if (field === "text") {
+          if (this.searchData.partialText) query["partialText"] = 1;
         }
 
         if (
