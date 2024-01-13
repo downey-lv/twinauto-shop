@@ -12,7 +12,7 @@
     <!--begin::Body-->
     <div class="card-body pt-5" v-loading="loading">
       <el-table :data="data" style="width: 100%" stripe>
-        <el-table-column label="Remonts">
+        <el-table-column label="Remonts" width="100">
           <template #default="scope"> #{{ scope.row.repair_id }} </template>
         </el-table-column>
         <el-table-column label="Automašīna">
@@ -20,13 +20,14 @@
             {{ scope.row.make }} {{ scope.row.model }}
           </template>
         </el-table-column>
-        <el-table-column label="Reģistrācijas numurs">
+        <el-table-column label="Reģ. nr." property="registration" width="150" />
+        <el-table-column label="VIN" width="250">
           <template #default="scope">
-            {{ scope.row.registration }}
+            {{ scope.row.vin }}
             <router-link
               :to="{
                 name: `tecdoc-car`,
-                query: { registration: scope.row.registration },
+                query: { registration: scope.row.vin },
               }"
               class="btn btn-flush"
               title="Meklēt automašīnu"
@@ -36,7 +37,7 @@
             </router-link>
           </template>
         </el-table-column>
-        <el-table-column>
+        <el-table-column width="150">
           <template #default="scope">
             <router-link
               :to="{
