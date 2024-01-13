@@ -31,10 +31,12 @@
       </DataTable>
     </div>
   </div>
+
+  <ImageHover />
 </template>
 
 <script lang="ts">
-import {defineComponent, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import { defineComponent, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import {
   getDtOptions,
   handleSelect,
@@ -44,9 +46,11 @@ import { useProductStore } from "@/stores/product";
 import Notice from "@/components/core/Notice.vue";
 import { useRoute } from "vue-router";
 import ApiService from "@/core/services/ApiService";
+import ImageHover from "@/components/parts/ImageHover.vue";
 
 export default defineComponent({
   components: {
+    ImageHover,
     Notice,
   },
   props: {
@@ -159,6 +163,13 @@ export default defineComponent({
 
     const columnOptions = {
       parts: {
+        productid: {
+          render: function (data, type, row) {
+            if (row.images[0])
+              return `<span onmouseover="showImage('${row.images[0]}')" onmouseleave="showImage()"><i class="fa-solid fa-image me-2"></i> ${data}</span>`;
+            else return data;
+          },
+        },
         name: {
           width: "350px",
         },

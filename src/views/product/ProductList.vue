@@ -19,7 +19,11 @@
     <div class="col-12" v-else>
       <div class="separator separator-content my-15">vai</div>
       <div class="text-center">
-        <button type="button" class="btn btn-light me-3" @click="loadAll = true">
+        <button
+          type="button"
+          class="btn btn-light me-3"
+          @click="loadAll = true"
+        >
           Parādīt jaunākos produktus
         </button>
       </div>
@@ -28,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, ref} from "vue";
+import { computed, defineComponent, ref } from "vue";
 import PartsTable from "@/components/parts/PartsTable.vue";
 import { useRoute } from "vue-router";
 import SearchBox from "@/components/parts/SearchBox.vue";
