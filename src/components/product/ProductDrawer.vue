@@ -228,6 +228,14 @@
                           >Izmaiņas</a
                         >
                       </li>
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          @click.prevent="addIssue()"
+                          >Paziņot par problēmu</a
+                        >
+                      </li>
                     </ul>
                   </div>
 
@@ -608,6 +616,11 @@
     logType="product"
     :logID="String(p?.productid)"
   />
+  <ReportIssue
+    v-if="p?.productid"
+    ref="modalIssue"
+    :productId="String(p?.productid)"
+  />
 </template>
 
 <style scoped>
@@ -654,6 +667,7 @@ import { push } from "@/main";
 import ApiService from "@/core/services/ApiService";
 import type { Product } from "@/types/Product";
 import LogModal from "@/components/data/LogModal.vue";
+import ReportIssue from "@/components/product/ReportIssue.vue";
 
 export default defineComponent({
   components: {
@@ -661,6 +675,7 @@ export default defineComponent({
     Notice,
     Copy,
     Search,
+    ReportIssue,
   },
   setup() {
     const productStore = useProductStore();
@@ -937,6 +952,9 @@ export default defineComponent({
     },
     showLog() {
       (this.$refs.modalLog as any).show();
+    },
+    addIssue() {
+      (this.$refs.modalIssue as any).show();
     },
   },
 });
