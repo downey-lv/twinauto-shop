@@ -4,8 +4,8 @@
       <h3 class="card-title">Dokuments: {{ $route.params.documentId }}</h3>
       <div class="card-toolbar">
         <a
-          v-if="document.links?.repair"
-          :href="`https://vide.twinauto.lv/service/repair/info/${document.links.repair}`"
+          v-if="documentData.links?.repair"
+          :href="`https://vide.twinauto.lv/service/repair/info/${documentData.links.repair}`"
           target="_blank"
           class="btn btn-sm btn-light me-2"
         >
@@ -14,15 +14,15 @@
         <template v-else>
           <div class="btn-group me-2" role="group">
             <a
-              v-if="document.links?.invoice"
-              :href="`https://vide.twinauto.lv/shop/invoice/${document.links.invoice}`"
+              v-if="documentData.links?.invoice"
+              :href="`https://vide.twinauto.lv/shop/invoice/${documentData.links.invoice}`"
               target="_blank"
               class="btn btn-sm btn-light"
             >
               Pavadzīme
             </a>
             <a
-              v-if="document.links?.prepaid"
+              v-if="documentData.links?.prepaid"
               :href="`https://vide.twinauto.lv/shop/documents/?document_id=${$route.params.documentId}`"
               target="_blank"
               class="btn btn-sm btn-light"
@@ -31,8 +31,8 @@
             </a>
             <a
               v-if="
-                !document.links?.invoice &&
-                [2, 3, 7, 9, 10, 11].includes(Number(document.ordertypeid))
+                !documentData.links?.invoice &&
+                [2, 3, 7, 9, 10, 11].includes(Number(documentData.ordertypeid))
               "
               class="btn btn-sm btn-light dropdown-toggle"
               data-bs-toggle="dropdown"
@@ -42,7 +42,7 @@
             <ul class="dropdown-menu">
               <li>
                 <a
-                  v-if="!document.links?.invoice"
+                  v-if="!documentData.links?.invoice"
                   class="dropdown-item"
                   :href="`https://vide.twinauto.lv/shop/invoice/new_${$route.params.documentId}`"
                   target="_blank"
@@ -51,7 +51,9 @@
               </li>
               <li>
                 <a
-                  v-if="!document.links?.invoice && !document.links?.prepaid"
+                  v-if="
+                    !documentData.links?.invoice && !documentData.links?.prepaid
+                  "
                   class="dropdown-item"
                   :href="`https://vide.twinauto.lv/shop/documents/?document_id=${$route.params.documentId}`"
                   target="_blank"
@@ -75,14 +77,16 @@
           <button
             type="button"
             class="btn btn-sm"
-            :class="document.islocked ? 'btn-warning' : 'btn-light'"
-            :title="document.islocked ? 'Atslēgt dokumentu' : 'Slēgt dokumentu'"
+            :class="documentData.islocked ? 'btn-warning' : 'btn-light'"
+            :title="
+              documentData.islocked ? 'Atslēgt dokumentu' : 'Slēgt dokumentu'
+            "
             v-tooltip
-            @click="lockDocument(document.islocked)"
+            @click="lockDocument(documentData.islocked)"
           >
             <i
               class="fa-solid fa-fw"
-              :class="document.islocked ? 'fa-lock' : 'fa-lock-open'"
+              :class="documentData.islocked ? 'fa-lock' : 'fa-lock-open'"
             ></i>
           </button>
         </div>
@@ -108,14 +112,14 @@
         </div>
 
         <router-link
-          v-if="document.grouping && !document.islocked"
+          v-if="documentData.grouping && !documentData.islocked"
           class="btn btn-sm btn-info me-2"
           type="button"
           :to="{
             name: `document-edit`,
             params: {
               editId: $route.params.documentId,
-              type: document.grouping,
+              type: documentData.grouping,
             },
           }"
         >
@@ -155,17 +159,17 @@
         <div class="col-lg">
           <div class="row">
             <div class="col-5 fw-bold">Tips</div>
-            <div class="col">{{ document.ordertypename }}</div>
+            <div class="col">{{ documentData.ordertypename }}</div>
           </div>
           <div class="row">
             <div class="col-5 fw-bold">Klients</div>
             <div class="col">
-              {{ document.companyname }}
+              {{ documentData.companyname }}
               <router-link
-                v-if="document.companyid"
+                v-if="documentData.companyid"
                 :to="{
                   name: 'client-view',
-                  params: { clientId: document.companyid },
+                  params: { clientId: documentData.companyid },
                 }"
                 title="Atvērt klientu"
                 v-tooltip
@@ -176,19 +180,21 @@
           </div>
           <div class="row">
             <div class="col-5 fw-bold">Dokumenta numurs</div>
-            <div class="col">{{ document.waybillno }}</div>
+            <div class="col">{{ documentData.waybillno }}</div>
           </div>
         </div>
         <div class="col-lg">
           <div class="row">
             <div class="col-5 fw-bold">Datums</div>
             <div class="col">
-              {{ String(document.orderdate).split("T")[0] }}
+              {{ String(documentData.orderdate).split("T")[0] }}
             </div>
           </div>
           <div class="row">
             <div class="col-5 fw-bold">Apmaksas termiņš</div>
-            <div class="col">{{ String(document.payterm).split("T")[0] }}</div>
+            <div class="col">
+              {{ String(documentData.payterm).split("T")[0] }}
+            </div>
           </div>
           <div class="row">
             <div class="col-5 fw-bold">Apmaksāts</div>
@@ -196,16 +202,16 @@
               <span
                 class="badge"
                 :class="{
-                  'badge-success': document.is_paid,
-                  'badge-danger': !document.is_paid,
+                  'badge-success': documentData.is_paid,
+                  'badge-danger': !documentData.is_paid,
                 }"
               >
-                {{ document.is_paid ? "Jā" : "Nē" }}
+                {{ documentData.is_paid ? "Jā" : "Nē" }}
               </span>
               <span
                 class="ms-2"
-                v-if="document.is_paid && document.paid_date"
-                >{{ String(document.paid_date).split("T")[0] }}</span
+                v-if="documentData.is_paid && documentData.paid_date"
+                >{{ String(documentData.paid_date).split("T")[0] }}</span
               >
             </div>
           </div>
@@ -213,7 +219,7 @@
         <div class="col-lg">
           <div class="row">
             <div class="col-5 fw-bold">Komentārs</div>
-            <div class="col">{{ document.comment }}</div>
+            <div class="col">{{ documentData.comment }}</div>
           </div>
         </div>
         <div class="col-lg">
@@ -222,18 +228,18 @@
             <div class="col">{{ totalPrice.toNumber().toFixed(2) }} €</div>
           </div>
           <div class="row">
-            <div class="col-5 fw-bold">PVN, {{ document.vat }}%</div>
+            <div class="col-5 fw-bold">PVN, {{ documentData.vat }}%</div>
             <div class="col">{{ totalVAT.toNumber().toFixed(2) }} €</div>
           </div>
           <div class="row">
             <div class="col-5 fw-bold">Summa ar PVN</div>
             <div class="col">{{ totalPriceVAT }} €</div>
           </div>
-          <template v-if="(document.balance_due ?? 0) > 0">
+          <template v-if="(documentData.balance_due ?? 0) > 0">
             <div class="separator my-2"></div>
             <div class="row">
               <div class="col-5 fw-bold">Apmaksai</div>
-              <div class="col">{{ document.balance_due }} €</div>
+              <div class="col">{{ documentData.balance_due }} €</div>
             </div>
           </template>
         </div>
@@ -245,11 +251,11 @@
     id="containerItems"
     class="card mb-5"
     v-loading="loading"
-    v-if="document.ordertypeid !== ''"
+    v-if="documentData.ordertypeid !== ''"
   >
     <div class="card-body">
       <el-table
-        :data="document.products"
+        :data="documentData.products"
         style="width: 100%"
         :default-sort="{ prop: 'entryid', order: 'ascending' }"
       >
@@ -262,6 +268,8 @@
               <button
                 class="btn btn-icon btn-sm btn-active-primary"
                 @click="viewProduct(scope.$index)"
+                :onmouseover="`showImage('${scope.row.data.images?.[0]}')`"
+                onmouseleave="showImage()"
               >
                 <i class="fa-solid fa-eye"></i>
               </button>
@@ -279,10 +287,22 @@
             <span v-html="scope.row.productname.replace(/\n/g, '<br/>')"></span>
           </template>
         </el-table-column>
-        <el-table-column property="quantity" label="Daudzums" sortable width="130" />
-        <el-table-column property="priceVAT" label="Cena ar PVN" sortable width="150">
+        <el-table-column
+          property="quantity"
+          label="Daudzums"
+          sortable
+          width="130"
+        />
+        <el-table-column
+          property="priceVAT"
+          label="Cena ar PVN"
+          sortable
+          width="150"
+        >
           <template #default="scope">
-            {{ scope.row.priceVAT.toFixed(2) }} €
+            <span class="tooltip-item" :title="scope.row.data.priceDetails"
+              >{{ scope.row.priceVAT.toFixed(2) }} €</span
+            >
           </template>
         </el-table-column>
         <el-table-column property="total" label="Summa" sortable width="100">
@@ -295,16 +315,24 @@
     </div>
   </div>
 
-  <DocumentLabelsModal ref="modalLabels" :pData="document.products" />
+  <DocumentLabelsModal ref="modalLabels" :pData="documentData.products" />
   <PaymentModal
     ref="modalPayment"
-    :pData="document"
+    :pData="documentData"
     @refresh="fetchDocument()"
   />
+  <ImageHover />
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch, onBeforeUnmount } from "vue";
+import {
+  computed,
+  defineComponent,
+  ref,
+  watch,
+  onBeforeUnmount,
+  nextTick,
+} from "vue";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
 import { Decimal } from "decimal.js";
@@ -322,6 +350,8 @@ import { removeTooltip } from "@/core/helpers/dom";
 import { DateTime } from "luxon";
 import PaymentModal from "@/components/documents/PaymentModal.vue";
 import { useAuthStore } from "@/stores/auth";
+import ImageHover from "@/components/parts/ImageHover.vue";
+import { Tooltip } from "bootstrap";
 
 const breadcrumbStore = useBreadcrumbStore();
 
@@ -331,7 +361,7 @@ export default defineComponent({
       return DateTime;
     },
   },
-  components: { PaymentModal, DocumentLabelsModal },
+  components: { ImageHover, PaymentModal, DocumentLabelsModal },
   setup() {
     const loading = ref<boolean>(false);
     const route = useRoute();
@@ -350,11 +380,11 @@ export default defineComponent({
       products: [],
       deletedItems: [],
     };
-    const document = ref({ ...blankDocument });
+    const documentData = ref({ ...blankDocument });
 
     // Define price calculators
     const vatDecimal = computed(() =>
-      new Decimal(document.value.vat).dividedBy(100).plus(1)
+      new Decimal(documentData.value.vat).dividedBy(100).plus(1)
     );
     const useProductWatcher = (product) => {
       product.priceVAT = computed({
@@ -396,7 +426,7 @@ export default defineComponent({
 
     // Calculate document totals
     const totalPrice = computed(() =>
-      calculateTotalPrice(document.value.products)
+      calculateTotalPrice(documentData.value.products)
     );
     const totalPriceVAT = computed(() =>
       calculateTotalPriceVAT(totalPrice.value, vatDecimal.value)
@@ -405,16 +435,31 @@ export default defineComponent({
       calculateTotalVAT(totalPriceVAT.value, totalPrice.value)
     );
 
+    // Tooltips for table
+    const initializeTooltips = () => {
+      nextTick(() => {
+        document.querySelectorAll(".tooltip-item").forEach((el) => {
+          new Tooltip(el, { html: true });
+        });
+      });
+    };
+
     // Document load
     const fetchDocument = async () => {
       loading.value = true;
       await ApiService.get("document", String(route.params.documentId))
         .then((response) => {
-          document.value = response.data;
+          documentData.value = response.data;
 
-          const products = document.value.products;
+          const products = documentData.value.products;
           products?.forEach((product) => {
             useProductWatcher(product);
+
+            ApiService.get("product/find", `id/${product.productid}`).then(
+              (response) => {
+                product.data = response.data[0];
+              }
+            );
           });
         })
         .catch((error) => {
@@ -422,6 +467,7 @@ export default defineComponent({
           push.error("Neizdevās ielādēt dokumentu");
         })
         .finally(() => {
+          initializeTooltips();
           loading.value = false;
         });
     };
@@ -443,7 +489,7 @@ export default defineComponent({
 
     return {
       loading,
-      document,
+      documentData,
       totalPrice,
       totalPriceVAT,
       totalVAT,
@@ -458,7 +504,7 @@ export default defineComponent({
   methods: {
     viewProduct(idx) {
       const productStore = useProductStore();
-      const data = this.document?.products[idx].data;
+      const data = this.documentData?.products[idx].data;
       if (data) productStore.setProduct([data]);
     },
     printLabels() {
@@ -505,7 +551,7 @@ export default defineComponent({
       const action = isLocked ? "unlock" : "lock";
       ApiService.get(`document/lock/${id}`, action)
         .then(() => {
-          this.document.islocked = !isLocked;
+          this.documentData.islocked = !isLocked;
           push.success(
             `Dokuments ${isLocked ? "atslēgts" : "slēgts"} veiksmīgi`
           );
