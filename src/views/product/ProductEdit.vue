@@ -561,7 +561,7 @@ export default defineComponent({
       }
 
       // Stop loading if new product and set to default
-      if (is_new.value) {
+      if (!is_copy && is_new.value) {
         const product = { ...defaultProduct };
 
         // If creating from purchase document, add values
@@ -597,7 +597,7 @@ export default defineComponent({
             const reset_fields = [
               "productid",
               "productidstr",
-              "productcode",
+              "ean",
               "images",
               "imagesweb",
               "image_ids",
