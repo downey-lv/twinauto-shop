@@ -46,7 +46,7 @@ import { useProductStore } from "@/stores/product";
 import Notice from "@/components/core/Notice.vue";
 import { useRoute } from "vue-router";
 import ApiService from "@/core/services/ApiService";
-import ImageHover from "@/components/parts/ImageHover.vue";
+import ImageHover from "@/components/product/ImageHover.vue";
 
 export default defineComponent({
   components: {

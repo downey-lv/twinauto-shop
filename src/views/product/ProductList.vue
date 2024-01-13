@@ -33,9 +33,9 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
-import PartsTable from "@/components/parts/PartsTable.vue";
+import PartsTable from "@/components/product/PartsTable.vue";
 import { useRoute } from "vue-router";
-import SearchBox from "@/components/parts/SearchBox.vue";
+import SearchBox from "@/components/product/SearchBox.vue";
 
 export default defineComponent({
   components: {

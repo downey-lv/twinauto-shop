@@ -67,7 +67,7 @@ import KTActivityDrawer from "@/layouts/main-layout/drawers/ActivityDrawer.vue";
 import KTCreateApp from "@/components/demo/modals/wizards/create-app-modal/CreateAppModal.vue";
 import KTInviteFriendsModal from "@/components/demo/modals/general/InviteFriendsModal.vue";
 import KTDrawerMessenger from "@/layouts/main-layout/extras/MessengerDrawer.vue";
-import ProductDrawer from "@/components/parts/ProductDrawer.vue";
+import ProductDrawer from "@/components/product/ProductDrawer.vue";
 import { reinitializeComponents } from "@/core/plugins/keenthemes";
 import {
   asideEnabled,

@@ -350,7 +350,7 @@ import { removeTooltip } from "@/core/helpers/dom";
 import { DateTime } from "luxon";
 import PaymentModal from "@/components/documents/PaymentModal.vue";
 import { useAuthStore } from "@/stores/auth";
-import ImageHover from "@/components/parts/ImageHover.vue";
+import ImageHover from "@/components/product/ImageHover.vue";
 import { Tooltip } from "bootstrap";
 
 const breadcrumbStore = useBreadcrumbStore();

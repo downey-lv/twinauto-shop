@@ -24,7 +24,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import TecdocCarSelection from "@/components/tecdoc/TecdocCarSelection.vue";
-import SearchBox from "@/components/parts/SearchBox.vue";
+import SearchBox from "@/components/product/SearchBox.vue";
 import DailyRevenue from "@/components/data/DailyRevenue.vue";
 import OnlineOrders from "@/components/data/OnlineOrders.vue";
 import { useAuthStore } from "@/stores/auth";

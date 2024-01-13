@@ -25,7 +25,7 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
 import TecdocCar from "@/components/tecdoc/TecdocCar.vue";
-import PartsTable from "@/components/parts/PartsTable.vue";
+import PartsTable from "@/components/product/PartsTable.vue";
 import { useRoute } from "vue-router";
 import { useBreadcrumbStore } from "@/stores/breadcrumb";
 
