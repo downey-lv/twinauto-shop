@@ -153,6 +153,12 @@ export default defineComponent({
       const carStore = useCarStore();
       carStore.unsetVehicle();
     }
+
+    // Find registration
+    if (this.$route.query.registration) {
+      this.selectedVIN = this.$route.query.registration.toString();
+      this.findVIN();
+    }
   },
   methods: {
     setValue(field: string, value: string, dropdown: boolean = true) {

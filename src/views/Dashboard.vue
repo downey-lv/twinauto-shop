@@ -15,7 +15,8 @@
       </div>
     </div>
     <div class="col-xl-8">
-      <OnlineOrders />
+      <OnlineOrders v-if="ordersAllowed" />
+      <ActiveRepairs v-if="repairsAllowed" />
     </div>
   </div>
 </template>
@@ -28,10 +29,12 @@ import DailyRevenue from "@/components/data/DailyRevenue.vue";
 import OnlineOrders from "@/components/data/OnlineOrders.vue";
 import { useAuthStore } from "@/stores/auth";
 import { push } from "@/main";
+import ActiveRepairs from "@/components/data/ActiveRepairs.vue";
 
 export default defineComponent({
   name: "dashboard-main",
   components: {
+    ActiveRepairs,
     SearchBox,
     TecdocCarSelection,
     DailyRevenue,
@@ -40,9 +43,13 @@ export default defineComponent({
   setup() {
     const auth = useAuthStore();
     const revenueAllowed = auth.user?.permissions?.includes("daily_revenue");
+    const ordersAllowed = auth.user?.permissions?.includes("active_orders");
+    const repairsAllowed = auth.user?.permissions?.includes("active_repairs");
 
     return {
       revenueAllowed,
+      ordersAllowed,
+      repairsAllowed,
     };
   },
 });

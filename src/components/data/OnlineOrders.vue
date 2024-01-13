@@ -1,6 +1,6 @@
 <template>
   <!--begin::List Widget 4-->
-  <div class="card">
+  <div class="card mb-5">
     <!--begin::Header-->
     <div class="card-header border-0 pt-5">
       <h3 class="card-title align-items-start flex-column">
