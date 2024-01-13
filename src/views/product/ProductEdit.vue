@@ -148,7 +148,7 @@
           </div>
         </div>
         <!-- Product parameters -->
-        <div class="card">
+        <div class="card mb-5">
           <div class="card-body">
             <div class="fv-row mb-2">
               <label class="fs-6 mb-2">EAN svītrukods</label>
@@ -193,6 +193,23 @@
                     prop="unitid"
                   />
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Product flags -->
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-row">
+              <div
+                class="form-check form-switch form-check-custom form-check-solid"
+              >
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  v-model="product.important"
+                />
+                <label class="form-check-label"> Svarīgs produkts </label>
               </div>
             </div>
           </div>
@@ -507,6 +524,7 @@ export default defineComponent({
       imagesweb: [] as boolean[],
       image_ids: [] as string[],
       crosses: [] as any[],
+      important: false,
     };
     const product = ref({ ...defaultProduct });
     let originalProduct;

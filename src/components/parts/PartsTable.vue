@@ -213,12 +213,13 @@ export default defineComponent({
           width: "30px",
           searchable: false,
           render: function (data, type, row) {
-            let icons = "";
+            if (row.important)
+              return `<i class="fa-duotone fa-fw fa-star text-primary fs-2" title="Svarīgs produkts"></i>`;
             if (data)
-              icons += `<i class="fa-duotone fa-fw fa-triangle-exclamation text-danger fs-2" title="Nav pārdots 6 mēnešus"></i>`;
+              return `<i class="fa-duotone fa-fw fa-triangle-exclamation text-warning fs-2" title="Nav pārdots 6 mēnešus"></i>`;
             if (row.topProduct)
-              icons += `<i class="fa-duotone fa-fw fa-trophy-star text-success fs-2" title="Top produkts"></i>`;
-            return icons;
+              return `<i class="fa-duotone fa-fw fa-trophy-star text-success fs-2" title="Top produkts"></i>`;
+            return "";
           },
         },
       },
