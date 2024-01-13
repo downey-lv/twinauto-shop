@@ -130,6 +130,7 @@ export interface Product {
   suppliers: Supplier[];
   restSupplier: number;
   exactMatch: number;
+  priceDetails: string;
 }
 
 export interface Price {
