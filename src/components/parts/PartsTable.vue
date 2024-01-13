@@ -214,7 +214,7 @@ export default defineComponent({
           searchable: false,
           render: function (data, type, row) {
             if (row.important)
-              return `<i class="fa-duotone fa-fw fa-star text-primary fs-2" title="Svarīgs produkts"></i>`;
+              return `<i class="fa-solid fa-fw fa-star text-info fs-2" title="Svarīgs produkts"></i>`;
             if (data)
               return `<i class="fa-duotone fa-fw fa-triangle-exclamation text-warning fs-2" title="Nav pārdots 6 mēnešus"></i>`;
             if (row.topProduct)
