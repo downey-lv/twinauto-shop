@@ -831,7 +831,7 @@ export default defineComponent({
     const columnOptions = {
       history: {
         orderdate: {
-          width: "100px",
+          width: "110px",
         },
       },
     };
