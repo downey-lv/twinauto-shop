@@ -279,13 +279,13 @@
             <span v-html="scope.row.productname.replace(/\n/g, '<br/>')"></span>
           </template>
         </el-table-column>
-        <el-table-column property="quantity" label="Daudzums" sortable />
-        <el-table-column property="priceVAT" label="Cena ar PVN" sortable>
+        <el-table-column property="quantity" label="Daudzums" sortable width="130" />
+        <el-table-column property="priceVAT" label="Cena ar PVN" sortable width="150">
           <template #default="scope">
             {{ scope.row.priceVAT.toFixed(2) }} €
           </template>
         </el-table-column>
-        <el-table-column property="total" label="Summa" sortable>
+        <el-table-column property="total" label="Summa" sortable width="100">
           <template #default="scope">
             {{ scope.row.total.toFixed(2) }} €
           </template>
