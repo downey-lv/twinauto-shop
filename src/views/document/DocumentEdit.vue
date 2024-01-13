@@ -305,7 +305,7 @@
               </el-form-item>
             </div>
 
-            <div class="col-lg-1 pb-1">
+            <div class="col-lg-1 pb-1" :title="item.priceDetails" v-tooltip-html>
               <el-form-item :prop="`products[${idx}].priceVAT`">
                 <el-input-number
                   v-model="item.priceVAT"
@@ -474,7 +474,8 @@ export default defineComponent({
       priceVAT: 0,
       total: 0,
       matches: [] as Product[],
-      comment: ""
+      comment: "",
+      priceDetails: "",
     };
 
     const blankDocument: Document = {
@@ -631,6 +632,18 @@ export default defineComponent({
     const useProductWatcher = (product) => {
       product.priceVAT = calculatePriceVAT(product, vatDecimal);
       product.total = calculateTotal(product, vatDecimal);
+
+      product.priceDetails = computed(() => {
+        let details = "";
+        if (product.data) {
+          details += `Iepirkums: ${product.data.priceBuy} €<br/>`;
+          details += `Pārdošana: ${product.data.priceSell} €<br/>`;
+          details += `E-veikals: ${product.data.priceOnline[1]} €<br/>`;
+          details += `2. līmenis: ${product.data.priceOnline[2]} €<br/>`;
+          details += `3. līmenis: ${product.data.priceOnline[3]} €<br/>`;
+        }
+        return details;
+      });
     };
 
     // Initialize price watcher and rules for existing products

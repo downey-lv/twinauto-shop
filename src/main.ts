@@ -74,6 +74,10 @@ app.directive("tooltip", (el) => {
   new Tooltip(el);
 });
 
+app.directive("tooltip-html", (el) => {
+  new Tooltip(el, { html: true });
+});
+
 // Place it at THE END of the app.use() chain, just right before app.mount()
 export const push = createNotivue(app);
 app.mount("#app");
