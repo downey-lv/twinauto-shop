@@ -164,10 +164,14 @@ export default defineComponent({
     const columnOptions = {
       parts: {
         productid: {
-          render: function (data, type, row) {
-            if (row.images[0])
-              return `<span onmouseover="showImage('${row.images[0]}')" onmouseleave="showImage()"><i class="fa-solid fa-image me-2"></i> ${data}</span>`;
-            else return data;
+          createdCell: function (td, cellData, rowData, row, col) {
+            if (rowData.images?.[0]) {
+              td.setAttribute(
+                "onmouseover",
+                `showImage('${rowData.images?.[0]}')`
+              );
+              td.setAttribute("onmouseleave", `showImage()`);
+            }
           },
         },
         name: {
