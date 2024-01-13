@@ -25,13 +25,17 @@ export default defineComponent({
       type: String,
       default: "",
     },
+    type: {
+      type: String,
+      default: "code",
+    },
   },
   methods: {
     codeSearch(value: string) {
       this.$router.push({
         name: "search-parts",
         params: {
-          type: "code",
+          type: this.type,
           query: value,
         },
       });
