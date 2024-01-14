@@ -13,7 +13,6 @@ export interface ReturnProduct extends DocumentProduct {
   history: ReturnHistory[];
   orderid: string;
   maxQuantity: number;
-  data?: Product[];
 }
 
 export interface ReturnHistory {

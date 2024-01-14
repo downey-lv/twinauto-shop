@@ -46,10 +46,7 @@
             />
             <el-table-column property="changes" label="Izmaiņas">
               <template #default="scope">
-                <div
-                  v-for="(item, field) in scope.row.changes"
-                  :key="field"
-                >
+                <div v-for="(item, field) in scope.row.changes" :key="field">
                   <b>{{ field }}: </b>
                   <template
                     v-for="(change, index) in getChanges(item)"
@@ -94,6 +91,7 @@ import { Modal } from "bootstrap";
 import { DateTime } from "luxon";
 import type { TableColumnCtx } from "element-plus";
 import { diffChars } from "diff";
+import type { Change } from "diff";
 
 interface Log {
   operation: string;
@@ -176,7 +174,13 @@ export default defineComponent({
       try {
         return diffChars(item.from || "", item.to || "");
       } catch (e) {
-        return `${item.from} -> ${item.to}`;
+        return [
+          {
+            added: false,
+            removed: false,
+            value: `${item.from} -> ${item.to}`,
+          },
+        ] as Change[];
       }
     },
   },

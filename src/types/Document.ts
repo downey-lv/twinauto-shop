@@ -27,7 +27,7 @@ export interface DocumentProduct {
   matches: Product[];
   selectedMatch?: number;
   imported?: ImportedProduct;
-  data?: object[];
+  data?: Product;
 }
 
 export interface Document {
