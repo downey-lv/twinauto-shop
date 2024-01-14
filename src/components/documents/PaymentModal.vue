@@ -225,8 +225,8 @@ export default defineComponent({
           paymentTypes.value = response.data;
 
           // Pre-select type
-          if (props.pData.ordertypeid === "3") {
-            // Atgriešana piegādātājam
+          if (["3", "9"].includes(props.pData.ordertypeid)) {
+            // Atgriešana piegādātājam, Garantija piegādātājam
             formData.value.type = "5"; // Pārskaitījums
             formData.value.recipient = "3"; // Ofiss
           }
