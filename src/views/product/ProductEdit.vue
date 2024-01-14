@@ -375,7 +375,22 @@
                   :hide-on-click-modal="true"
                 >
                 </el-image>
-
+                <div>
+                  <a
+                    href="#"
+                    v-if="index > 1"
+                    @click.prevent="moveImage(index)"
+                  >
+                    <i class="fa-solid fa-left fa-fw"></i>
+                  </a>
+                  <a
+                    href="#"
+                    v-if="index < 3"
+                    @click.prevent="moveImage(index, false)"
+                  >
+                    <i class="fa-solid fa-right fa-fw"></i>
+                  </a>
+                </div>
                 <el-upload
                   accept="image/*"
                   class="avatar-uploader p-2"
@@ -1070,6 +1085,30 @@ export default defineComponent({
         .finally(() => {
           this.loading.tecdoc = false;
         });
+    },
+    moveImage(index: number, left = true) {
+      index = index - 1;
+      const newIndex = left ? index - 1 : index + 1;
+
+      // Get current image
+      const image = this.product.images[index];
+      const imageWeb = this.product.imagesweb[index];
+      const imageId = this.product.image_ids[index];
+
+      // Get image in the new location
+      const imageNew = this.product.images[newIndex];
+      const imageWebNew = this.product.imagesweb[newIndex];
+      const imageIdNew = this.product.image_ids[newIndex];
+
+      // Move current to new location
+      this.product.images[index] = imageNew;
+      this.product.imagesweb[index] = imageWebNew;
+      this.product.image_ids[index] = imageIdNew;
+
+      // Move new to current location
+      this.product.images[newIndex] = image;
+      this.product.imagesweb[newIndex] = imageWeb;
+      this.product.image_ids[newIndex] = imageId;
     },
   },
 });
