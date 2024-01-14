@@ -152,6 +152,7 @@ export default defineComponent({
           log.value = response.data;
         })
         .catch((error) => {
+          log.value = [];
           console.error(`Error fetching data from audit log:`, error);
           push.error(`Neizdevās ielādēt vēsturi`);
         });

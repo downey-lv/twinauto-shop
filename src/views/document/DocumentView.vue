@@ -67,12 +67,12 @@
         <div class="btn-group me-2" role="group">
           <button
             type="button"
-            title="Nosūtīt uz telefonu"
+            title="Izmaiņas"
             v-tooltip
             class="btn btn-sm btn-light"
-            @click="toPhone($event)"
+            @click="showLog()"
           >
-            <i class="fa-solid fa-mobile-signal-out"></i>
+            <i class="fa-solid fa-book"></i>
           </button>
           <button
             type="button"
@@ -100,6 +100,15 @@
           </button>
         </div>
         <div class="btn-group me-2" role="group">
+          <button
+            type="button"
+            title="Nosūtīt uz telefonu"
+            v-tooltip
+            class="btn btn-sm btn-light"
+            @click="toPhone($event)"
+          >
+            <i class="fa-solid fa-mobile-signal-out"></i>
+          </button>
           <button
             type="button"
             class="btn btn-sm btn-light"
@@ -331,6 +340,11 @@
     @refresh="fetchDocument()"
   />
   <ImageHover />
+  <LogModal
+    ref="modalLog"
+    logType="orders"
+    :logID="String($route.params.documentId)"
+  />
 </template>
 
 <script lang="ts">
@@ -361,6 +375,7 @@ import PaymentModal from "@/components/documents/PaymentModal.vue";
 import { useAuthStore } from "@/stores/auth";
 import ImageHover from "@/components/product/ImageHover.vue";
 import { Tooltip } from "bootstrap";
+import LogModal from "@/components/data/LogModal.vue";
 
 const breadcrumbStore = useBreadcrumbStore();
 
@@ -370,7 +385,7 @@ export default defineComponent({
       return DateTime;
     },
   },
-  components: { ImageHover, PaymentModal, DocumentLabelsModal },
+  components: { LogModal, ImageHover, PaymentModal, DocumentLabelsModal },
   setup() {
     const loading = ref<boolean>(false);
     const route = useRoute();
@@ -596,6 +611,9 @@ export default defineComponent({
         .finally(() => {
           this.toggleButtonState(el, false);
         });
+    },
+    showLog() {
+      (this.$refs.modalLog as any).show();
     },
   },
 });
