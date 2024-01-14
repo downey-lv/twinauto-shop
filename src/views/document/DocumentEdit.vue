@@ -414,7 +414,7 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import Notice from "@/components/core/Notice.vue";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
 import DocumentHeader from "@/components/documents/DocumentHeader.vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter, onBeforeRouteLeave } from "vue-router";
 import tourSteps from "@/tours/DocumentEditTour";
 import tourOptions from "@/tours/TourOptions";
 import { useProductStore } from "@/stores/product";
@@ -918,6 +918,10 @@ export default defineComponent({
 
     const changeMatch = (product, increase=true) =>
       productService.changeMatch(product, increase);
+
+    onBeforeRouteLeave(() => {
+      watcherHandles.forEach((stop) => stop());
+    });
 
     onBeforeUnmount(() => {
       watcherHandles.forEach((stop) => stop());
