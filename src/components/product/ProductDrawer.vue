@@ -217,7 +217,7 @@
                               query: { copy: p.productid },
                             })
                           "
-                          >Kopēt</a
+                          ><i class="fa-solid fa-copy fa-fw me-2"></i> Kopēt</a
                         >
                       </li>
                       <li>
@@ -225,7 +225,7 @@
                           class="dropdown-item"
                           href="#"
                           @click.prevent="showLog()"
-                          >Izmaiņas</a
+                          ><i class="fa-solid fa-book fa-fw me-2"></i> Izmaiņas</a
                         >
                       </li>
                       <li>
@@ -233,7 +233,7 @@
                           class="dropdown-item"
                           href="#"
                           @click.prevent="addIssue()"
-                          >Paziņot par problēmu</a
+                          ><i class="fa-solid fa-triangle-exclamation fa-fw me-2"></i> Paziņot par problēmu</a
                         >
                       </li>
                     </ul>
