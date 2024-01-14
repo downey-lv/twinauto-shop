@@ -67,6 +67,15 @@
         <div class="btn-group me-2" role="group">
           <button
             type="button"
+            title="Nosūtīt uz telefonu"
+            v-tooltip
+            class="btn btn-sm btn-light"
+            @click="toPhone($event)"
+          >
+            <i class="fa-solid fa-mobile-signal-out"></i>
+          </button>
+          <button
+            type="button"
             class="btn btn-sm btn-info"
             title="Maksājumi"
             v-tooltip
@@ -559,6 +568,33 @@ export default defineComponent({
         .catch((error) => {
           console.error("Error fetching data:", error);
           push.error(`Neizdevās ${isLocked ? "atslēgt" : "slēgt"} dokumentu`);
+        });
+    },
+    toggleButtonState(el, isLoading) {
+      if (isLoading) {
+        el.innerHTML = `<i class="fa-solid fa-spinner-third fa-spin"></i>`;
+      } else {
+        el.innerHTML = el.getAttribute("data-original-content");
+      }
+    },
+    toPhone(event) {
+      // Format button
+      const el = event.target;
+      el.setAttribute("data-original-content", el.innerHTML); // Store original content
+      this.toggleButtonState(el, true); // Set to loading state
+
+      const id = this.$route.params.documentId;
+      if (!id) return;
+      ApiService.get(`data`, `cart/${id}?order`)
+        .then(() => {
+          push.info("Nosūtīts");
+        })
+        .catch((error) => {
+          push.error("Neizdevās nosūtīt");
+          console.error("Error fetching data:", error);
+        })
+        .finally(() => {
+          this.toggleButtonState(el, false);
         });
     },
   },
