@@ -582,6 +582,7 @@ export default defineComponent({
           trigger: "change",
         },
       ],
+      products: [] as any[],
     });
 
     const addProductRules = (idx) => {
