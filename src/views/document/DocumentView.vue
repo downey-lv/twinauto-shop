@@ -376,6 +376,7 @@ import { useAuthStore } from "@/stores/auth";
 import ImageHover from "@/components/product/ImageHover.vue";
 import { Tooltip } from "bootstrap";
 import LogModal from "@/components/data/LogModal.vue";
+import { useViewHistoryStore } from "@/stores/viewHistory";
 
 const breadcrumbStore = useBreadcrumbStore();
 
@@ -473,7 +474,18 @@ export default defineComponent({
       loading.value = true;
       await ApiService.get("document", String(route.params.documentId))
         .then((response) => {
-          documentData.value = response.data;
+          const data = response.data;
+          documentData.value = data;
+
+          // Add document to viewHistory
+          const viewHistoryStore = useViewHistoryStore();
+          const comment = data.comment ? ` - ${data.comment}` : "";
+          viewHistoryStore.addHistory(
+            "documents",
+            route.fullPath,
+            `[${data.orderid}] ${data.ordertypename}`,
+            `${data.companyname}${comment}`
+          );
 
           const products = documentData.value.products;
           products?.forEach((product) => {

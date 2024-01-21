@@ -55,22 +55,13 @@
 <!--    </div>-->
 <!--    &lt;!&ndash;end::Chat&ndash;&gt;-->
 
-<!--    &lt;!&ndash;begin::Notifications&ndash;&gt;-->
-<!--    <div class="d-flex align-items-center ms-1 ms-lg-3">-->
-<!--      &lt;!&ndash;begin::Menu&ndash;&gt;-->
-<!--      <div-->
-<!--        class="btn btn-icon btn-active-light-primary position-relative w-30px h-30px w-md-40px h-md-40px"-->
-<!--        data-kt-menu-trigger="click"-->
-<!--        data-kt-menu-attach="parent"-->
-<!--        data-kt-menu-placement="bottom-end"-->
-<!--        data-kt-menu-flip="bottom"-->
-<!--      >-->
-<!--        <i class="bi bi-grid fs-2"></i>-->
-<!--      </div>-->
-<!--      <KTNotificationsMenu></KTNotificationsMenu>-->
-<!--      &lt;!&ndash;end::Menu&ndash;&gt;-->
-<!--    </div>-->
-<!--    &lt;!&ndash;end::Notifications&ndash;&gt;-->
+    <!--begin::Notifications-->
+    <div class="d-flex align-items-center ms-1 ms-lg-3">
+      <!--begin::Menu-->
+      <ViewHistory />
+      <!--end::Menu-->
+    </div>
+    <!--end::Notifications-->
 
     <!--begin::Theme mode-->
     <div class="d-flex align-items-center ms-1 ms-lg-3">
@@ -135,7 +126,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import KTSearch from "@/layouts/main-layout/search/Search.vue";
-import KTNotificationsMenu from "@/layouts/main-layout/menus/NotificationsMenu.vue";
+import ViewHistory from "@/layouts/main-layout/menus/ViewHistory.vue";
 import KTQuickLinksMenu from "@/layouts/main-layout/menus/QuickLinksMenu.vue";
 import KTUserMenu from "@/layouts/main-layout/menus/UserAccountMenu.vue";
 import KTThemeModeSwitcher from "@/layouts/main-layout/theme-mode/ThemeModeSwitcher.vue";
@@ -145,7 +136,7 @@ export default defineComponent({
   name: "layout-topbar",
   components: {
     KTSearch,
-    KTNotificationsMenu,
+    ViewHistory,
     KTQuickLinksMenu,
     KTUserMenu,
     KTThemeModeSwitcher,
