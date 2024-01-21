@@ -14,9 +14,7 @@ export const calculateTotalPrice = (products, deliveryCost: number | undefined =
     return sum.plus(productTotal);
   }, new Decimal(0));
 
-  console.log(deliveryCost);
   if (deliveryCost) {
-    console.log("calculate");
     return total.plus(deliveryCost);
   }
   return total;
