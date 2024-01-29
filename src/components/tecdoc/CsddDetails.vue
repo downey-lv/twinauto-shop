@@ -37,6 +37,18 @@
         </div>
       </template>
     </div>
+
+    <div class="separator separator-dashed my-3"></div>
+    <div class="d-flex justify-content-center">
+      <a
+        href="#"
+        class="fw-bold fs-6 me-2 text-primary"
+        @click.prevent="openOilSearchModal()"
+        ><i class="fa-sharp fa-solid fa-oil-can-drip text-primary"></i> Eļļas meklētājs</a
+      >
+    </div>
+
+    <OilSearchModal :vin="carData.csdd.VIN" ref="oilPayment" />
   </template>
 </template>
 
@@ -46,10 +58,11 @@ import Copy from "@/components/core/buttons/Copy.vue";
 import { useCarStore } from "@/stores/car";
 import Notice from "@/components/core/Notice.vue";
 import type { CarInfo } from "@/types/CarInfo";
+import OilSearchModal from "@/components/tecdoc/OilSearchModal.vue";
 
 export default defineComponent({
   name: "csdd-details",
-  components: { Notice, Copy },
+  components: { OilSearchModal, Notice, Copy },
   props: {
     altDetails: {
       type: Object,
@@ -79,6 +92,11 @@ export default defineComponent({
     return {
       carData,
     };
+  },
+  methods: {
+    openOilSearchModal() {
+      (this.$refs.oilPayment as any).show();
+    },
   },
 });
 </script>
