@@ -5,7 +5,7 @@
     </div>
 
     <div class="col-xl-9">
-      <PartsTable resource="tecdoc/catalogue" :slug="url">
+      <PartsTable resource="tecdoc/catalogue" :slug="url" :query="{includeCriteria: true}">
         <template v-slot:header>
           <h3 class="card-title"></h3>
           <div class="card-toolbar">

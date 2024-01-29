@@ -4,6 +4,38 @@
       <slot name="header"></slot>
     </div>
     <div class="card-body pt-0">
+      <el-collapse v-if="criteria.length > 0">
+        <el-collapse-item title="Filtrs" name="1">
+          <template #title>
+            Filtrs
+            <span
+              class="badge badge-circle badge-primary ms-2"
+              v-if="filterCount > 0"
+            >
+              {{ filterCount }}
+            </span>
+          </template>
+
+          <template v-for="(row, index) in criteria" :key="index">
+            <el-select
+              v-model="filterCriteria[row.id]"
+              class="m-2"
+              :placeholder="row.label"
+              style="width: 240px"
+              clearable
+              multiple
+              filterable
+            >
+              <el-option
+                v-for="item in row.values"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </template>
+        </el-collapse-item>
+      </el-collapse>
       <Notice
         v-if="countWarning"
         classes="rounded-3 mb-3"
@@ -36,7 +68,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import {
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import {
   getDtOptions,
   handleSelect,
@@ -47,6 +85,8 @@ import Notice from "@/components/core/Notice.vue";
 import { useRoute } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import ImageHover from "@/components/product/ImageHover.vue";
+import type { WatchStopHandle } from "vue";
+import type { Criteria, CriteriaFiltered } from "@/types/FilterCriteria";
 
 export default defineComponent({
   components: {
@@ -74,14 +114,35 @@ export default defineComponent({
     const route = useRoute();
     const tabsKey = ref(0);
     const table = ref();
+    const criteria = ref<Criteria[]>([]);
+    const filterCriteria = ref<CriteriaFiltered>({});
+    const watcherHandles: WatchStopHandle[] = [];
 
     // Setup data load
     const loadData = async () => {
       if (props.resource && props.slug) {
         loading.value = true;
-        ApiService.get(props.resource, props.slug, props.query)
+
+        let query = props.query;
+        // Add filterCtriteria
+        if (Object.keys(filterCriteria.value).length > 0) {
+          query = {
+            ...query,
+            filterCriteria: filterCriteria.value,
+          };
+        }
+
+        ApiService.get(props.resource, props.slug, query)
           .then((response) => {
-            parts.value = response.data;
+            const data = response.data;
+
+            if (props.query && "includeCriteria" in props.query) {
+              parts.value = data.data;
+              if (criteria.value.length === 0) criteria.value = data.criteria;
+            } else {
+              parts.value = data;
+            }
+
             tabsKey.value += 1;
 
             countWarning.value =
@@ -109,10 +170,37 @@ export default defineComponent({
       () => [props.slug, props.query], // watching the URL prop
       ([newSlug, newQuery], [prevSlug, prevQuery]) => {
         if (newSlug !== prevSlug || newQuery !== prevQuery) {
+          filterCriteria.value = {};
           loadData();
         }
       }
     );
+    watcherHandles.push(pWatcher);
+
+    // Filter counter
+    const filterCount = ref(0);
+
+    // React to changes in filterCriteria
+    const fWatcher = watch(
+      filterCriteria,
+      () => {
+        // Set filter count
+        let count = 0;
+        for (const key in filterCriteria.value) {
+          if (
+            Array.isArray(filterCriteria.value[key]) &&
+            filterCriteria.value[key].length > 0
+          ) {
+            count++;
+          }
+        }
+        filterCount.value = count;
+
+        loadData();
+      },
+      { deep: true }
+    );
+    watcherHandles.push(fWatcher);
 
     // Define datatable
     let dtOptions = getDtOptions(1);
@@ -228,7 +316,7 @@ export default defineComponent({
     const dt = transformDtSource(dtSource, columnOptions);
 
     onBeforeUnmount(() => {
-      pWatcher();
+      watcherHandles.forEach((stop) => stop());
     });
 
     return {
@@ -240,6 +328,9 @@ export default defineComponent({
       countWarning,
       tabsKey,
       table,
+      criteria,
+      filterCriteria,
+      filterCount,
     };
   },
   methods: {
