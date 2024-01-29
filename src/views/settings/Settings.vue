@@ -15,7 +15,7 @@
           placeholder="Filtrēt"
           class="mb-2"
           clearable
-        />post
+        />
         <el-tree
           :data="settings"
           node-key="id"
