@@ -5,39 +5,51 @@
     </div>
 
     <div class="col-xl-9 g-5 row" v-loading="loading">
-      <div class="card">
-        <DataTable
-          ref="table"
-          id="categories"
-          :columns="dt.categories.columns"
+      <div class="card p-5">
+        <el-input
+          v-model="filterText"
+          placeholder="Meklēt"
+          class="mb-5"
+          clearable
+        />
+        <el-tree
           :data="categories"
-          :options="dtOptions"
-          class="table table-hover table-row-bordered gy-5"
-          @select="onSelect"
+          node-key="id"
+          :filter-node-method="filterNode"
+          ref="treeRef"
         >
-          <thead>
-            <tr class="fw-bolder text-dark p-4">
-              <th v-for="(header, index) in dt.categories.headers" :key="index">
-                {{ header }}
-              </th>
-            </tr>
-          </thead>
-        </DataTable>
+          <template #default="{ node, data }">
+            <span
+              class="custom-tree-node"
+              @dblclick.stop="openCategory(data.data)"
+              @click="data.children ? '' : openCategory(data.data)"
+            >
+              {{ node.label }}
+            </span>
+          </template>
+        </el-tree>
       </div>
     </div>
   </div>
 </template>
 
+<style>
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
+}
+</style>
+
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onBeforeUnmount, watch } from "vue";
 import TecdocCar from "@/components/tecdoc/TecdocCar.vue";
-import {
-  getDtOptions,
-  handleSelect,
-  transformDtSource,
-} from "@/assets/ts/layout/dtOptions";
 import { useBreadcrumbStore } from "@/stores/breadcrumb";
 import ApiService from "@/core/services/ApiService";
+import type { WatchStopHandle } from "vue";
 
 const breadcrumbStore = useBreadcrumbStore();
 
@@ -47,34 +59,39 @@ export default defineComponent({
     TecdocCar,
   },
   setup() {
+    const watcherHandles: WatchStopHandle[] = [];
     const loading = ref<boolean>(false);
     const categories = ref();
 
-    let dtOptions = getDtOptions(1);
-    dtOptions["select"] = true;
+    // Tree setup
+    const treeRef = ref();
+    const filterText = ref("");
 
-    let dtSource = {
-      categories: {
-        assemblyGroupName: "Grupa",
-        parentName: "Kategorija",
-      },
+    const tWatcher = watch(filterText, (val) => {
+      treeRef.value!.filter(val);
+    });
+    watcherHandles.push(tWatcher);
+
+    const filterNode = (value: string, data: any) => {
+      if (!value) return true;
+      // Remove accents
+      const cleanString = (s: string) =>
+        s
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase();
+      return cleanString(data.label).includes(cleanString(value));
     };
 
-    const columnOptions = {
-      categories: {
-        parentName: {
-          searchable: false,
-          className: "text-muted",
-        },
-      },
-    };
-
-    const dt = transformDtSource(dtSource, columnOptions);
+    onBeforeUnmount(() => {
+      watcherHandles.forEach((stop) => stop());
+    });
 
     return {
       categories,
-      dtOptions,
-      dt,
+      treeRef,
+      filterNode,
+      filterText,
       loading,
     };
   },
@@ -92,12 +109,10 @@ export default defineComponent({
       });
   },
   methods: {
-    onSelect(e, dt, type, indexes) {
-      const rowData = handleSelect(dt, indexes);
-
+    openCategory(data) {
       let params = this.$route.params;
-      params.groupId = rowData[0]["assemblyGroupNodeId"];
-      this.updateBreadcrumbs(rowData[0].assemblyGroupName);
+      params.groupId = data.id;
+      this.updateBreadcrumbs(data.name);
 
       this.$router.push({
         name: "tecdoc-parts",
