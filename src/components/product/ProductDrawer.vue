@@ -225,7 +225,8 @@
                           class="dropdown-item"
                           href="#"
                           @click.prevent="showLog()"
-                          ><i class="fa-solid fa-book fa-fw me-2"></i> Izmaiņas</a
+                          ><i class="fa-solid fa-book fa-fw me-2"></i>
+                          Izmaiņas</a
                         >
                       </li>
                       <li>
@@ -233,7 +234,10 @@
                           class="dropdown-item"
                           href="#"
                           @click.prevent="addIssue()"
-                          ><i class="fa-solid fa-triangle-exclamation fa-fw me-2"></i> Paziņot par problēmu</a
+                          ><i
+                            class="fa-solid fa-triangle-exclamation fa-fw me-2"
+                          ></i>
+                          Paziņot par problēmu</a
                         >
                       </li>
                     </ul>
@@ -499,9 +503,10 @@
               }"
             >
               <div class="row mb-3 fw-bold">
-                <label class="col-lg-3">Piegādātājs</label>
-                <label class="col-lg-5">Kods</label>
-                <label class="col-lg-2">Atlikums</label>
+                <label class="col-lg-2">Piegādātājs</label>
+                <label class="col-lg-4">Kods</label>
+                <label class="col-lg-3">Piegāde</label>
+                <label class="col-lg-1">Atl.</label>
                 <label class="col-lg-2">Cena</label>
               </div>
               <div
@@ -509,8 +514,8 @@
                 v-for="(item, index) in suppliers"
                 :key="index"
               >
-                <label class="col-lg-3">{{ item.supplier_name }}</label>
-                <label class="col-lg-5">
+                <label class="col-lg-2">{{ item.supplier_name }}</label>
+                <label class="col-lg-4">
                   {{ item.code_supplier }}
                   <a
                     :href="item.search_url"
@@ -526,12 +531,21 @@
                     button-class="ms-1"
                   />
                 </label>
+                <label class="col-lg-3">
+                  {{ item.delivery_info ?? "" }}
+                </label>
                 <label
-                  class="col-lg-2"
+                  class="col-lg-1"
                   :class="item.supplier_rest == 0 ? `text-danger` : ``"
                   >{{ item.supplier_rest }}</label
                 >
-                <label class="col-lg-2">{{ item.supplier_price }} €</label>
+                <label
+                  class="col-lg-2"
+                  :title="item.order_date || ''"
+                  v-tooltip
+                >
+                  {{ item.supplier_price }} €
+                </label>
               </div>
             </div>
             <div class="tab-pane fade p-3" id="tab_prices" role="tabpanel">
