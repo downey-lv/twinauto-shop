@@ -531,7 +531,7 @@
                     button-class="ms-1"
                   />
                 </label>
-                <label class="col-lg-3">
+                <label class="col-lg-3" :class="item.delivery_missed ? `text-danger`: ``">
                   {{ item.delivery_info ?? "" }}
                 </label>
                 <label
