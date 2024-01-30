@@ -86,11 +86,16 @@ export const labelService = {
         }
         if (key === "saleprice") {
           if (hidePrice) return "";
-          return data.saleprice + " €";
+          return data.priceSell + " €";
         }
         if (key === "unitprice") {
-          if (!hidePrice && data.volume && data.unitname) {
-            const unit_price = (data.saleprice / data.volume).toFixed(2);
+          if (
+            !hidePrice &&
+            data.volume &&
+            data.volume !== "1" &&
+            data.unitname
+          ) {
+            const unit_price = (data.priceSell / data.volume).toFixed(2);
             return `${unit_price} €/${data.unitname} - `;
           }
           return "";
@@ -102,7 +107,10 @@ export const labelService = {
     // Prepare labels
     const labels: object[] = [];
     for (const item of data) {
-      let result = replacePlaceholders(shop_template, item);
+      const product = item.shop;
+      product.priceSell = item.priceSell;
+
+      let result = replacePlaceholders(shop_template, product);
 
       result += "\nP1,1\n "; // Print - number of label sets, number of copies
       labels.push(result);

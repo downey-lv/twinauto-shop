@@ -127,7 +127,7 @@ export default defineComponent({
         let products = [] as any[];
         this.products.forEach((product) => {
           for (let i = 0; i < product.quantity; i++) {
-            if (product.data?.shop) products.push(product.data.shop);
+            if (product.data?.shop) products.push(product.data);
           }
         });
 

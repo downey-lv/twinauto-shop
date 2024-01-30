@@ -920,7 +920,7 @@ export default defineComponent({
       };
 
       try {
-        await labelService.print("product", [this.p.shop], params);
+        await labelService.print("product", [this.p], params);
       } finally {
         this.toggleButtonState(el, false);
       }
