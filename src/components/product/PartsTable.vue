@@ -284,6 +284,14 @@ export default defineComponent({
         restSupplier: {
           width: "90px",
           className: "text-center",
+          render: function (data, type, row) {
+            if (row.fastestDelivery === 0) {
+              return `<span class="text-success">${data}</span>`;
+            } else if (row.fastestDelivery === 1) {
+              return `<span class="text-warning">${data}</span>`;
+            }
+            return data;
+          },
         },
         sold6Months: {
           width: "90px",
