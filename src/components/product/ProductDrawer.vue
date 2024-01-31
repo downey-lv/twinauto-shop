@@ -308,10 +308,31 @@
           </div>
           <!--end::Details-->
 
+          <Notice
+            classes="rounded-3 mb-3"
+            color="primary"
+            :body="p.shop.message"
+            v-if="p.shop?.message"
+          ></Notice>
+
           <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6" :key="tabsKey">
+            <!-- Tecdoc parameters -->
+            <template v-if="p.tecdoc">
+              <li class="nav-item" v-if="p.tecdoc.details">
+                <a
+                  class="nav-link active"
+                  data-bs-toggle="tab"
+                  href="#tab_tecdoc"
+                  >Parametri</a
+                >
+              </li>
+            </template>
+
+            <!-- Autoshop information -->
             <li class="nav-item">
               <a
-                class="nav-link active"
+                class="nav-link"
+                :class="{ active: !p.tecdoc }"
                 data-bs-toggle="tab"
                 href="#tab_shop"
                 v-if="p.shop"
@@ -319,17 +340,8 @@
               >
             </li>
 
-            <!-- Tecdoc tabs -->
+            <!-- TecDoc details -->
             <template v-if="p.tecdoc">
-              <li class="nav-item" v-if="p.tecdoc.details">
-                <a
-                  class="nav-link"
-                  :class="{ active: !p.shop }"
-                  data-bs-toggle="tab"
-                  href="#tab_tecdoc"
-                  >Parametri</a
-                >
-              </li>
               <li
                 class="nav-item"
                 v-if="p.tecdoc.oemNumbers && p.tecdoc.oemNumbers.length > 0"
@@ -387,18 +399,12 @@
 
           <div class="tab-content" :key="tabsKey">
             <div
-              class="tab-pane fade show active"
+              class="tab-pane fade"
+              :class="{ 'active show': !p.tecdoc }"
               id="tab_shop"
               role="tabpanel"
               v-if="p.shop"
             >
-              <Notice
-                classes="rounded-3 mb-3"
-                color="primary"
-                :body="p.shop.message"
-                v-if="p.shop.message"
-              ></Notice>
-
               <div class="row mb-3" v-if="p.shop.productgroupid">
                 <label class="col-lg-4 fw-light">Grupa</label>
                 <label class="col-lg-8 fs-6 text-dark">
@@ -434,8 +440,7 @@
             <!-- TecDoc tabs -->
             <template v-if="p.tecdoc">
               <div
-                class="tab-pane fade p-3"
-                :class="{ 'active show': !p.shop }"
+                class="tab-pane fade p-3 active show"
                 id="tab_tecdoc"
                 role="tabpanel"
               >
@@ -531,7 +536,12 @@
                     button-class="ms-1"
                   />
                 </label>
-                <label class="col-lg-3" :class="item.delivery_missed ? `text-danger`: ``" :title="item.delivery_warehouse" v-tooltip>
+                <label
+                  class="col-lg-3"
+                  :class="item.delivery_missed ? `text-danger` : ``"
+                  :title="item.delivery_warehouse"
+                  v-tooltip
+                >
                   {{ item.delivery_info ?? "" }}
                 </label>
                 <label
