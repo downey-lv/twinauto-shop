@@ -13,6 +13,7 @@
   text-align: center;
   border-radius: 6px;
   padding: 5px 0;
+  color: #000;
 }
 </style>
 
@@ -25,13 +26,16 @@ export default defineComponent({
   setup() {},
   mounted() {
     const imageViewerScript = document.createElement("script");
-    imageViewerScript.innerHTML = `function showImage(src = false) {
+    imageViewerScript.innerHTML = `function showImage(src = false, text = false) {
       const imageViewer = document.getElementById("image-viewer");
       if (imageViewer) {
         if (!src)
             imageViewer.style.visibility = "hidden";
         else {
-            imageViewer.innerHTML = "<img src=" + src + " alt='image' style='max-width: 300px' />";
+            if (text)
+                imageViewer.innerHTML = src;
+            else
+                imageViewer.innerHTML = "<img src=" + src + " alt='image' style='max-width: 300px' />";
             imageViewer.style.visibility = "visible";
         }
       }

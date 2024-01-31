@@ -68,13 +68,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-} from "vue";
+import { defineComponent, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import {
   getDtOptions,
   handleSelect,
@@ -264,6 +258,21 @@ export default defineComponent({
         },
         name: {
           width: "350px",
+          createdCell: function (td, cellData, rowData, row, col) {
+            const details = rowData.tecdoc?.details;
+            if (details) {
+              const detailsString = details
+                .map((detail) => `${detail.label}: ${detail.value}`)
+                .join("<br/>")
+                .replace(/'/g, "`");
+
+              td.setAttribute(
+                "onmouseover",
+                `showImage('${detailsString}', true)`
+              );
+              td.setAttribute("onmouseleave", `showImage()`);
+            }
+          },
         },
         priceSell: {
           width: "90px",
