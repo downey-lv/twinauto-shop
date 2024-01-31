@@ -531,7 +531,7 @@
                     button-class="ms-1"
                   />
                 </label>
-                <label class="col-lg-3" :class="item.delivery_missed ? `text-danger`: ``">
+                <label class="col-lg-3" :class="item.delivery_missed ? `text-danger`: ``" :title="item.delivery_warehouse" v-tooltip>
                   {{ item.delivery_info ?? "" }}
                 </label>
                 <label
