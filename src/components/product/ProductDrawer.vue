@@ -538,7 +538,7 @@
                 </label>
                 <label
                   class="col-lg-3"
-                  :class="item.delivery_missed ? `text-danger` : ``"
+                  :class="item.delivery_missed ? `text-warning` : ``"
                   :title="item.delivery_warehouse"
                   v-tooltip
                 >
