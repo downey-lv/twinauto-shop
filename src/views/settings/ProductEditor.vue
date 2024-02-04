@@ -38,9 +38,15 @@
       <h3 class="card-title">Produkti</h3>
     </div>
     <div class="card-body">
+      <el-input
+        v-model="filterText"
+        placeholder="Filtrēt"
+        class="mb-2"
+        clearable
+      />
       <el-table
         height="600"
-        :data="products"
+        :data="filterProducts"
         style="width: 100%"
         @selection-change="handleSelectionChange"
       >
@@ -124,6 +130,7 @@ import { computed, defineComponent, ref, watch, onBeforeUnmount } from "vue";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
+import type { Products } from "@/types/ProductEditor";
 
 export default defineComponent({
   components: { SelectComponent },
@@ -131,6 +138,23 @@ export default defineComponent({
     const loading = ref<boolean>(false);
     const loadingFilters = ref<boolean>(false);
     const settings = ref<any>({});
+    const filterText = ref("");
+
+    const containsText = (text, filterValue) =>
+      text.toLowerCase().includes(filterValue.toLowerCase());
+
+    const filterProducts = computed(() => {
+      const filterValue = filterText.value;
+      return products.value.filter(
+        (data) =>
+          !filterValue ||
+          containsText(data.productname, filterValue) ||
+          containsText(data.productcode, filterValue) ||
+          containsText(data.producer, filterValue) ||
+          containsText(data.productgroup, filterValue) ||
+          containsText(data.locations, filterValue)
+      );
+    });
 
     const fields = {
       productgroupid: "",
@@ -140,7 +164,7 @@ export default defineComponent({
     const filters = ref({ ...fields });
     const updateFields = ref({ ...fields });
 
-    const products = ref([]);
+    const products = ref<Products[]>([]);
     const selectedProducts = ref([] as any);
 
     function loadProducts() {
@@ -189,6 +213,8 @@ export default defineComponent({
       loadingFilters,
       filters,
       products,
+      filterText,
+      filterProducts,
       selectedProducts,
       updateFields,
       updateSet,
