@@ -140,19 +140,18 @@ export default defineComponent({
     const settings = ref<any>({});
     const filterText = ref("");
 
-    const containsText = (text, filterValue) =>
-      text.toLowerCase().includes(filterValue.toLowerCase());
+    const containsText = (text) =>
+      (text ?? "").toLowerCase().includes(filterText.value.toLowerCase());
 
     const filterProducts = computed(() => {
-      const filterValue = filterText.value;
       return products.value.filter(
         (data) =>
-          !filterValue ||
-          containsText(data.productname, filterValue) ||
-          containsText(data.productcode, filterValue) ||
-          containsText(data.producer, filterValue) ||
-          containsText(data.productgroup, filterValue) ||
-          containsText(data.locations, filterValue)
+          !filterText.value ||
+          containsText(data.productname) ||
+          containsText(data.productcode) ||
+          containsText(data.producer) ||
+          containsText(data.productgroup) ||
+          containsText(data.locations)
       );
     });
 
