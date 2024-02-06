@@ -811,7 +811,10 @@ export default defineComponent({
             !data.producer.startsWith("OE ")
           ) {
             reloadProduct(data);
-          } else updateValues(data);
+          } else {
+            if (data.tecdoc) loadVehicles(data);
+            updateValues(data);
+          }
         }
       }
     );
