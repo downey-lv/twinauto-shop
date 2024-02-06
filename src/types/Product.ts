@@ -1,3 +1,5 @@
+import type { LinkageBrand } from "./Linkages";
+
 export interface Shop {
   productid: string;
   productcode: string;
@@ -73,6 +75,7 @@ export interface Tecdoc {
     withFrame: Record<string, unknown>; // Adjust based on actual structure
     withoutFrame: string[];
   };
+  linkages?: LinkageBrand[];
 }
 
 export interface Vide {

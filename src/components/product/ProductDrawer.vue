@@ -361,6 +361,11 @@
                   >Aizvietotāji</a
                 >
               </li>
+              <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#tab_vehicles"
+                  >Automašīnas</a
+                >
+              </li>
             </template>
 
             <li class="nav-item">
@@ -493,6 +498,26 @@
                   <label class="col-lg-5 fs-6 text-dark">
                     {{ item.description }}
                   </label>
+                </div>
+              </div>
+
+              <div class="tab-pane fade p-3" id="tab_vehicles" role="tabpanel">
+                <div
+                  class="text-center text-muted fs-6"
+                  v-if="!p.tecdoc.linkages || p.tecdoc.linkages.length == 0"
+                >
+                  Nav saistīto transportlīdzekļu
+                </div>
+                <div class="d-flex flex-row mb-3 flex-column" v-else>
+                  <div
+                    class="p-2"
+                    v-for="(item, index) in p.tecdoc.linkages"
+                    :key="index"
+                  >
+                    <a href="#" @click.prevent="showLinkages(item.manuId)">{{
+                      item.manuName
+                    }}</a>
+                  </div>
                 </div>
               </div>
             </template>
@@ -645,6 +670,7 @@
     ref="modalIssue"
     :productId="String(p?.productid)"
   />
+  <LinkageModal v-if="p?.tecdoc" ref="linkageModalRef" :data="p.tecdoc" />
 </template>
 
 <style scoped>
@@ -692,6 +718,7 @@ import ApiService from "@/core/services/ApiService";
 import type { Product } from "@/types/Product";
 import LogModal from "@/components/data/LogModal.vue";
 import ReportIssue from "@/components/product/ReportIssue.vue";
+import LinkageModal from "@/components/product/ProductLinkages.vue";
 
 export default defineComponent({
   components: {
@@ -700,6 +727,7 @@ export default defineComponent({
     Copy,
     Search,
     ReportIssue,
+    LinkageModal,
   },
   setup() {
     const productStore = useProductStore();
@@ -788,6 +816,19 @@ export default defineComponent({
       }
     );
 
+    function loadVehicles(data) {
+      ApiService.get(`tecdoc/linkages`, `${data.tecdocId}/${data.codeAlphanum}`)
+        .then((response) => {
+          if (p.value) p.value.tecdoc.linkages = response.data;
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        })
+        .finally(() => {
+          // loading.value = false;
+        });
+    }
+
     function reloadProduct(data) {
       loading.value = true;
       ApiService.get(`tecdoc/article`, `${data.tecdocId}/${data.codeAlphanum}`)
@@ -796,6 +837,8 @@ export default defineComponent({
           if (d) {
             p.value = d;
             updateValues(d);
+
+            if (d.tecdoc) loadVehicles(data);
           } else {
             updateValues(data);
           }
@@ -979,6 +1022,9 @@ export default defineComponent({
     },
     addIssue() {
       (this.$refs.modalIssue as any).show();
+    },
+    showLinkages(manuId) {
+      (this.$refs.linkageModalRef as any).show(manuId);
     },
   },
 });
