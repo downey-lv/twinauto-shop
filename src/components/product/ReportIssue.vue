@@ -67,7 +67,7 @@ import { Modal } from "bootstrap";
 import type { FormInstance } from "element-plus";
 
 export default defineComponent({
-  name: "payment-modal",
+  name: "issue-modal",
   props: {
     productId: {
       type: String,
