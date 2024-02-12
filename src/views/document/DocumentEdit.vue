@@ -763,7 +763,7 @@ export default defineComponent({
           document.value.orderdate = DateTime.fromISO(data.date).toJSDate();
           document.value.payterm = DateTime.fromISO(data.term).toJSDate();
           document.value.comment = data.comment ?? "";
-          updatePayterm();
+          updatePayterm(data.term);
 
           products = [];
           for (const item of data.items) {
@@ -888,7 +888,8 @@ export default defineComponent({
     watcherHandles.push(iWatcher);
 
     // Update payterm
-    const updatePayterm = () => {
+    const updatePayterm = (termValue = null as any) => {
+      if (termValue) return;
       if (!document.value.orderdate) return;
 
       const company = companies.value.find(
