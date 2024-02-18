@@ -290,21 +290,27 @@
           <div class="col-lg-3">
             <div class="card h-100">
               <div class="card-body">
-                <label class="fs-6 mb-2"
-                  >Produktu sasaiste
-                  <i
-                    class="text-primary fa-solid fa-circle-info"
-                    title="Automātiski sasaista visus produktus kā analogus, tiek izmantots arī internetā"
-                    v-tooltip
-                  ></i
-                ></label>
-                <div
-                  class="row"
-                  v-for="(item, idx) in product.crosses"
-                  :key="idx"
-                >
-                  <div class="col">{{ item.code }}</div>
-                  <div class="col">{{ item.nextis_name }}</div>
+                <label class="fs-5 mb-2">TecDoc analogs</label>
+                <div class="fv-row mb-2">
+                  <label class="fs-6 mb-2">Kods</label>
+                  <el-form-item>
+                    <el-input
+                      v-model="product.td_code"
+                      @change="loadTecDoc(false, true)"
+                    ></el-input>
+                  </el-form-item>
+                </div>
+
+                <div class="fv-row mb-2" v-loading="loading.producers">
+                  <label class="fs-6 mb-2">Ražotājs</label>
+                  <SelectComponent
+                    :options="producersTecdoc"
+                    v-model="product.td_producer"
+                    prop="producerid"
+                    key-column="brandId"
+                    label-column="brandName"
+                    @change="loadTecDoc(false, true)"
+                  />
                 </div>
               </div>
             </div>
@@ -508,6 +514,7 @@ export default defineComponent({
 
     const groups = ref();
     const producers = ref();
+    const producersTecdoc = ref();
     const units = ref();
     const locations = ref();
     const is_new = ref(true);
@@ -540,6 +547,8 @@ export default defineComponent({
       image_ids: [] as string[],
       crosses: [] as any[],
       important: false,
+      td_code: "",
+      td_producer: "",
     };
     const product = ref({ ...defaultProduct });
     let originalProduct;
@@ -621,6 +630,7 @@ export default defineComponent({
           // Convert to string for dropdowns
           data["producerid"] = String(data["producerid"]);
           data["productgroupid"] = String(data["productgroupid"]);
+          data["td_producer"] = String(data["td_producer"] ?? "");
 
           // Convert numeric values
           data["volume"] = parseFloat(data["volume"]);
@@ -782,6 +792,7 @@ export default defineComponent({
       groups,
       locations,
       producers,
+      producersTecdoc,
       units,
       rules,
       is_new,
@@ -798,6 +809,7 @@ export default defineComponent({
       this.loadData("unit", "units"),
       this.loadData("producer", "producers"),
       this.loadData("group", "groups"),
+      this.loadData("tecdoc/producers", "producersTecdoc"),
     ]);
 
     // Re-validate form
@@ -957,10 +969,18 @@ export default defineComponent({
       if (modifiedPath) this.$router.replace(modifiedPath);
       else this.$router.go(-1);
     },
-    loadTecDoc(ean = false) {
-      let productCode = this.product.productcode;
-      let producerId = this.product.producerid;
+    loadTecDoc(ean = false, analogue = false) {
+      let productCode;
+      let producerId;
       let tecdocId;
+
+      if (analogue) {
+        productCode = this.product.td_code;
+        tecdocId = this.product.td_producer;
+      } else {
+        productCode = this.product.productcode;
+        producerId = this.product.producerid;
+      }
 
       // Change to EAN
       if (ean) {
@@ -969,11 +989,11 @@ export default defineComponent({
       }
 
       // If fields are empty, do nothing
-      if (!productCode || (!producerId && !ean)) {
+      if (!productCode || (!producerId && !ean && !analogue)) {
         return;
       }
 
-      if (!ean) {
+      if (!ean && !analogue) {
         // Find tecdocid from producers
         const producer = this.producers.find(
           (producer) => producer.id === producerId
@@ -1023,9 +1043,6 @@ export default defineComponent({
             this.product.unitid = "2";
           }
 
-          // Set ean
-          if (article.gtins?.length > 0) this.product.ean = article.gtins[0];
-
           // Set OE codes
           this.product.oecode = article.oemNumbers
             .map((item) => {
@@ -1042,14 +1059,20 @@ export default defineComponent({
             .join("\n");
 
           // Set name
-          if (article.nameSuggestions.length === 1) {
+          if (
+            this.product.productname == "" &&
+            article.nameSuggestions.length === 1
+          ) {
             this.product.productname = article.nameSuggestions;
           } else {
             this.nameSuggestions = article.nameSuggestions;
           }
 
           // Set location
-          if (Object.keys(article.locationSuggestions).length === 1) {
+          if (
+            this.product.location_list == [] &&
+            Object.keys(article.locationSuggestions).length === 1
+          ) {
             const key = Object.keys(article.locationSuggestions)[0];
             this.product.location_list = article.locationSuggestions[key];
           } else {
@@ -1057,26 +1080,34 @@ export default defineComponent({
           }
 
           // Set group
-          if (Object.keys(article.groupSuggestions).length === 1) {
+          if (
+            this.product.productgroupid == "" &&
+            Object.keys(article.groupSuggestions).length === 1
+          ) {
             const key = Object.keys(article.groupSuggestions)[0];
             this.product.productgroupid = key;
           } else {
             this.groupSuggestions = article.groupSuggestions;
           }
 
-          // Set image
-          if (article.images[0].imageURL400) {
-            const imageURL = article.images[0].imageURL400;
+          if (!analogue) {
+            // Set ean
+            if (article.gtins?.length > 0) this.product.ean = article.gtins[0];
 
-            // Stage image for upload
-            ApiService.get("tecdoc", "image", { url: imageURL })
-              .then((response) => {
-                this.uploadImage(1)({ file: response.data });
-              })
-              .catch((error) => {
-                console.log("Failed to fetch image:", error);
-                push.error("Neizdevās pievienot TecDoc attēlu");
-              });
+            // Set image
+            if (article.images[0].imageURL400) {
+              const imageURL = article.images[0].imageURL400;
+
+              // Stage image for upload
+              ApiService.get("tecdoc", "image", { url: imageURL })
+                .then((response) => {
+                  this.uploadImage(1)({ file: response.data });
+                })
+                .catch((error) => {
+                  console.log("Failed to fetch image:", error);
+                  push.error("Neizdevās pievienot TecDoc attēlu");
+                });
+            }
           }
         })
         .catch((error) => {
