@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="../../assets/hover-icon.css">
 <template>
   <DocumentHeader v-on:menu-data="headerUpdate" />
   <el-form
@@ -127,15 +126,21 @@
                     />
                   </el-form-item>
                 </div>
-                <div class="fv-row" v-if="$route.params.type === 'in' && $route.params.editId === 'new'">
+                <div
+                  class="fv-row"
+                  v-if="
+                    $route.params.type === 'in' &&
+                    $route.params.editId === 'new'
+                  "
+                >
                   <label class="fs-6">Piegādes izdevumi, bez PVN</label>
                   <el-form-item>
                     <el-input-number
-                        v-model="document.deliveryCost"
-                        :controls="false"
-                        :precision="4"
-                        @keydown.enter.prevent
-                        class="w-100"
+                      v-model="document.deliveryCost"
+                      :controls="false"
+                      :precision="4"
+                      @keydown.enter.prevent
+                      class="w-100"
                     />
                     <div class="fs-7 fw-semibold text-muted">
                       Pēc saglabāšanas pārbaudi kopsummu
@@ -260,7 +265,10 @@
                     ></el-button>
                   </template>
                 </el-input>
-                <div class="fs-7 fw-semibold text-muted" v-if="item.imported?.code">
+                <div
+                  class="fs-7 fw-semibold text-muted"
+                  v-if="item.imported?.code"
+                >
                   {{ item.imported.code }}
                 </div>
               </el-form-item>
@@ -305,7 +313,11 @@
               </el-form-item>
             </div>
 
-            <div class="col-lg-1 pb-1" :title="item.data?.priceDetails || ``" v-tooltip-html>
+            <div
+              class="col-lg-1 pb-1"
+              :title="item.data?.priceDetails || ``"
+              v-tooltip-html
+            >
               <el-form-item :prop="`products[${idx}].priceVAT`">
                 <el-input-number
                   v-model="item.priceVAT"
@@ -403,7 +415,15 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, reactive, ref, toRefs, watch, onBeforeUnmount} from "vue";
+import {
+  computed,
+  defineComponent,
+  reactive,
+  ref,
+  toRefs,
+  watch,
+  onBeforeUnmount,
+} from "vue";
 import type { WatchStopHandle } from "vue";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
@@ -441,8 +461,8 @@ import {
   validateCode,
   validateID,
 } from "@/components/documents/validators";
-import "@/assets/hover-icon.css"
-import type {Product} from "@/types/Product";
+import "@/assets/hover-icon.css";
+import type { Product } from "@/types/Product";
 import { DateTime } from "luxon";
 
 export default defineComponent({
@@ -836,8 +856,12 @@ export default defineComponent({
           response.data.companyid = String(response.data.companyid);
 
           // Format date
-          response.data.orderdate = DateTime.fromISO(response.data.orderdate).toJSDate();
-          response.data.payterm = DateTime.fromISO(response.data.payterm).toJSDate();
+          response.data.orderdate = DateTime.fromISO(
+            response.data.orderdate
+          ).toJSDate();
+          response.data.payterm = DateTime.fromISO(
+            response.data.payterm
+          ).toJSDate();
 
           // Format products
           response.data.products.forEach((product) => {
@@ -899,7 +923,9 @@ export default defineComponent({
       let days = parseInt(company?.default_payterm ?? "14");
       if (!days || days === 0) return;
 
-      document.value.payterm = DateTime.fromJSDate(document.value.orderdate).plus({ days: days }).toJSDate();
+      document.value.payterm = DateTime.fromJSDate(document.value.orderdate)
+        .plus({ days: days })
+        .toJSDate();
     };
 
     // Handle product search
@@ -917,7 +943,7 @@ export default defineComponent({
     const selectMatch = (product, match) =>
       productService.selectMatch(product, match);
 
-    const changeMatch = (product, increase=true) =>
+    const changeMatch = (product, increase = true) =>
       productService.changeMatch(product, increase);
 
     onBeforeRouteLeave(() => {
@@ -1032,10 +1058,13 @@ export default defineComponent({
       const matches = product.matches;
 
       // Select match
-      if (Object.keys(matches).length >  0)
-        this.selectMatch(this.document.products[idx], matches[Number(product.selectedMatch)]);
+      if (Object.keys(matches).length > 0)
+        this.selectMatch(
+          this.document.products[idx],
+          matches[Number(product.selectedMatch)]
+        );
 
-      this.nextRow(idx, 'code');
+      this.nextRow(idx, "code");
     },
     submit() {
       if (!this.document) {
@@ -1049,11 +1078,10 @@ export default defineComponent({
 
       (this.$refs.formRef as FormInstance).validate((valid: boolean) => {
         if (valid) {
-
           const data = { ...this.document } as any;
 
           // Format dates
-          if (!data.orderdate || !data.payterm) return
+          if (!data.orderdate || !data.payterm) return;
           data.orderdate = DateTime.fromJSDate(data.orderdate).toISODate();
           data.payterm = DateTime.fromJSDate(data.payterm).toISODate();
 
