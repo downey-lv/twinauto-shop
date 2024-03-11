@@ -2,7 +2,12 @@
   <SearchBox />
   <div class="row g-5 g-xl-8">
     <div class="col-12" v-if="dataUrl">
-      <PartsTable resource="product/find" :slug="dataUrl" :query="dataQuery">
+      <PartsTable
+        resource="product/find"
+        :slug="dataUrl"
+        :query="dataQuery"
+        :focus-search="focusSearch"
+      >
         <template v-slot:header>
           <h3 class="card-title"></h3>
           <div class="card-toolbar">
@@ -46,6 +51,10 @@ export default defineComponent({
     const route = useRoute();
     const loadAll = ref(false);
 
+    const focusSearch = computed(() => {
+      return route.params.type != "id";
+    });
+
     const dataUrl = computed(() => {
       let url;
       if (route.params.type && route.params.query) {
@@ -65,7 +74,7 @@ export default defineComponent({
       return route.query;
     });
 
-    return { dataUrl, dataQuery, loadAll };
+    return { dataUrl, dataQuery, loadAll, focusSearch };
   },
 });
 </script>

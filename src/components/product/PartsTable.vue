@@ -68,7 +68,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import {
+  computed,
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import {
   getDtOptions,
   handleSelect,
@@ -99,6 +106,11 @@ export default defineComponent({
     query: {
       type: Object,
       required: false,
+    },
+    focusSearch: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   setup(props) {
@@ -149,7 +161,7 @@ export default defineComponent({
           .finally(() => {
             // Reset table to the default order
             const dtObj = table.value.dt;
-            dtObj.order(dtOptions["order"]).draw();
+            dtObj.order(dtOptions.value["order"]).draw();
 
             loading.value = false;
           });
@@ -197,34 +209,33 @@ export default defineComponent({
     watcherHandles.push(fWatcher);
 
     // Define datatable
-    let dtOptions = getDtOptions(1);
-    dtOptions["select"] = true;
-    dtOptions["order"] = [
-      [10, "desc"], // Exact match
-      [6, "desc"], // Rest
-      [0, "desc"], // ID
-      [7, "desc"], // Rest supplier
-    ];
+    let dtOptions = computed(function () {
+      let options = getDtOptions(+props.focusSearch);
+      options["select"] = true;
+      options["order"] = [
+        [10, "desc"],
+        [6, "desc"],
+        [0, "desc"],
+        [7, "desc"],
+      ];
+      let existingFunction = options["initComplete"];
 
-    let existingFunction = dtOptions["initComplete"];
-    dtOptions["initComplete"] = function (settings, json) {
-      // First run the existing function, if it's defined
-      if (typeof existingFunction === "function") {
-        existingFunction(settings, json);
-      }
-
-      // Get all 'th' elements in the document
-      const thElements = document.getElementsByTagName("th");
-
-      // Loop through all 'th' elements
-      for (var i = 0; i < thElements.length; i++) {
-        // Check if the text content of the current 'th' element includes "Veikalā"
-        if ((thElements[i].textContent || "").includes("Veikalā")) {
-          // If it includes "Veikalā", remove the 'fs-3' class from this 'th' element
-          thElements[i].classList.remove("fs-3", "fw-bold");
+      options["initComplete"] = function (settings, json) {
+        if (typeof existingFunction === "function") {
+          existingFunction(settings, json);
         }
-      }
-    };
+
+        const thElements = document.getElementsByTagName("th");
+
+        for (var i = 0; i < thElements.length; i++) {
+          if ((thElements[i].textContent || "").includes("Veikalā")) {
+            thElements[i].classList.remove("fs-3", "fw-bold");
+          }
+        }
+      };
+
+      return options;
+    });
 
     let dtSource = {
       parts: {
