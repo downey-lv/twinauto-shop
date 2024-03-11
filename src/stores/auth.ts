@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import ApiService from "@/core/services/ApiService";
 import JwtService from "@/core/services/JwtService";
 import router from "@/router";
+import {push} from "@/main";
 
 export interface User {
   name: string;
@@ -22,6 +23,17 @@ export const useAuthStore = defineStore("auth", () => {
     user.value = authUser;
     errors.value = {};
     JwtService.saveToken(user.value.api_token);
+
+    // Grab app settings
+    ApiService.get("user", "settings")
+        .then((response) => {
+          for (let key in response.data) {
+            localStorage.setItem(`option_${key}`, response.data[key]);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
   }
 
   function setError(error: any) {

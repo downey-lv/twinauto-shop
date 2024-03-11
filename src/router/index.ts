@@ -78,7 +78,16 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/document",
         name: "document",
-        redirect: { name: "document-list", params: { type: "out" } },
+        beforeEnter: (to, from, next) => {
+          let defaultType = localStorage.getItem('option_default_document_type') || 'daily';
+
+          // Implementing a stop condition to prevent infinite loop
+          if (to.params.type === defaultType) {
+            next();
+          } else {
+            next({ name: 'document-list', params: { type: defaultType } });
+          }
+        },
         meta: {
           breadcrumbStore: "document",
         },
