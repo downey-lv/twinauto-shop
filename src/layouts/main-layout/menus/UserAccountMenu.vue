@@ -54,7 +54,7 @@
           <!--begin::Menu item-->
           <div class="menu-item px-3">
             <a
-              @click.prevent="setOption(key, value)"
+              @click.prevent="saveOption(key, value)"
               href="#"
               class="menu-link d-flex px-5"
               :class="{ active: optionValues[key] === value }"
@@ -81,10 +81,11 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from "vue";
+import { defineComponent, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import ApiService from "@/core/services/ApiService";
+import { options, getOption, setOption } from "@/core/services/OptionService";
 
 export default defineComponent({
   name: "kt-user-menu",
@@ -98,34 +99,13 @@ export default defineComponent({
       router.push({ name: "sign-in" });
     };
 
-    const options = {
-      "default_document_type": {
-        title: "Dokumenti",
-        default: "daily", 
-        values: {
-          daily: "Dienas pārdotais",
-          in: "Iepirkums",
-          service: "Serviss"
-        }
-      }  
-    };
-
-    const getOption = (key: string) => {
-      let value = localStorage.getItem(`option_${key}`);
-      if (!value) {
-        value = String(options[key].default);
-        localStorage.setItem(`option_${key}`, value);
-      }
-      return value;
-    };
-
-    const optionValues = ref({})
+    const optionValues = ref({});
     Object.keys(options).forEach((key) => {
       optionValues.value[key] = getOption(key);
     });
 
-    const setOption = (key: string, value: string) => {
-      localStorage.setItem(`option_${key}`, value);
+    const saveOption = (key: string, value: string) => {
+      setOption(key, value);
       optionValues.value[key] = value;
       updateDatabase(key, value);
     };
@@ -133,18 +113,17 @@ export default defineComponent({
     const updateDatabase = (key: string, value: string) => {
       const data = {
         key: key,
-        value: value
+        value: value,
       };
 
-      ApiService.post("user/settings", data)
-          .catch((err) => {
-            console.error(err);
-          });
-    }
+      ApiService.post("user/settings", data).catch((err) => {
+        console.error(err);
+      });
+    };
 
     return {
       signOut,
-      setOption,
+      saveOption,
       optionValues,
       options,
       user: store.user,

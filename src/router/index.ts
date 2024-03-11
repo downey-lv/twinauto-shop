@@ -5,6 +5,7 @@ import {
 } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
+import { getOption } from "@/core/services/OptionService";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -79,13 +80,17 @@ const routes: Array<RouteRecordRaw> = [
         path: "/document",
         name: "document",
         beforeEnter: (to, from, next) => {
-          let defaultType = localStorage.getItem('option_default_document_type') || 'daily';
+          const defaultType = getOption("default_document_type");
 
-          // Implementing a stop condition to prevent infinite loop
-          if (to.params.type === defaultType) {
-            next();
+          if (to.name === "document") {
+            // Implementing a stop condition to prevent infinite loop
+            if (to.params.type === defaultType) {
+              next();
+            } else {
+              next({name: "document-list", params: {type: defaultType}});
+            }
           } else {
-            next({ name: 'document-list', params: { type: defaultType } });
+            next();
           }
         },
         meta: {
