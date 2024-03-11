@@ -70,13 +70,32 @@ initVeeValidate();
 app.use(i18n);
 
 // Set up tooltip
-app.directive("tooltip", (el) => {
-  new Tooltip(el);
-});
+function makeTooltip(
+    constructorArgs: Partial<Tooltip.Options> | undefined = undefined
+) {
+  return {
+    mounted(el) {
+      el.tooltipInstance = new Tooltip(el, constructorArgs);
+    },
+    beforeUnmount(el) {
+      disposeTooltip(el);
+    },
+    updated(el) {
+      disposeTooltip(el);
+      el.tooltipInstance = new Tooltip(el, constructorArgs);
+    },
+  };
+}
 
-app.directive("tooltip-html", (el) => {
-  new Tooltip(el, { html: true });
-});
+function disposeTooltip(el) {
+  if (el.tooltipInstance) {
+    el.tooltipInstance.dispose();
+    delete el.tooltipInstance;
+  }
+}
+
+app.directive("tooltip", makeTooltip());
+app.directive("tooltip-html", makeTooltip({ html: true }));
 
 // Place it at THE END of the app.use() chain, just right before app.mount()
 export const push = createNotivue(app);
