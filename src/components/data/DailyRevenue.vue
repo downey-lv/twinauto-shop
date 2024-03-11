@@ -133,6 +133,11 @@ export default defineComponent({
           },
           { separator: 1 },
           {
+            title: "Kopā",
+            amount: this.data.official,
+            color: "danger",
+          },
+          {
             title: "Atlikums",
             amount: this.data.cash,
             color: "warning",
