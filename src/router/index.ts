@@ -79,19 +79,9 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/document",
         name: "document",
-        beforeEnter: (to, from, next) => {
-          const defaultType = getOption("default_document_type");
-
-          if (to.name === "document") {
-            // Implementing a stop condition to prevent infinite loop
-            if (to.params.type === defaultType) {
-              next();
-            } else {
-              next({name: "document-list", params: {type: defaultType}});
-            }
-          } else {
-            next();
-          }
+        redirect: () => {
+          const defaultType = getOption("default_document_type")
+          return { name: "document-list", params: { type: defaultType }};
         },
         meta: {
           breadcrumbStore: "document",
