@@ -721,6 +721,7 @@ import LogModal from "@/components/data/LogModal.vue";
 import ReportIssue from "@/components/product/ReportIssue.vue";
 import LinkageModal from "@/components/product/ProductLinkages.vue";
 import CartAddModal from "@/components/cart/CartAddModal.vue";
+import { getOption, getOptionLabel } from "@/core/services/OptionService";
 
 export default defineComponent({
   components: {
@@ -755,10 +756,12 @@ export default defineComponent({
       let newStats: Stat[] = [];
 
       // Set stats
-      if (p.priceSell !== "")
+      const priceKey = getOption("default_price");
+      const priceLabel = getOptionLabel("default_price");
+      if (p[priceKey] !== "")
         newStats.push({
-          title: "Pārdošanas cena",
-          value: String(p.priceSell) + " €",
+          title: `Cena ${priceLabel}`,
+          value: String(p[priceKey]) + " €",
         });
 
       if (p.shop) {

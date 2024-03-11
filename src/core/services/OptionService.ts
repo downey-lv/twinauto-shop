@@ -17,6 +17,15 @@ const options = {
       "3": "Ofiss",
     },
   },
+  default_price: {
+    title: "Cena",
+    default: "priceSell",
+    values: {
+      priceSell: "Veikals",
+      priceService: "Serviss",
+      priceOnlineDefault: "Internets",
+    },
+  },
 };
 
 export const getOption = (key: string) => {
@@ -26,6 +35,11 @@ export const getOption = (key: string) => {
     localStorage.setItem(`option_${key}`, value);
   }
   return value;
+};
+
+export const getOptionLabel = (key: string) => {
+  const value = getOption(key);
+  return options[key].values[value];
 };
 
 export const setOption = (key: string, value: string) => {

@@ -88,6 +88,7 @@ import ApiService from "@/core/services/ApiService";
 import ImageHover from "@/components/product/ImageHover.vue";
 import type { WatchStopHandle } from "vue";
 import type { Criteria, CriteriaFiltered } from "@/types/FilterCriteria";
+import {getOption, getOptionLabel} from "@/core/services/OptionService";
 
 export default defineComponent({
   components: {
@@ -237,6 +238,7 @@ export default defineComponent({
       return options;
     });
 
+    const priceKey = getOption("default_price");
     let dtSource = {
       parts: {
         productid: "ID",
@@ -244,7 +246,7 @@ export default defineComponent({
         producer: "Ražotājs",
         name: "Nosaukums",
         comment: "Komentārs",
-        priceSell: "Cena",
+        [priceKey]: getOptionLabel("default_price"),
         rest: "Veikalā",
         restSupplier: "Noliktavā",
         sold6Months: "6 mēn.",
