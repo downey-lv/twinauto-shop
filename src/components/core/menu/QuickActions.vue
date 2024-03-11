@@ -47,6 +47,18 @@
       </router-link>
     </div>
 
+    <div class="menu-item px-3">
+      <router-link
+        :to="{
+          name: 'document-edit',
+          params: { editId: 'new', type: 'daily' },
+        }"
+        class="menu-link px-3"
+      >
+        <i class="fa-solid fa-cash-register fa-fw me-3"></i> Dienas pārdotais
+      </router-link>
+    </div>
+
     <!--    &lt;!&ndash;begin::Menu item&ndash;&gt;-->
     <!--    <div-->
     <!--      class="menu-item px-3"-->

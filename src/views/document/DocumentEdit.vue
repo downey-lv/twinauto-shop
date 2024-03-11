@@ -75,7 +75,7 @@
           <div class="col-lg-8">
             <div class="row">
               <div class="col-lg">
-                <div class="fv-row" id="containerType">
+                <div class="fv-row" id="containerType" v-if="!dailyDocument">
                   <label class="fs-6 required">Tips</label>
                   <SelectComponent
                     :options="typesFiltered"
@@ -92,13 +92,22 @@
                     prop="companyid"
                   />
                 </div>
-                <div class="fv-row">
+                <div class="fv-row" v-if="!dailyDocument">
                   <label class="fs-6">Dokumenta numurs</label>
                   <el-form-item prop="waybillno">
                     <el-input
                       v-model="document.waybillno"
                       @keydown.enter.prevent
                     />
+                  </el-form-item>
+                </div>
+                <div class="fv-row" v-else-if="!document.orderid">
+                  <label class="fs-6 required">Darba vieta</label>
+                  <el-form-item prop="paymentRecipient">
+                    <el-radio-group v-model="document.paymentRecipient">
+                      <el-radio-button label="V1" value="1" />
+                      <el-radio-button label="V2" value="2" />
+                    </el-radio-group>
                   </el-form-item>
                 </div>
               </div>
@@ -115,7 +124,7 @@
                     />
                   </el-form-item>
                 </div>
-                <div class="fv-row">
+                <div class="fv-row" v-if="!dailyDocument">
                   <label class="fs-6 required">Apmaksas termiņš</label>
                   <el-form-item prop="payterm">
                     <el-date-picker
@@ -124,6 +133,16 @@
                       @keydown.enter.prevent
                       class="w-100"
                     />
+                  </el-form-item>
+                </div>
+                <div class="fv-row" v-else-if="!document.orderid">
+                  <label class="fs-6 required">Apmaksas veids</label>
+                  <el-form-item prop="paymentType">
+                    <el-radio-group v-model="document.paymentType">
+                      <el-radio-button label="Skaidra nauda" value="1" />
+                      <el-radio-button label="Kase" value="2" />
+                      <el-radio-button label="Bankas karte" value="3" />
+                    </el-radio-group>
                   </el-form-item>
                 </div>
                 <div
@@ -508,6 +527,8 @@ export default defineComponent({
       islocked: false,
       products: [],
       deletedItems: [],
+      paymentRecipient: "",
+      paymentType: "",
     };
 
     // Overwrite values from query
@@ -519,10 +540,19 @@ export default defineComponent({
       blankDocument.payterm = DateTime.now().toJSDate();
     }
 
-    if (route.query.clientId)
+    if (route.params.type == "daily") {
+      blankDocument.companyid = "6570";
+      blankDocument.payterm = blankDocument.orderdate;
+    } else if (route.query.clientId)
       blankDocument.companyid = String(route.query.clientId);
 
     const document = ref({ ...blankDocument });
+
+    // Daily document
+    const dailyDocument = ref(false);
+    function setDailyDocument() {
+      dailyDocument.value = route.params.type === "daily";
+    }
 
     // Custom validators
     const validateWaybillno = async (rule, value, callback) => {
@@ -558,8 +588,8 @@ export default defineComponent({
       }
     };
 
-    // Form rules
-    const rules = ref<FormRules>({
+    // Define form rules
+    const documentRules = {
       ordertypeid: [
         {
           required: true,
@@ -576,7 +606,7 @@ export default defineComponent({
               callback();
             }
             // Re-validate waybillno
-            if (formRef.value)
+            if (formRef.value && "waybillno" in rules.value)
               formRef.value.validateField("waybillno", () => null);
           },
           trigger: "change",
@@ -589,6 +619,10 @@ export default defineComponent({
           trigger: "change",
         },
       ],
+      products: [] as any[],
+    };
+
+    const invoiceRules = {
       payterm: [
         {
           required: true,
@@ -602,8 +636,43 @@ export default defineComponent({
           trigger: "change",
         },
       ],
-      products: [] as any[],
-    });
+    };
+
+    const dailyRules = {
+      paymentRecipient: [
+        {
+          required: true,
+          message: "Jāizvēlas darba vieta",
+          trigger: "change",
+        },
+      ],
+      paymentType: [
+        {
+          required: true,
+          message: "Jāizvēlas apmaksas veids",
+          trigger: "change",
+        },
+      ],
+    };
+
+    // Set rules
+    const rules = ref<FormRules>(documentRules);
+    function setRules() {
+      if (route.params.type === "daily") {
+        // Delete invoiceRules
+        for (const key in invoiceRules) delete rules.value[key];
+
+        // Add dailyRules
+        for (const key in dailyRules) rules.value[key] = dailyRules[key];
+      } else {
+        // Delete dailyRules
+        for (const key in dailyRules) delete rules.value[key];
+
+        // Add invoiceRules
+        for (const key in invoiceRules) rules.value[key] = invoiceRules[key];
+      }
+      console.log(rules.value);
+    }
 
     const addProductRules = (idx) => {
       const product = document.value.products[idx];
@@ -719,6 +788,8 @@ export default defineComponent({
     const oWatcher = watch(
       typesFiltered,
       () => {
+        setRules();
+        setDailyDocument();
         preSelectType();
       },
       { immediate: true }
@@ -915,6 +986,7 @@ export default defineComponent({
     const updatePayterm = (termValue = null as any) => {
       if (termValue) return;
       if (!document.value.orderdate) return;
+      if (dailyDocument.value) return;
 
       const company = companies.value.find(
         (company) => company.id === document.value.companyid
@@ -980,6 +1052,7 @@ export default defineComponent({
       documentMatches,
       formRef,
       hasZeroPrice,
+      dailyDocument,
     };
   },
   async mounted() {

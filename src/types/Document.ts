@@ -51,6 +51,8 @@ export interface Document {
   returnid?: string;
   deliveryCost?: number;
   balance_due?: number;
+  paymentRecipient?: string;
+  paymentType?: string;
 }
 
 interface DocumentLinks {

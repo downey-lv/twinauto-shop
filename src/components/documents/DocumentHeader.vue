@@ -44,6 +44,10 @@ export default defineComponent({
   setup(_, { emit }) {
     const menu = [
       {
+        title: "Dienas pārdotais",
+        type: "daily",
+      },
+      {
         title: "Pārdošana",
         type: "out",
       },
