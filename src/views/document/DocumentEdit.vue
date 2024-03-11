@@ -483,6 +483,7 @@ import {
 import "@/assets/hover-icon.css";
 import type { Product } from "@/types/Product";
 import { DateTime } from "luxon";
+import { getOption } from "@/core/services/OptionService";
 
 export default defineComponent({
   components: {
@@ -543,6 +544,7 @@ export default defineComponent({
     if (route.params.type == "daily") {
       blankDocument.companyid = "6570";
       blankDocument.payterm = blankDocument.orderdate;
+      blankDocument.paymentRecipient = getOption("default_payment_recipient");
     } else if (route.query.clientId)
       blankDocument.companyid = String(route.query.clientId);
 

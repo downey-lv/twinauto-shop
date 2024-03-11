@@ -8,6 +8,15 @@ const options = {
       service: "Serviss",
     },
   },
+  default_payment_recipient: {
+    title: "Maksājumi",
+    default: "1",
+    values: {
+      "1": "V1",
+      "2": "V2",
+      "3": "Ofiss",
+    },
+  },
 };
 
 export const getOption = (key: string) => {

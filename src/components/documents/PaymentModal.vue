@@ -130,11 +130,11 @@ import { computed, defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
-import { Plus } from "@element-plus/icons-vue";
 import "@/assets/uploader.css";
 import { Modal } from "bootstrap";
 import type { FormInstance } from "element-plus";
 import { removeTooltip } from "@/core/helpers/dom";
+import { getOption } from "@/core/services/OptionService";
 
 export default defineComponent({
   name: "payment-modal",
@@ -155,7 +155,7 @@ export default defineComponent({
     const blankForm = {
       amount: "",
       type: "",
-      recipient: "",
+      recipient: getOption("default_payment_recipient"),
       orderid: "",
     };
     const formData = ref({ ...blankForm });
