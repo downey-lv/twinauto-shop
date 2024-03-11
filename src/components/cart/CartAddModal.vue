@@ -169,7 +169,7 @@ export default defineComponent({
 
   methods: {
     submit() {
-      if (!this.formData || !this.formData.orderid) {
+      if (!this.formData) {
         return;
       }
 
