@@ -243,7 +243,7 @@
                     </ul>
                   </div>
 
-                  <a href="#" class="btn btn-sm btn-primary me-3">Pārdot</a>
+                  <a href="#" @click.prevent="addtoCart()" class="btn btn-sm btn-primary me-3">Pārdot</a>
                 </div>
                 <!--end::Actions-->
               </div>
@@ -671,6 +671,7 @@
     :productId="String(p?.productid)"
   />
   <LinkageModal v-if="p?.tecdoc" ref="linkageModalRef" :data="p.tecdoc" />
+  <CartAddModal v-if="p?.productid" ref="cartAddModalRef" :product="p" />
 </template>
 
 <style scoped>
@@ -719,6 +720,7 @@ import type { Product } from "@/types/Product";
 import LogModal from "@/components/data/LogModal.vue";
 import ReportIssue from "@/components/product/ReportIssue.vue";
 import LinkageModal from "@/components/product/ProductLinkages.vue";
+import CartAddModal from "@/components/cart/CartAddModal.vue";
 
 export default defineComponent({
   components: {
@@ -728,6 +730,7 @@ export default defineComponent({
     Search,
     ReportIssue,
     LinkageModal,
+    CartAddModal,
   },
   setup() {
     const productStore = useProductStore();
@@ -1028,6 +1031,10 @@ export default defineComponent({
     },
     showLinkages(manuId) {
       (this.$refs.linkageModalRef as any).show(manuId);
+    },
+    addtoCart() {
+      return false;
+      (this.$refs.cartAddModalRef as any).show();
     },
   },
 });
