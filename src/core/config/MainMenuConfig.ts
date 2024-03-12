@@ -36,6 +36,11 @@ const MainMenuConfig: Array<MenuItem> = [
     faIcon: "boxes-packing",
   },
   {
+    heading: "Pārdotais",
+    route: "/sold/",
+    faIcon: "timeline",
+  },
+  {
     heading: "Klienti",
     route: "/client/",
     faIcon: "users",

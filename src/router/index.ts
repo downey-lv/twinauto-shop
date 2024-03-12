@@ -77,11 +77,20 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/sold/:type?",
+        name: "report-sold-products",
+        component: () => import("@/views/reports/SoldProducts.vue"),
+        meta: {
+          pageTitle: "Labot preci",
+          breadcrumbs: [],
+        },
+      },
+      {
         path: "/document",
         name: "document",
         redirect: () => {
-          const defaultType = getOption("default_document_type")
-          return { name: "document-list", params: { type: defaultType }};
+          const defaultType = getOption("default_document_type");
+          return { name: "document-list", params: { type: defaultType } };
         },
         meta: {
           breadcrumbStore: "document",

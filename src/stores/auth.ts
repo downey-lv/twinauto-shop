@@ -6,6 +6,7 @@ import router from "@/router";
 import { setOption } from "@/core/services/OptionService";
 
 export interface User {
+  user_id: number;
   name: string;
   email: string;
   password: string;

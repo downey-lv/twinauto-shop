@@ -7,7 +7,7 @@
       :multiple-limit="multipleLimit"
       :size="size"
       default-first-option
-      placeholder="Izvēlēties"
+      :placeholder="placeholder"
       class="w-100"
       @update:modelValue="(val) => $emit('update:modelValue', val)"
       @change="$emit('change', $event)"
@@ -66,6 +66,10 @@ export default defineComponent({
     size: {
       type: String,
       default: "",
+    },
+    placeholder: {
+      type: String,
+      default: "Izvēlēties",
     },
   },
   emits: ["update:modelValue", "change"],
