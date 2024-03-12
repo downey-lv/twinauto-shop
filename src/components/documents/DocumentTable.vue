@@ -27,7 +27,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import {
+  computed,
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import {
   getDtOptions,
   handleSelect,
@@ -96,6 +103,11 @@ export default defineComponent({
       });
     };
 
+    // Set source
+    onMounted(async () => {
+      setSource(props.type, "");
+    });
+
     // Fetch data when the component is first loaded
     if (!props.serverSide) onMounted(loadData);
 
@@ -104,10 +116,13 @@ export default defineComponent({
       () => props.type, // watching the URL prop
       (newType, prevType) => {
         if (newType !== prevType) {
-          if (props.serverSide) {
-            table.value.dt.draw();
-          } else {
-            loadData();
+          const sourceChanged = setSource(newType, prevType);
+          if (!sourceChanged) {
+            if (props.serverSide) {
+              table.value.dt.draw();
+            } else {
+              loadData();
+            }
           }
         }
       }
@@ -124,17 +139,37 @@ export default defineComponent({
       dtOptions["serverSide"] = true;
     }
 
-    let dtSource = {
-      documents: {
-        orderid: "ID",
-        orderdate: "Datums",
-        companyname: "Klients",
-        ordertypename: "Veids",
-        waybillno: "Dokumenta nr.",
-        comment: "Komentārs",
-        amount_payable: "Summa",
-        is_paid: "Apmaksāts",
-      },
+    const documentSource = {
+      orderid: "ID",
+      orderdate: "Datums",
+      companyname: "Klients",
+      ordertypename: "Veids",
+      waybillno: "Dokumenta nr.",
+      comment: "Komentārs",
+      amount_payable: "Summa",
+      is_paid: "Apmaksāts",
+    };
+
+    let dtSource = ref({
+      documents: documentSource,
+    });
+
+    const setSource = (newType, oldType) => {
+      if (newType !== "daily" && oldType !== "daily") return false;
+
+      const dailySource = {
+        payments: "Apmaksa",
+        recipients: "Darba vieta",
+      };
+
+      if (props.type === "daily") {
+        dtSource.value.documents = { ...documentSource, ...dailySource };
+      } else {
+        dtSource.value.documents = documentSource;
+      }
+
+      tabsKey.value += 1;
+      return true;
     };
 
     const columnOptions = {
@@ -166,7 +201,7 @@ export default defineComponent({
       },
     };
 
-    const dt = transformDtSource(dtSource, columnOptions);
+    const dt = computed(() => transformDtSource(dtSource.value, columnOptions));
 
     onBeforeUnmount(() => {
       pWatcher();
