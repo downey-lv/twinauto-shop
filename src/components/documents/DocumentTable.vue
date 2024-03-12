@@ -142,8 +142,14 @@ export default defineComponent({
             if (newFilters) {
               if ("date" in newFilters)
                 table.value.dt.columns(1).search(newFilters.date ?? "");
+
               if ("recipientName" in newFilters)
-                table.value.dt.columns(9).search(newFilters.recipientName ?? "");
+                table.value.dt
+                  .columns(9)
+                  .search(newFilters.recipientName ?? "");
+
+              if ("paymentName" in newFilters)
+                table.value.dt.columns(8).search(newFilters.paymentName ?? "");
             } else {
               table.value.dt.columns().search("");
             }

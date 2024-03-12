@@ -2,8 +2,8 @@
   <div class="card mb-5">
     <div class="card-body ps-9 p-5">
       <div class="row">
-        <div class="col-5 row">
-          <div class="col-4">
+        <div class="col-8 row">
+          <div class="col-3">
             <el-date-picker
               class="me-2 w-100"
               v-model="filterDate"
@@ -16,7 +16,7 @@
               value-format="YYYY-MM-DD"
             />
           </div>
-          <div class="col-4" v-if="showUserFilter">
+          <div class="col-3" v-if="showUserFilter">
             <SelectComponent
               v-loading="loadingUsers"
               class="me-2"
@@ -29,7 +29,7 @@
               clearable
             />
           </div>
-          <div class="col-4" v-if="showRecipientFilter">
+          <div class="col-3" v-if="showRecipientFilter">
             <SelectComponent
               v-loading="loadingRecipients"
               class="me-2"
@@ -37,6 +37,18 @@
               placeholder="Saņēmējs"
               :options="paymentRecipients"
               v-model="filterRecipient"
+              size="large"
+              @change="updateParent"
+              clearable
+            />
+          </div>
+          <div class="col-3" v-if="showPaymentFilter">
+            <SelectComponent
+              class="me-2"
+              element-class="mb-0"
+              placeholder="Apmaksas veids"
+              :options="paymentTypes"
+              v-model="filterPayment"
               size="large"
               @change="updateParent"
               clearable
@@ -69,8 +81,18 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    showPaymentFilter: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props, { emit }) {
+    // Get name
+    const getName = (id: string, list: any) => {
+      if (!id || !list.length) return "";
+      return list.find((item: any) => item.id == id)?.name ?? "";
+    };
+
     // Emit selection
     const updateParent = () => {
       const data = {
@@ -83,12 +105,15 @@ export default defineComponent({
 
       if (props.showRecipientFilter) {
         data["recipient"] = filterRecipient.value;
-        data["recipientName"] =
-          filterRecipient.value && paymentRecipients.value.length
-            ? paymentRecipients.value.find(
-                (item: any) => item.id == filterRecipient.value
-              )?.name ?? ""
-            : "";
+        data["recipientName"] = getName(
+          filterRecipient.value,
+          paymentRecipients.value
+        );
+      }
+
+      if (props.showPaymentFilter) {
+        data["payment"] = filterPayment.value;
+        data["paymentName"] = getName(filterPayment.value, paymentTypes.value);
       }
 
       emit("updateFilters", data);
@@ -152,6 +177,14 @@ export default defineComponent({
         });
     };
 
+    // Payment type selection
+    const filterPayment = ref("");
+    const paymentTypes = ref([
+      { id: "1", name: "Skaidra nauda" },
+      { id: "2", name: "Kase" },
+      { id: "3", name: "Bankas karte" },
+    ]);
+
     // Default values
     const setDefaults = () => {
       const authStore = useAuthStore();
@@ -161,6 +194,8 @@ export default defineComponent({
 
       filterDate.value = currentDate;
       filterRecipient.value = defaultRecipient;
+      filterUser.value = "";
+      filterPayment.value = "";
     };
 
     onMounted(async () => {
@@ -174,10 +209,12 @@ export default defineComponent({
       filterDate,
       filterRecipient,
       filterUser,
+      filterPayment,
       disabledDate,
       shortcuts,
       users,
       paymentRecipients,
+      paymentTypes,
       loadingUsers,
       loadingRecipients,
       updateParent,

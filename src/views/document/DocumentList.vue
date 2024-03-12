@@ -3,6 +3,7 @@
   <DailyFilter
     v-if="documentType === 'daily'"
     :show-user-filter="false"
+    :show-payment-filter="true"
     @updateFilters="updateFilters"
   />
   <DailyFilter
