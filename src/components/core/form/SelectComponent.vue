@@ -5,6 +5,7 @@
       :model-value="modelValue"
       :multiple="multiple"
       :multiple-limit="multipleLimit"
+      :size="size"
       default-first-option
       placeholder="Izvēlēties"
       class="w-100"
@@ -61,6 +62,10 @@ export default defineComponent({
     clearable: {
       type: Boolean,
       default: false,
+    },
+    size: {
+      type: String,
+      default: "",
     },
   },
   emits: ["update:modelValue", "change"],
