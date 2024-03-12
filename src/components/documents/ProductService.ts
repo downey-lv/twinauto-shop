@@ -149,6 +149,7 @@ export class ProductService {
             }
             break;
           case "out":
+          case "daily":
             price = match.priceSell;
             break;
           case "service":

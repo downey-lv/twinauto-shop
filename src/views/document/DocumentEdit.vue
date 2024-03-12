@@ -544,7 +544,10 @@ export default defineComponent({
     if (route.params.type == "daily") {
       blankDocument.companyid = "6570";
       blankDocument.payterm = blankDocument.orderdate;
-      blankDocument.paymentRecipient = getOption("default_payment_recipient");
+
+      const default_recipient = getOption("default_payment_recipient");
+      if (default_recipient == "1" || default_recipient == "2")
+        blankDocument.paymentRecipient = default_recipient;
     } else if (route.query.clientId)
       blankDocument.companyid = String(route.query.clientId);
 
