@@ -66,6 +66,10 @@ export default defineComponent({
       type: String,
       required: false,
     },
+    filters: {
+      type: Object,
+      required: false,
+    },
   },
   setup(props) {
     const loading = ref<boolean>(false);
@@ -126,6 +130,29 @@ export default defineComponent({
           }
         }
       }
+    );
+
+    // Watch for changes in filters
+    const fWatcher = watch(
+      () => props.filters,
+      (newFilters, oldFilters) => {
+        if (newFilters !== oldFilters) {
+          // Filters supported only for serverSide
+          if (props.serverSide) {
+            if (newFilters) {
+              if ("date" in newFilters)
+                table.value.dt.columns(1).search(newFilters.date ?? "");
+              if ("paymentName" in newFilters)
+                table.value.dt.columns(9).search(newFilters.paymentName ?? "");
+            } else {
+              table.value.dt.columns().search("");
+            }
+
+            table.value.dt.draw();
+          }
+        }
+      },
+      { deep: true }
     );
 
     // Define datatable
@@ -205,6 +232,7 @@ export default defineComponent({
 
     onBeforeUnmount(() => {
       pWatcher();
+      fWatcher();
     });
 
     return {

@@ -1,5 +1,5 @@
 <template>
-  <el-form-item :prop="prop">
+  <el-form-item :prop="prop" :class="elementClass">
     <el-select
       filterable
       :model-value="modelValue"
@@ -70,6 +70,10 @@ export default defineComponent({
     placeholder: {
       type: String,
       default: "Izvēlēties",
+    },
+    elementClass: {
+      type: String,
+      default: "",
     },
   },
   emits: ["update:modelValue", "change"],

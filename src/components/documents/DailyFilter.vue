@@ -1,9 +1,9 @@
 <template>
-  <div class="card mb-5 mb-xl-10">
-    <div class="card-body ps-9 pt-9 p-3">
+  <div class="card mb-5">
+    <div class="card-body ps-9 p-5">
       <div class="row">
         <div class="col-5 row">
-          <div class="col">
+          <div class="col-4">
             <el-date-picker
               class="me-2 w-100"
               v-model="filterDate"
@@ -16,10 +16,11 @@
               value-format="YYYY-MM-DD"
             />
           </div>
-          <div class="col">
+          <div class="col-4" v-if="showUserFilter">
             <SelectComponent
               v-loading="loadingUsers"
               class="me-2"
+              element-class="mb-0"
               placeholder="Lietotājs"
               :options="users"
               v-model="filterUser"
@@ -28,10 +29,11 @@
               clearable
             />
           </div>
-          <div class="col">
+          <div class="col-4" v-if="showPaymentFilter">
             <SelectComponent
               v-loading="loadingRecipients"
               class="me-2"
+              element-class="mb-0"
               placeholder="Saņēmējs"
               :options="paymentRecipients"
               v-model="filterPayment"
@@ -52,19 +54,48 @@ import SelectComponent from "@/components/core/form/SelectComponent.vue";
 import ApiService from "@/core/services/ApiService";
 import { useAuthStore } from "@/stores/auth";
 import { getOption } from "@/core/services/OptionService";
+import { DateTime } from "luxon";
 
 export default defineComponent({
   name: "document-header",
   components: { SelectComponent },
   emits: ["updateFilters"],
-  setup(_, { emit }) {
+  props: {
+    showUserFilter: {
+      type: Boolean,
+      default: true,
+    },
+    showPaymentFilter: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  setup(props, { emit }) {
     // Emit selection
     const updateParent = () => {
-      emit("updateFilters", { date: filterDate.value, user: filterUser.value, payment: filterPayment.value });
+      const data = {
+        date: filterDate.value,
+      };
+
+      if (props.showUserFilter) {
+        data["user"] = filterUser.value;
+      }
+
+      if (props.showPaymentFilter) {
+        data["payment"] = filterPayment.value;
+        data["paymentName"] =
+          filterPayment.value && paymentRecipients.value.length
+            ? paymentRecipients.value.find(
+                (item: any) => item.id == filterPayment.value
+              )?.name ?? ""
+            : "";
+      }
+
+      emit("updateFilters", data);
     };
 
     // Date selection
-    const filterDate = ref(new Date().toISOString());
+    const filterDate = ref("");
     const shortcuts = [
       {
         text: "Šodien",
@@ -85,15 +116,13 @@ export default defineComponent({
     };
 
     // User selection
-    const authStore = useAuthStore();
-    const currentUser = String(authStore.user.user_id);
     const loadingUsers = ref(false);
     const filterUser = ref("");
     const users = ref([]);
 
     const fetchUsers = async () => {
       loadingUsers.value = true;
-      ApiService.get("user", "list")
+      await ApiService.get("user", "list")
         .then((response) => {
           users.value = response.data;
         })
@@ -108,10 +137,10 @@ export default defineComponent({
     // Payment selection
     const loadingRecipients = ref(false);
     const paymentRecipients = ref<any>([]);
-    const filterPayment = ref(getOption("default_payment_recipient"));
+    const filterPayment = ref("");
     const fetchRecipients = async () => {
       loadingRecipients.value = true;
-      ApiService.get("payment", "recipients")
+      await ApiService.get("payment", "recipients")
         .then((response) => {
           paymentRecipients.value = response.data;
         })
@@ -123,10 +152,22 @@ export default defineComponent({
         });
     };
 
-    onMounted(() => {
-      fetchUsers();
+    // Default values
+    const setDefaults = () => {
+      const authStore = useAuthStore();
+      const currentUser = String(authStore.user.user_id);
+      const currentDate = DateTime.local().toISODate();
+      const defaultPayment = getOption("default_payment_recipient");
+
+      filterDate.value = currentDate;
+      filterPayment.value = defaultPayment;
+    };
+
+    onMounted(async () => {
+      await fetchUsers();
+      await fetchRecipients();
+      setDefaults();
       updateParent();
-      fetchRecipients();
     });
 
     return {

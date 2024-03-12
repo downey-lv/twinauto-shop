@@ -1,9 +1,21 @@
 <template>
   <DocumentHeader v-on:menu-data="headerUpdate" />
+  <DailyFilter
+    v-if="documentType === 'daily'"
+    :show-user-filter="false"
+    @updateFilters="updateFilters"
+  />
+  <DailyFilter
+    v-else
+    :show-user-filter="false"
+    :show-payment-filter="false"
+    @updateFilters="updateFilters"
+  />
   <DocumentTable
     v-if="documentType && documentType !== 'all'"
     :type="documentType"
     :server-side="true"
+    :filters="filters"
   />
 </template>
 
@@ -12,6 +24,7 @@ import { computed, defineComponent, watch, ref, onBeforeUnmount } from "vue";
 import { useRoute } from "vue-router";
 import DocumentHeader from "@/components/documents/DocumentHeader.vue";
 import DocumentTable from "@/components/documents/DocumentTable.vue";
+import DailyFilter from "@/components/documents/DailyFilter.vue";
 import { useBreadcrumbStore } from "@/stores/breadcrumb";
 import type { Header } from "@/types/Document";
 
@@ -21,6 +34,7 @@ export default defineComponent({
   components: {
     DocumentHeader,
     DocumentTable,
+    DailyFilter,
   },
   setup() {
     const route = useRoute();
@@ -57,7 +71,12 @@ export default defineComponent({
       bWatcher();
     });
 
-    return { documentType, menuData };
+    const filters = ref<any>({});
+    const updateFilters = (newData) => {
+      filters.value = { ...newData };
+    };
+
+    return { documentType, menuData, updateFilters, filters };
   },
   methods: {
     headerUpdate(data) {
