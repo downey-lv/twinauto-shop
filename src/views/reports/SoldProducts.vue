@@ -110,7 +110,7 @@ export default defineComponent({
         type: documentType.value,
         date: filterDate.value,
         user: filterUser.value,
-        payment: filterpayment.value,
+        recipient: filterRecipient.value,
       })
         .then((response) => {
           let data = response.data;
@@ -147,22 +147,22 @@ export default defineComponent({
 
     const filterDate = ref("");
     const filterUser = ref("");
-    const filterpayment = ref("");
+    const filterRecipient = ref("");
     const updateFilters = (newData) => {
       const oldData = {
         date: filterDate.value,
         user: filterUser.value,
-        payment: filterpayment.value,
+        recipient: filterRecipient.value,
       };
 
       filterDate.value = newData.date;
       filterUser.value = newData.user;
-      filterpayment.value = newData.payment;
+      filterRecipient.value = newData.recipient;
 
       if (
         oldData.date !== newData.date ||
         oldData.user !== newData.user ||
-        oldData.payment !== newData.payment
+        oldData.recipient !== newData.recipient
       )
         loadProducts();
     };

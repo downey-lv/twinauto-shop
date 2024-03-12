@@ -8,7 +8,7 @@
   <DailyFilter
     v-else
     :show-user-filter="false"
-    :show-payment-filter="false"
+    :show-recipient-filter="false"
     @updateFilters="updateFilters"
   />
   <DocumentTable

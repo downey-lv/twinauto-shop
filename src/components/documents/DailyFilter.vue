@@ -29,14 +29,14 @@
               clearable
             />
           </div>
-          <div class="col-4" v-if="showPaymentFilter">
+          <div class="col-4" v-if="showRecipientFilter">
             <SelectComponent
               v-loading="loadingRecipients"
               class="me-2"
               element-class="mb-0"
               placeholder="Saņēmējs"
               :options="paymentRecipients"
-              v-model="filterPayment"
+              v-model="filterRecipient"
               size="large"
               @change="updateParent"
               clearable
@@ -65,7 +65,7 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
-    showPaymentFilter: {
+    showRecipientFilter: {
       type: Boolean,
       default: true,
     },
@@ -81,12 +81,12 @@ export default defineComponent({
         data["user"] = filterUser.value;
       }
 
-      if (props.showPaymentFilter) {
-        data["payment"] = filterPayment.value;
-        data["paymentName"] =
-          filterPayment.value && paymentRecipients.value.length
+      if (props.showRecipientFilter) {
+        data["recipient"] = filterRecipient.value;
+        data["recipientName"] =
+          filterRecipient.value && paymentRecipients.value.length
             ? paymentRecipients.value.find(
-                (item: any) => item.id == filterPayment.value
+                (item: any) => item.id == filterRecipient.value
               )?.name ?? ""
             : "";
       }
@@ -134,10 +134,10 @@ export default defineComponent({
         });
     };
 
-    // Payment selection
+    // Recipient selection
     const loadingRecipients = ref(false);
     const paymentRecipients = ref<any>([]);
-    const filterPayment = ref("");
+    const filterRecipient = ref("");
     const fetchRecipients = async () => {
       loadingRecipients.value = true;
       await ApiService.get("payment", "recipients")
@@ -157,10 +157,10 @@ export default defineComponent({
       const authStore = useAuthStore();
       const currentUser = String(authStore.user.user_id);
       const currentDate = DateTime.local().toISODate();
-      const defaultPayment = getOption("default_payment_recipient");
+      const defaultRecipient = getOption("default_payment_recipient");
 
       filterDate.value = currentDate;
-      filterPayment.value = defaultPayment;
+      filterRecipient.value = defaultRecipient;
     };
 
     onMounted(async () => {
@@ -172,7 +172,7 @@ export default defineComponent({
 
     return {
       filterDate,
-      filterPayment,
+      filterRecipient,
       filterUser,
       disabledDate,
       shortcuts,
