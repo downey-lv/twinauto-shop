@@ -62,13 +62,7 @@
     <div class="separator opacity-75"></div>
 
     <div class="menu-item px-3">
-      <router-link
-        :to="{
-          name: 'document-edit',
-          params: { editId: 'new', type: getOption('default_document_type') },
-        }"
-        class="menu-link px-3"
-      >
+      <router-link :to="defaultDocumentRoute" class="menu-link px-3">
         <i class="fa-solid fa-star fa-fw me-3"></i>
         {{ getOptionLabel("default_document_type") }}
       </router-link>
@@ -83,5 +77,23 @@ import { getOption, getOptionLabel } from "@/core/services/OptionService";
 export default defineComponent({
   name: "quick-action",
   methods: { getOptionLabel, getOption },
+  computed: {
+    defaultDocumentRoute() {
+      let routeName = "document-edit";
+      let routeParams = {};
+      const optionVal = this.getOption("default_document_type");
+
+      if (optionVal === "in") {
+        routeName = "purchase-import";
+      } else {
+        routeParams = { editId: "new", type: optionVal };
+      }
+
+      return {
+        name: routeName,
+        params: routeParams,
+      };
+    },
+  },
 });
 </script>
