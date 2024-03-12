@@ -34,7 +34,7 @@
               v-loading="loadingRecipients"
               class="me-2"
               element-class="mb-0"
-              placeholder="Saņēmējs"
+              placeholder="Darba vieta"
               :options="paymentRecipients"
               v-model="filterRecipient"
               size="large"
