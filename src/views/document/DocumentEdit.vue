@@ -139,9 +139,9 @@
                   <label class="fs-6 required">Apmaksas veids</label>
                   <el-form-item prop="paymentType">
                     <el-radio-group v-model="document.paymentType">
-                      <el-radio-button label="Skaidra nauda" value="1" />
                       <el-radio-button label="Kase" value="2" />
-                      <el-radio-button label="Bankas karte" value="3" />
+                      <el-radio-button label="Karte" value="3" />
+                      <el-radio-button label="Skaidra" value="1" />
                     </el-radio-group>
                   </el-form-item>
                 </div>
