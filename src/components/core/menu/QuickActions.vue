@@ -59,45 +59,29 @@
       </router-link>
     </div>
 
-    <!--    &lt;!&ndash;begin::Menu item&ndash;&gt;-->
-    <!--    <div-->
-    <!--      class="menu-item px-3"-->
-    <!--      data-kt-menu-trigger="hover"-->
-    <!--      data-kt-menu-placement="right-start"-->
-    <!--      data-kt-menu-flip="left-start, top"-->
-    <!--    >-->
-    <!--      &lt;!&ndash;begin::Menu item&ndash;&gt;-->
-    <!--      <a href="#" class="menu-link px-3">-->
-    <!--        <span class="menu-title">Jauns dokuments</span>-->
-    <!--        <span class="menu-arrow"></span>-->
-    <!--      </a>-->
-    <!--      &lt;!&ndash;end::Menu item&ndash;&gt;-->
+    <div class="separator opacity-75"></div>
 
-    <!--      &lt;!&ndash;begin::Menu sub&ndash;&gt;-->
-    <!--      <div class="menu-sub menu-sub-dropdown w-175px py-4 px-3">-->
-    <!--        <router-link :to="{ name: 'purchase-import' }" class="menu-link px-3">-->
-    <!--          Iepirkums-->
-    <!--        </router-link>-->
-    <!--        <router-link-->
-    <!--          :to="{-->
-    <!--            name: 'document-edit',-->
-    <!--            params: { editId: 'new', type: 'out' },-->
-    <!--          }"-->
-    <!--          class="menu-link px-3"-->
-    <!--        >-->
-    <!--          Pārdošana-->
-    <!--        </router-link>-->
-    <!--      </div>-->
-    <!--      &lt;!&ndash;end::Menu sub&ndash;&gt;-->
-    <!--    </div>-->
-    <!--    &lt;!&ndash;end::Menu item&ndash;&gt;-->
+    <div class="menu-item px-3">
+      <router-link
+        :to="{
+          name: 'document-edit',
+          params: { editId: 'new', type: getOption('default_document_type') },
+        }"
+        class="menu-link px-3"
+      >
+        <i class="fa-solid fa-star fa-fw me-3"></i>
+        {{ getOptionLabel("default_document_type") }}
+      </router-link>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { getOption, getOptionLabel } from "@/core/services/OptionService";
 
 export default defineComponent({
   name: "quick-action",
+  methods: { getOptionLabel, getOption },
 });
 </script>
