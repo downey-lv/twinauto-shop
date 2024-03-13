@@ -337,7 +337,7 @@
                 <el-tooltip
                   :content="item.data?.priceDetails || ``"
                   raw-content
-                  placement="right"
+                  placement="left"
                 >
                   <el-input-number
                     v-model="item.priceVAT"
@@ -348,6 +348,15 @@
                     @keydown.enter.prevent="nextRow(idx)"
                   />
                 </el-tooltip>
+                <i
+                  v-if="
+                    $route.params.type !== `in` &&
+                    item.priceVAT < item.data?.priceBuy
+                  "
+                  class="fa-solid fa-triangle-exclamation ms-3 text-danger"
+                  title="Cena zem iepirkuma"
+                  v-tooltip
+                ></i>
               </el-form-item>
             </div>
 
