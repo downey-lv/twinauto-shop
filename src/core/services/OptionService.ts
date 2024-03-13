@@ -26,6 +26,16 @@ const options = {
       priceOnlineDefault: "Internets",
     },
   },
+  search_speed: {
+    title: "Meklēšanas ātrums",
+    default: 1000,
+    values: {
+      700: "Ātri",
+      1000: "Standarta",
+      1300: "Lēni",
+      1600: "Ļoti lēni",
+    },
+  },
 };
 
 export const getOption = (key: string) => {

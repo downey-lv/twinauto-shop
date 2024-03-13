@@ -1077,7 +1077,10 @@ export default defineComponent({
   methods: {
     debounceSearch(type, idx) {
       if (!this.debouncedSearch) {
-        this.debouncedSearch = debounce(this.searchProduct, 700);
+        this.debouncedSearch = debounce(
+          this.searchProduct,
+          Number(getOption("search_speed"))
+        );
       }
       this.debouncedSearch(type, idx);
     },
