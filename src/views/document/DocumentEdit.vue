@@ -332,20 +332,22 @@
               </el-form-item>
             </div>
 
-            <div
-              class="col-lg-1 pb-1"
-              :title="item.data?.priceDetails || ``"
-              v-tooltip-html
-            >
+            <div class="col-lg-1 pb-1">
               <el-form-item :prop="`products[${idx}].priceVAT`">
-                <el-input-number
-                  v-model="item.priceVAT"
-                  size="large"
-                  :controls="false"
-                  :precision="2"
-                  placeholder="Cena"
-                  @keydown.enter.prevent="nextRow(idx)"
-                />
+                <el-tooltip
+                  :content="item.data?.priceDetails || ``"
+                  raw-content
+                  placement="right"
+                >
+                  <el-input-number
+                    v-model="item.priceVAT"
+                    size="large"
+                    :controls="false"
+                    :precision="2"
+                    placeholder="Cena"
+                    @keydown.enter.prevent="nextRow(idx)"
+                  />
+                </el-tooltip>
               </el-form-item>
             </div>
 
