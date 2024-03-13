@@ -156,6 +156,8 @@
                 <el-input
                   v-model="product.ean"
                   @keydown.enter.prevent="loadTecDoc(true)"
+                  maxlength="20"
+                  show-word-limit
                 />
                 <div class="fs-7 fw-semibold text-muted">
                   Lai meklētu, ievadi EAN svītrkodu un nospied Enter
@@ -228,6 +230,8 @@
                       v-model="product.comment"
                       type="textarea"
                       rows="2"
+                      maxlength="300"
+                      show-word-limit
                     />
                   </el-form-item>
                 </div>
@@ -238,6 +242,8 @@
                     <el-input
                       v-model="product.suppliercode"
                       type="textarea"
+                      maxlength="100"
+                      show-word-limit
                       rows="2"
                     />
                     <div class="fs-7 fw-semibold text-muted">
