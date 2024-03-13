@@ -321,6 +321,18 @@
             <span class="tooltip-item" :title="scope.row.data.priceDetails"
               >{{ scope.row.priceVAT.toFixed(2) }} €</span
             >
+            <i
+              v-if="
+                $route.params.type !== `in` &&
+                scope.row.priceVAT < (scope.row.data.priceBuy ?? 0) * 1.1
+              "
+              class="fa-solid fa-triangle-exclamation ms-3"
+              :class="
+                scope.row.priceVAT < (scope.row.data.priceBuy ?? 0)
+                  ? 'text-danger'
+                  : 'text-warning'
+              "
+            ></i>
           </template>
         </el-table-column>
         <el-table-column property="total" label="Summa" sortable width="100">
