@@ -351,7 +351,7 @@
                 <i
                   v-if="
                     $route.params.type !== `in` &&
-                    item.priceVAT < item.data?.priceBuy
+                    item.priceVAT < (item.data?.priceBuy ?? 0)
                   "
                   class="fa-solid fa-triangle-exclamation ms-3 text-danger"
                   title="Cena zem iepirkuma"

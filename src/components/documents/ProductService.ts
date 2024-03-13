@@ -175,7 +175,7 @@ export class ProductService {
     if (this.formRef.value) this.formRef.value.validate();
   }
 
-  addMatch(product, matches, overwriteData) {
+  addMatch(product, matches, overwriteData = false) {
     if (matches.length == 1 && matches[0].productid) {
       const match = matches[0];
       this.selectMatch(product, match, overwriteData);
