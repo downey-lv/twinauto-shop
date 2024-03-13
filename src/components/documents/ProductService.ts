@@ -9,6 +9,7 @@ export class ProductService {
   router: any;
   returnDocument: boolean;
   cancelToken: any;
+  activeIdx: any;
 
   constructor(
     document,
@@ -61,7 +62,9 @@ export class ProductService {
       cancelToken: this.cancelToken.token,
     })
       .then((response) => {
-        this.addMatch(product, response.data);
+        const overwriteData = this.activeIdx === idx;
+        this.addMatch(product, response.data, overwriteData);
+        this.activeIdx = idx;
       })
       .catch((error) => {
         if (axios.isCancel(error)) {
@@ -75,7 +78,7 @@ export class ProductService {
       });
   }
 
-  selectMatch(product, match) {
+  selectMatch(product, match, overwriteData = false) {
     // Add full data
     product.data = match;
     product.valid = true;
@@ -127,7 +130,7 @@ export class ProductService {
       // Set price
       let matchingSuppliers: any[] = [];
       const currentPrice = product.price;
-      if (!currentPrice || currentPrice === 0) {
+      if (overwriteData || !currentPrice || currentPrice === 0) {
         let price;
         let priceGross;
         switch (this.route.params.type) {
@@ -172,10 +175,10 @@ export class ProductService {
     if (this.formRef.value) this.formRef.value.validate();
   }
 
-  addMatch(product, matches) {
+  addMatch(product, matches, overwriteData) {
     if (matches.length == 1 && matches[0].productid) {
       const match = matches[0];
-      this.selectMatch(product, match);
+      this.selectMatch(product, match, overwriteData);
     } else {
       // Set product as invalid
       product.valid = false;
