@@ -1,6 +1,10 @@
 <template>
   <DocumentHeader />
-  <DailyFilter v-if="documentType" @updateFilters="updateFilters" />
+  <DailyFilter
+    v-if="documentType"
+    @updateFilters="updateFilters"
+    :show-recipient-filter="documentType == `daily`"
+  />
 
   <div class="card mb-5" v-loading="loading" v-if="searchReady">
     <div class="card-body">
