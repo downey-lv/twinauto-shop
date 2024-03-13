@@ -134,6 +134,7 @@ export interface Product {
   restSupplier: number;
   exactMatch: number;
   priceDetails: string;
+  priceDetailsList: string[];
 }
 
 export interface Price {

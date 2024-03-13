@@ -339,6 +339,22 @@
                   raw-content
                   placement="left"
                 >
+                  <template #content>
+                    <div
+                      v-for="(price, label) in item.data?.priceDetailsList ||
+                      []"
+                      :key="label"
+                      class="d-flex"
+                    >
+                      <div class="flex-grow-1 me-2">{{ label }}</div>
+                      <div>
+                        <a href="#" @click.prevent="setPrice(idx, price)">{{
+                          price
+                        }}</a>
+                        €
+                      </div>
+                    </div>
+                  </template>
                   <el-input
                     v-model="item.priceVAT"
                     size="large"
@@ -1101,6 +1117,9 @@ export default defineComponent({
         );
       }
       this.debouncedSearch(type, idx);
+    },
+    setPrice(idx, price) {
+      this.document.products[idx].priceVAT = price;
     },
     async loadData(resource: string, attr: string) {
       return ApiService.get(resource)
