@@ -42,6 +42,7 @@ import {
   serverSide,
 } from "@/assets/ts/layout/dtOptions";
 import ApiService from "@/core/services/ApiService";
+import { DateTime } from "luxon";
 
 export default defineComponent({
   name: "document-table",
@@ -193,6 +194,7 @@ export default defineComponent({
       const dailySource = {
         payments: "Apmaksa",
         recipients: "Darba vieta",
+        created_date: "Izveidots",
       };
 
       if (props.type === "daily") {
@@ -229,6 +231,13 @@ export default defineComponent({
             } else {
               return '<span class="badge badge-light-danger">Nē</span>';
             }
+          },
+        },
+        created_date: {
+          render: function (data) {
+            return DateTime.fromISO(data)
+              .setLocale("lv")
+              .toLocaleString(DateTime.DATETIME_SHORT);
           },
         },
       },
