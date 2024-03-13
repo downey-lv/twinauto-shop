@@ -155,7 +155,7 @@ export default defineComponent({
     const blankForm = {
       amount: "",
       type: "",
-      recipient: getOption("default_payment_recipient"),
+      recipient: "",
       orderid: "",
     };
     const formData = ref({ ...blankForm });
@@ -195,6 +195,7 @@ export default defineComponent({
     const payments = ref([]);
     function loadData() {
       formData.value = { ...blankForm };
+      formData.value.recipient = getOption("default_payment_recipient");
 
       // Load payments
       ApiService.get("payment", props.pData.orderid)
