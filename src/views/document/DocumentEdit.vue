@@ -62,9 +62,9 @@
               </span>
             </button>
             <i
-              v-if="hasZeroPrice"
+              v-if="hasPriceIssues"
               class="fa-solid fa-triangle-exclamation text-warning"
-              title="Dokumentā ir produkti bez cenas"
+              title="Dokumentā ir problēmas ar cenām"
               v-tooltip
             ></i>
           </div>
@@ -339,24 +339,28 @@
                   raw-content
                   placement="left"
                 >
-                  <el-input-number
+                  <el-input
                     v-model="item.priceVAT"
                     size="large"
-                    :controls="false"
-                    :precision="2"
+                    type="number"
+                    input-style="text-align: center;"
+                    step="0.01"
                     placeholder="Cena"
                     @keydown.enter.prevent="nextRow(idx)"
-                  />
+                  >
+                    <template #suffix>
+                      <i
+                        v-if="item.priceWarning"
+                        class="fa-solid fa-triangle-exclamation ms-3"
+                        :class="
+                          item.priceVAT < (item.data?.priceBuy ?? 0)
+                            ? 'text-danger'
+                            : 'text-warning'
+                        "
+                      ></i>
+                    </template>
+                  </el-input>
                 </el-tooltip>
-                <i
-                  v-if="
-                    $route.params.type !== `in` &&
-                    item.priceVAT < (item.data?.priceBuy ?? 0)
-                  "
-                  class="fa-solid fa-triangle-exclamation ms-3 text-danger"
-                  title="Cena zem iepirkuma"
-                  v-tooltip
-                ></i>
               </el-form-item>
             </div>
 
@@ -725,8 +729,8 @@ export default defineComponent({
     };
 
     // Computed if any prices are 0
-    const hasZeroPrice = computed(() =>
-      document.value.products.some((product) => product.price === 0)
+    const hasPriceIssues = computed(() =>
+      document.value.products.some((product) => product.priceWarning)
     );
 
     // Define price calculators
@@ -736,6 +740,9 @@ export default defineComponent({
     const useProductWatcher = (product) => {
       product.priceVAT = calculatePriceVAT(product, vatDecimal);
       product.total = calculateTotal(product, vatDecimal);
+      product.priceWarning = computed(
+        () => product.priceVAT < (product.data?.priceBuy ?? 0) * 1.1
+      );
     };
 
     // Initialize price watcher and rules for existing products
@@ -1067,7 +1074,7 @@ export default defineComponent({
       fetchDocument,
       documentMatches,
       formRef,
-      hasZeroPrice,
+      hasPriceIssues,
       dailyDocument,
     };
   },

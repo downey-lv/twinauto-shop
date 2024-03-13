@@ -28,6 +28,7 @@ export interface DocumentProduct {
   selectedMatch?: number;
   imported?: ImportedProduct;
   data?: Product;
+  priceWarning?: boolean;
 }
 
 export interface Document {
