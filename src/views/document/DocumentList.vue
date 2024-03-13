@@ -10,6 +10,7 @@
     v-else
     :show-user-filter="false"
     :show-recipient-filter="false"
+    :pre-select-date="false"
     @updateFilters="updateFilters"
   />
   <DocumentTable

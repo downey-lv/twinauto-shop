@@ -85,6 +85,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    preSelectDate: {
+      type: Boolean,
+      default: true,
+    },
   },
   setup(props, { emit }) {
     // Get name
@@ -189,8 +193,10 @@ export default defineComponent({
     const setDefaults = () => {
       const authStore = useAuthStore();
       const currentUser = String(authStore.user.user_id);
-      const currentDate = DateTime.local().toISODate();
+      let currentDate = DateTime.local().toISODate();
       const defaultRecipient = getOption("default_payment_recipient");
+
+      if (!props.preSelectDate) currentDate = "";
 
       filterDate.value = currentDate;
       filterRecipient.value = defaultRecipient;
