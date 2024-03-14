@@ -1050,19 +1050,21 @@ export default defineComponent({
           }
 
           // Set OE codes
-          this.product.oecode = article.oemNumbers
+          const oe = article.oemNumbers
             .map((item) => {
               // item[0] is the OEM number, item[1] is the array of manufacturers
               return `${item[0]} - ${item[1].join(", ")}`;
             })
             .join("\n");
+          if (oe) this.product.oecode = this.product.oecode + oe;
 
           // Set analogues
-          this.product.analogi = article.tecdocCrosses
+          const crosses = article.tecdocCrosses
             .map((item) => {
               return `${item.code} - ${item.producer}`;
             })
             .join("\n");
+          if (crosses) this.product.analogi = this.product.analogi + crosses;
 
           // Set name
           if (
