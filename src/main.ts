@@ -71,7 +71,7 @@ app.use(i18n);
 
 // Set up tooltip
 function makeTooltip(
-    constructorArgs: Partial<Tooltip.Options> | undefined = undefined
+  constructorArgs: Partial<Tooltip.Options> | undefined = undefined
 ) {
   return {
     mounted(el) {
