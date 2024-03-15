@@ -333,11 +333,21 @@
             </div>
 
             <div class="col-lg-1 pb-1">
-              <el-form-item :prop="`products[${idx}].priceVAT`">
+              <el-form-item
+                :prop="`products[${idx}].priceVAT`"
+                :error="
+                  item.priceWarning
+                    ? item.priceVAT < (item.data?.priceBuy ?? 0)
+                      ? `Zem iepirkuma`
+                      : `Peļņa < 10%`
+                    : ``
+                "
+              >
                 <el-tooltip
                   :content="item.data?.priceDetails || ``"
                   raw-content
                   placement="left"
+                  :disabled="!item.data?.priceDetails"
                 >
                   <template #content>
                     <div
@@ -355,27 +365,14 @@
                       </div>
                     </div>
                   </template>
-                  <el-input
+                  <el-input-number
                     v-model="item.priceVAT"
                     size="large"
-                    type="number"
-                    input-style="text-align: center;"
-                    step="0.01"
+                    :controls="false"
+                    :precision="2"
                     placeholder="Cena"
                     @keydown.enter.prevent="nextRow(idx)"
-                  >
-                    <template #suffix>
-                      <i
-                        v-if="item.priceWarning"
-                        class="fa-solid fa-triangle-exclamation ms-3"
-                        :class="
-                          item.priceVAT < (item.data?.priceBuy ?? 0)
-                            ? 'text-danger'
-                            : 'text-warning'
-                        "
-                      ></i>
-                    </template>
-                  </el-input>
+                  />
                 </el-tooltip>
               </el-form-item>
             </div>
