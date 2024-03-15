@@ -318,21 +318,33 @@
           width="150"
         >
           <template #default="scope">
-            <span class="tooltip-item" :title="scope.row.data.priceDetails"
-              >{{ scope.row.priceVAT.toFixed(2) }} €</span
+            <el-tooltip
+              :content="scope.row.data.priceDetails"
+              placement="left"
+              raw-content
             >
-            <i
-              v-if="
-                $route.params.type !== `in` &&
-                scope.row.priceVAT < (scope.row.data.priceBuy ?? 0) * 1.1
-              "
-              class="fa-solid fa-triangle-exclamation ms-3"
-              :class="
+              {{ scope.row.priceVAT.toFixed(2) }} €
+            </el-tooltip>
+            <el-tooltip
+              :content="
                 scope.row.priceVAT < (scope.row.data.priceBuy ?? 0)
-                  ? 'text-danger'
-                  : 'text-warning'
+                  ? `Zem iepirkuma`
+                  : `Peļņa zem 10%`
               "
-            ></i>
+            >
+              <i
+                v-if="
+                  $route.params.type !== `in` &&
+                  scope.row.priceVAT < (scope.row.data.priceBuy ?? 0) * 1.1
+                "
+                class="fa-solid fa-triangle-exclamation ms-3"
+                :class="
+                  scope.row.priceVAT < (scope.row.data.priceBuy ?? 0)
+                    ? 'text-danger'
+                    : 'text-warning'
+                "
+              ></i>
+            </el-tooltip>
           </template>
         </el-table-column>
         <el-table-column property="total" label="Summa" sortable width="100">
@@ -472,15 +484,6 @@ export default defineComponent({
       calculateTotalVAT(totalPriceVAT.value, totalPrice.value)
     );
 
-    // Tooltips for table
-    const initializeTooltips = () => {
-      nextTick(() => {
-        document.querySelectorAll(".tooltip-item").forEach((el) => {
-          new Tooltip(el, { html: true });
-        });
-      });
-    };
-
     // Document load
     const fetchDocument = async () => {
       loading.value = true;
@@ -515,7 +518,6 @@ export default defineComponent({
           push.error("Neizdevās ielādēt dokumentu");
         })
         .finally(() => {
-          initializeTooltips();
           loading.value = false;
         });
     };
