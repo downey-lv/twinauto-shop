@@ -359,13 +359,11 @@
                           v-tooltip
                         ></i>
                       </label>
-                      <el-form-item prop="description">
-                        <el-input
-                          v-model="product.description"
-                          type="textarea"
-                          rows="10"
-                        />
-                      </el-form-item>
+                      <quill-editor
+                        theme="snow"
+                        v-model:content="product.description"
+                        contentType="html"
+                      />
                     </div>
                   </div>
                 </div>
@@ -485,6 +483,14 @@
   height: 0;
 }
 </style>
+<style>
+.ql-editor {
+  color: var(--el-text-color-regular);
+}
+.ql-editor p {
+  padding-top: 5px;
+}
+</style>
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
@@ -499,6 +505,7 @@ import Notice from "@/components/core/Notice.vue";
 import { isEqual } from "lodash";
 import "@/assets/uploader.css";
 import type { FormInstance } from "element-plus";
+import { QuillEditor } from "@vueup/vue-quill";
 
 export default defineComponent({
   name: "product-edit",
@@ -506,6 +513,7 @@ export default defineComponent({
     Notice,
     SelectComponent,
     Plus,
+    QuillEditor,
   },
   setup() {
     const loading = ref({

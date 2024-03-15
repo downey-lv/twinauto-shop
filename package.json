@@ -36,6 +36,7 @@
     "@reside-ic/vue3-treeselect": "^1.0.18",
     "@tinymce/tinymce-vue": "^5.1.0",
     "@vueform/multiselect": "^1.2.5",
+    "@vueup/vue-quill": "^1.2.0",
     "animate.css": "^4.1.1",
     "apexcharts": "^3.35.5",
     "axios": "^1.1.3",

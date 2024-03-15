@@ -243,7 +243,12 @@
                     </ul>
                   </div>
 
-                  <a href="#" @click.prevent="addtoCart()" class="btn btn-sm btn-primary me-3">Pārdot</a>
+                  <a
+                    href="#"
+                    @click.prevent="addtoCart()"
+                    class="btn btn-sm btn-primary me-3"
+                    >Pārdot</a
+                  >
                 </div>
                 <!--end::Actions-->
               </div>
@@ -433,6 +438,11 @@
                 <label class="col-lg-4 fw-light">{{ item.label }}</label>
                 <label class="col-lg-8 fs-6 text-dark" v-if="item.value">
                   <span
+                    v-if="item.label == `Specifikācija`"
+                    v-html="item.value"
+                  ></span>
+                  <span
+                    v-else
                     v-for="(line, lineNumber) of item.value.split('\n')"
                     v-bind:key="lineNumber"
                   >
