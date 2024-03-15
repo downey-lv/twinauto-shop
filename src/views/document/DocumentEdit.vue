@@ -757,7 +757,9 @@ export default defineComponent({
       product.priceVAT = calculatePriceVAT(product, vatDecimal);
       product.total = calculateTotal(product, vatDecimal);
       product.priceWarning = computed(
-        () => product.priceVAT < (product.data?.priceBuy ?? 0) * 1.1
+        () =>
+          route.params.type !== "in" &&
+          product.priceVAT < (product.data?.priceBuy ?? 0) * 1.1
       );
     };
 
