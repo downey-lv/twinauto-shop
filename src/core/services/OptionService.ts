@@ -4,6 +4,7 @@ const options = {
     default: "daily",
     values: {
       daily: "Dienas pārdotais",
+      out: "Pārdošana",
       in: "Iepirkums",
       service: "Serviss",
     },
