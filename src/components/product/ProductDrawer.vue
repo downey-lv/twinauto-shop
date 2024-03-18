@@ -545,7 +545,14 @@
               <div class="row mb-3 fw-bold">
                 <label class="col-lg-2">Piegādātājs</label>
                 <label class="col-lg-4">Kods</label>
-                <label class="col-lg-3">Piegāde</label>
+                <label class="col-lg-3"
+                  >Piegāde
+                  <i
+                    class="fa-solid fa-circle-info text-info ms-1"
+                    title="<span class='text-success'>Piegāde šodien</span><br/><span class='text-warning'>Piegāde rīt</span>"
+                    v-tooltip-html
+                  ></i
+                ></label>
                 <label class="col-lg-1">Atl.</label>
                 <label class="col-lg-2">Cena</label>
               </div>
@@ -573,7 +580,13 @@
                 </label>
                 <label
                   class="col-lg-3"
-                  :class="item.delivery_missed ? `text-warning` : ``"
+                  :class="
+                    item.delivery_days === 0
+                      ? `text-success`
+                      : item.delivery_days === 1
+                      ? `text-warning`
+                      : ``
+                  "
                   :title="item.delivery_warehouse"
                   v-tooltip
                 >
