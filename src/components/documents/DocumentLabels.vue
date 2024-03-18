@@ -57,10 +57,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { defineComponent, ref } from "vue";
 import { push } from "@/main";
 import { Modal } from "bootstrap";
 import { labelService } from "@/core/services/LabelService";
+import { cloneDeep } from "lodash";
+import type {DocumentProduct} from "@/types/Document";
 
 export default defineComponent({
   name: "document-labels-modal",
@@ -74,6 +76,7 @@ export default defineComponent({
     const formRef = ref<null | HTMLFormElement>(null);
     const documentLabelsModalRef = ref();
     const loading = ref<boolean>(false);
+    const products = ref<DocumentProduct[]>([]);
 
     // Init modal
     const initModal = () => {
@@ -87,6 +90,7 @@ export default defineComponent({
       if (!modal) {
         initModal();
       }
+      loadData();
       modal.show();
     };
 
@@ -97,8 +101,10 @@ export default defineComponent({
       }
     };
 
-    // Setup data load
-    const products = computed(() => props.pData.map((item) => ({ ...item })));
+    // Load data
+    const loadData = () => {
+      products.value = cloneDeep(props.pData) as DocumentProduct[];
+    };
 
     return {
       products,
