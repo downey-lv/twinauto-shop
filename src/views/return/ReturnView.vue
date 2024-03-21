@@ -32,7 +32,7 @@
             returnDoc.status.name
           }}</span></span
         >
-        <span class="p-2">Komentārs: {{ returnDoc.comment }}</span>
+        <span class="p-2">Komentārs: {{ returnDoc.return_comment }}</span>
       </div>
     </div>
     <DocumentView v-if="documentId" />
@@ -118,7 +118,7 @@ export default defineComponent({
     const returnDoc = ref<ReturnView>({
       direction: "",
       title: null,
-      comment: "",
+      return_comment: "",
       date: "",
       companyname: "",
       status: {

@@ -30,7 +30,7 @@ export interface ReturnType {
 export interface ReturnView {
   direction: string;
   title: string | null;
-  comment: string;
+  return_comment: string;
   date: string;
   hasSupplier: boolean;
   hasClient: boolean;
