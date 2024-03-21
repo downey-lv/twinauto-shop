@@ -32,7 +32,9 @@
             <a
               v-if="
                 !documentData.links?.invoice &&
-                [2, 3, 7, 9, 10, 11].includes(Number(documentData.ordertypeid))
+                [2, 3, 7, 8, 9, 10, 11].includes(
+                  Number(documentData.ordertypeid)
+                )
               "
               class="btn btn-sm btn-light dropdown-toggle"
               data-bs-toggle="dropdown"
@@ -46,13 +48,13 @@
                   class="dropdown-item"
                   :href="`https://vide.twinauto.lv/shop/invoice/new_${$route.params.documentId}`"
                   target="_blank"
-                  >Pavadzīme</a
+                  >{{ documentData.ordertypeid === '8' ? 'Kredītrēķins' : 'Pavadzīme' }}</a
                 >
               </li>
               <li>
                 <a
                   v-if="
-                    !documentData.links?.invoice && !documentData.links?.prepaid
+                    !documentData.links?.invoice && !documentData.links?.prepaid && documentData.ordertypeid !== '8'
                   "
                   class="dropdown-item"
                   :href="`https://vide.twinauto.lv/shop/documents/?document_id=${$route.params.documentId}`"
