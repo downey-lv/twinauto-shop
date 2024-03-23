@@ -5,19 +5,9 @@
         <div class="card-header border-0 pt-5">
           <h3 class="card-title">{{ client.companyname }}</h3>
           <div class="card-toolbar">
-            <router-link
-              v-if="false"
-              class="btn btn-sm btn-info me-2"
-              type="button"
-              :to="{
-                name: `client-edit`,
-                params: {
-                  clientId: $route.params.clientId,
-                },
-              }"
-            >
+            <button @click="editClient()" class="btn btn-sm btn-info me-2">
               <i class="fa-solid fa-pencil"></i> Labot
-            </router-link>
+            </button>
 
             <button @click="$router.back()" class="btn btn-sm btn-light me-3">
               Aizvērt
@@ -55,7 +45,7 @@
               <div class="row">
                 <div class="col-5 fw-bold">Tips</div>
                 <div class="col">
-                  {{ client.is_supplier ? "Piegādātājs" : "Klients" }}
+                  {{ client.is_supplier ? "Piegādātājs" : "Pircējs" }}
                 </div>
               </div>
             </div>
@@ -89,6 +79,12 @@
               <div class="row">
                 <div class="col-5 fw-bold">Telefons</div>
                 <div class="col">{{ client.telno }}</div>
+              </div>
+              <div class="row">
+                <div class="col-5 fw-bold">E-pasts</div>
+                <div class="col">
+                  <a :href="`mailto:${client.email}`">{{ client.email }}</a>
+                </div>
               </div>
             </div>
             <div class="col-lg">
@@ -128,6 +124,11 @@
     </div>
   </div>
   <DocumentTable type="all" :client-id="clientId" />
+  <ClientModal
+    ref="editModal"
+    :company-id="clientId"
+    @refresh="fetchClient()"
+  />
 </template>
 
 <script lang="ts">
@@ -137,9 +138,10 @@ import type { Client } from "@/types/Client";
 import DocumentTable from "@/components/documents/DocumentTable.vue";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
+import ClientModal from "@/components/clients/ClientModal.vue";
 
 export default defineComponent({
-  components: { DocumentTable },
+  components: { DocumentTable, ClientModal },
   setup: function () {
     const loading = ref<boolean>(false);
 
@@ -156,6 +158,7 @@ export default defineComponent({
       countryName: "",
       person: "",
       telno: "",
+      email: "",
       account: "",
       comment: "",
       default_payterm: 0,
@@ -188,6 +191,11 @@ export default defineComponent({
   async mounted() {
     // Load client
     await this.fetchClient();
+  },
+  methods: {
+    editClient() {
+      (this.$refs.editModal as any).show();
+    },
   },
 });
 </script>

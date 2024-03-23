@@ -13,7 +13,8 @@ export interface Client {
   vat_validated: any;
   vat_excluded: boolean;
   is_supplier: boolean;
-  credit: number | null;
-  balance: number;
+  credit?: number | null;
+  balance?: number;
   comment: string;
+  email: string;
 }
