@@ -1059,7 +1059,7 @@ export default defineComponent({
       (this.$refs.linkageModalRef as any).show(manuId);
     },
     addtoCart() {
-      return false;
+      // return false;
       (this.$refs.cartAddModalRef as any).show();
     },
   },

@@ -12,13 +12,30 @@
       @update:modelValue="(val) => $emit('update:modelValue', val)"
       @change="$emit('change', $event)"
       :clearable="clearable"
+      :allow-create="allowCreate"
     >
-      <el-option
-        v-for="option in options"
-        :key="String(option[keyColumn])"
-        :label="option[labelColumn]"
-        :value="String(option[keyColumn])"
-      ></el-option>
+      <template v-if="grouped">
+        <el-option-group
+          v-for="group in options"
+          :key="group.label"
+          :label="group.label"
+        >
+          <el-option
+            v-for="option in group.options"
+            :key="String(option[keyColumn])"
+            :label="option[labelColumn]"
+            :value="String(option[keyColumn])"
+          ></el-option>
+        </el-option-group>
+      </template>
+      <template v-else>
+        <el-option
+          v-for="option in options"
+          :key="String(option[keyColumn])"
+          :label="option[labelColumn]"
+          :value="String(option[keyColumn])"
+        ></el-option>
+      </template>
     </el-select>
   </el-form-item>
 </template>
@@ -78,6 +95,14 @@ export default defineComponent({
     label: {
       type: String,
       default: "",
+    },
+    allowCreate: {
+      type: Boolean,
+      default: false,
+    },
+    grouped: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ["update:modelValue", "change"],

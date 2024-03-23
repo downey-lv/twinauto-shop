@@ -43,22 +43,57 @@
               ref="formRef"
               label-width="120px"
             >
+              <SelectComponent
+                v-model="formData.selectedCart"
+                :options="carts"
+                label="Grozs"
+                allow-create
+                grouped
+                clearable
+                placeholder="Izvēlies, ievadi jaunā nosaukumu vai atstāj tukšu"
+              />
               <el-form-item prop="amount" label="Cena">
-                <el-input-number
-                  v-model="formData.amount"
-                  :step="1"
-                  class="w-75"
-                />
+                <el-tooltip
+                  :content="product.priceDetails || ``"
+                  raw-content
+                  placement="left"
+                  :disabled="!product.priceDetails"
+                >
+                  <template #content>
+                    <div
+                      v-for="(price, label) in product.priceDetailsList || []"
+                      :key="label"
+                      class="d-flex"
+                    >
+                      <div class="flex-grow-1 me-2">{{ label }}</div>
+                      <div>
+                        <a href="#" @click.prevent="setPrice(price)">{{
+                          price
+                        }}</a>
+                        €
+                      </div>
+                    </div>
+                  </template>
+                  <el-input-number
+                    v-model="formData.amount"
+                    :precision="2"
+                    class="w-50"
+                    :controls="false"
+                  />
+                </el-tooltip>
               </el-form-item>
               <el-form-item prop="quantity" label="Daudzums">
                 <el-input-number
                   v-model="formData.quantity"
                   :step="1"
-                  class="w-75"
+                  class="w-50"
                 />
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="submit">Pievienot</el-button>
+                <el-button type="success" @click="submit(true)"
+                  >Pievienot un pārdot</el-button
+                >
                 <el-button @click="hide()">Atcelt</el-button>
               </el-form-item>
             </el-form>
@@ -76,18 +111,19 @@ import { computed, defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
-import { Plus } from "@element-plus/icons-vue";
 import "@/assets/uploader.css";
 import { Modal } from "bootstrap";
 import type { FormInstance } from "element-plus";
-import { removeTooltip } from "@/core/helpers/dom";
+import type { PropType } from "vue";
+import type { Product } from "@/types/Product";
+import type { newCartItem } from "@/types/Cart";
 
 export default defineComponent({
   name: "cart-add-modal",
   components: { SelectComponent },
   props: {
     product: {
-      type: Object,
+      type: Object as PropType<Product>,
       required: true,
     },
   },
@@ -96,8 +132,10 @@ export default defineComponent({
     const cartAddModalRef = ref();
     const loading = ref<boolean>(false);
 
-    const blankForm = {
-      amount: "",
+    const blankForm: newCartItem = {
+      selectedCart: "",
+      productId: "",
+      amount: null,
       quantity: 1,
     };
     const formData = ref({ ...blankForm });
@@ -127,9 +165,12 @@ export default defineComponent({
 
     const cartAdd = ref([]);
     function loadData() {
+      loadCarts();
       formData.value = { ...blankForm };
-      console.log(props.product);
-      formData.value.amount = props.product.priceSell;
+
+      // Set product data
+      formData.value.productId = props.product.productid;
+      formData.value.amount = Number(props.product.priceSell);
     }
 
     // Setup data load
@@ -154,6 +195,31 @@ export default defineComponent({
       ],
     });
 
+    const carts = ref([]);
+    function loadCarts() {
+      ApiService.get("cart", "list")
+        .then((response) => {
+          const data = response.data;
+          carts.value = data.cartList;
+
+          // Get current cart from local storage
+          const cartId = localStorage.getItem("cartId");
+          if (cartId) {
+            // Check if cart exists
+            const { cartObj } = data;
+            const cartExists = cartObj.some(
+              (item) => String(item.cart_id) === String(cartId)
+            );
+
+            // Set as selected cart
+            if (cartExists) formData.value.selectedCart = cartId;
+          }
+        })
+        .catch(() => {
+          push.error("Neizdevās ielādēt grozus");
+        });
+    }
+
     return {
       cartAdd,
       rules,
@@ -164,27 +230,32 @@ export default defineComponent({
       hide,
       loadData,
       formData,
+      carts,
     };
   },
 
   methods: {
-    submit() {
-      if (!this.formData) {
-        return;
-      }
-
+    submit(createDocument = false) {
       (this.$refs.formRef as FormInstance).validate((valid: boolean) => {
         if (valid) {
           this.loading = true;
-          ApiService.post("payment/", this.formData)
-            .then(() => {
+          ApiService.post("cart/", this.formData)
+            .then((response) => {
               this.loadData();
-              push.success("Saglabāts");
+              push.success("Pievienots");
               this.$emit("refresh");
               this.hide();
+
+              const { cartId } = response.data;
+              // Save cart id to local storage
+              localStorage.setItem("cartId", cartId);
+
+              // Create document
+              if (createDocument) {
+              }
             })
             .catch(() => {
-              push.error("Neizdevās saglabāt");
+              push.error("Neizdevās pievienot");
             })
             .finally(() => {
               this.loading = false;
@@ -193,6 +264,9 @@ export default defineComponent({
           return false;
         }
       });
+    },
+    setPrice(price) {
+      this.formData.amount = Number(price);
     },
   },
 });
