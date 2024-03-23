@@ -15,4 +15,5 @@ export interface Client {
   is_supplier: boolean;
   credit: number | null;
   balance: number;
+  comment: string;
 }

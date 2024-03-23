@@ -52,6 +52,12 @@
                   </template>
                 </div>
               </div>
+              <div class="row">
+                <div class="col-5 fw-bold">Tips</div>
+                <div class="col">
+                  {{ client.is_supplier ? "Piegādātājs" : "Klients" }}
+                </div>
+              </div>
             </div>
             <div class="col-lg">
               <div class="row">
@@ -69,6 +75,10 @@
                   />
                   {{ client.countryName }}
                 </div>
+              </div>
+              <div class="row">
+                <div class="col-5 fw-bold">Komentārs</div>
+                <div class="col">{{ client.comment }}</div>
               </div>
             </div>
             <div class="col-lg">
@@ -147,6 +157,7 @@ export default defineComponent({
       person: "",
       telno: "",
       account: "",
+      comment: "",
       default_payterm: 0,
       vat_validated: undefined,
       vat_excluded: false,
