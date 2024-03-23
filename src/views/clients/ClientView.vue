@@ -114,7 +114,7 @@
             <div class="col-5 fw-bold">Kredītlimits</div>
             <div
               class="col"
-              :class="client.balance > client.credit ? `text-danger` : ``"
+              :class="(client.balance ?? 0) > client.credit ? `text-danger` : ``"
             >
               {{ client.credit }} €
             </div>
