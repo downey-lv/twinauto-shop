@@ -90,10 +90,10 @@
                 />
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="submit">Pievienot</el-button>
                 <el-button type="success" @click="submit(true)"
                   >Pievienot un pārdot</el-button
                 >
+                <el-button type="primary" @click="submit">Pievienot</el-button>
                 <el-button @click="hide()">Atcelt</el-button>
               </el-form-item>
             </el-form>

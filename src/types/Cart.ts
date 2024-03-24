@@ -4,3 +4,11 @@ export interface newCartItem {
   quantity: number;
   productId: string;
 }
+
+export interface Cart {
+  cart_id: string;
+  title: string;
+  owner_name: string;
+  created_timestamp?: string;
+  products?: newCartItem[];
+}

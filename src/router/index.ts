@@ -212,6 +212,15 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/carts/",
+        name: "cart-list",
+        component: () => import("@/views/cart/CartList.vue"),
+        meta: {
+          pageTitle: "Grozi",
+          breadcrumbs: [],
+        },
+      },
+      {
         path: "/crafted/pages/profile",
         name: "profile",
         component: () => import("@/components/demo/page-layouts/Profile.vue"),

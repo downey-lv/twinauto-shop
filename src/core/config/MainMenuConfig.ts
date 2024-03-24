@@ -41,6 +41,11 @@ const MainMenuConfig: Array<MenuItem> = [
     faIcon: "timeline",
   },
   {
+    heading: "Grozi",
+    route: "/carts/",
+    faIcon: "basket-shopping-simple",
+  },
+  {
     heading: "Klienti",
     route: "/client/",
     faIcon: "users",
