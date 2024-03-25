@@ -54,6 +54,7 @@ export interface Document {
   balance_due?: number;
   paymentRecipient?: string;
   paymentType?: string;
+  cartId?: string | null;
 }
 
 interface DocumentLinks {

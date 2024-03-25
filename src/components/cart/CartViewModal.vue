@@ -27,27 +27,8 @@
         </div>
         <!--end::Modal header-->
         <!--begin::Modal body-->
-        <div class="modal-body py-10 px-lg-10" v-loading="loading">
-          <div class="row">
-            <div class="col-5 fw-bold">Nosaukums</div>
-            <div class="col">
-              {{ cartData.title }}
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-5 fw-bold">Lietotājs</div>
-            <div class="col">
-              {{ cartData.owner_name }}
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-5 fw-bold">Izveidots</div>
-            <div class="col">
-              {{ cartData.created_timestamp }}
-            </div>
-          </div>
-          <div class="separator separator-dashed my-6"></div>
-          <CartProducts :cart-data="cartData" @refresh="loadData" />
+        <div class="modal-body py-10 px-lg-10">
+          <CartView :cart-id="cartId" />
         </div>
         <!--end::Modal body-->
         <div class="modal-footer flex-center">
@@ -58,22 +39,14 @@
               confirm-button-type="danger"
               :title="`Izdzēst grozu?`"
               :width="300"
-              @confirm="
-                hide();
-                this.$emit(`delete`);
-              "
+              @confirm="emitAction(`delete`)"
             >
               <template #reference>
                 <el-button type="danger">Dzēst</el-button>
               </template>
             </el-popconfirm>
 
-            <el-button
-              type="success"
-              @click="
-                hide();
-                this.$emit(`sell`);
-              "
+            <el-button type="success" @click="emitAction(`sell`)"
               >Pārdot</el-button
             >
             <el-button @click="hide()">Aizvērt</el-button>
@@ -85,17 +58,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
-import ApiService from "@/core/services/ApiService";
-import { push } from "@/main";
+import { defineComponent, ref } from "vue";
 import "@/assets/uploader.css";
 import { Modal } from "bootstrap";
-import type { Cart } from "@/types/Cart";
-import CartProducts from "@/components/cart/CartProducts.vue";
+import CartView from "@/components/cart/CartView.vue";
 
 export default defineComponent({
   name: "cart-view-modal",
-  components: { CartProducts },
+  components: { CartView },
   emits: ["delete", "sell"],
   props: {
     cartId: {
@@ -103,18 +73,8 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
-    const formRef = ref<null | HTMLFormElement>(null);
+  setup() {
     const cartViewModalRef = ref();
-    const loading = ref<boolean>(false);
-
-    const blankCart: Cart = {
-      cart_id: "",
-      title: "",
-      owner_name: "",
-      products: [],
-    };
-    const cartData = ref({ ...blankCart });
 
     // Init modal
     const initModal = () => {
@@ -138,49 +98,17 @@ export default defineComponent({
       }
     };
 
-    const cartAdd = ref([]);
-    function loadData() {
-      cartData.value = { ...blankCart };
-
-      if (!props.cartId) return;
-
-      // Load cart data
-      loading.value = true;
-      ApiService.get(`cart/${props.cartId}`)
-        .then((response) => {
-          cartData.value = response.data;
-        })
-        .catch(() => {
-          push.error("Neizdevās ielādēt grozu");
-        })
-        .finally(() => {
-          loading.value = false;
-        });
-    }
-
-    // Setup data load
-    const idWatcher = watch(
-      () => props.cartId,
-      (newVal) => {
-        if (newVal) loadData();
-      },
-      { immediate: true }
-    );
-
-    onBeforeUnmount(() => {
-      idWatcher();
-    });
-
     return {
-      cartAdd,
-      formRef,
-      loading,
       cartViewModalRef,
       show,
       hide,
-      loadData,
-      cartData,
     };
+  },
+  methods: {
+    emitAction(event) {
+      this.hide();
+      this.$emit(event);
+    },
   },
 });
 </script>

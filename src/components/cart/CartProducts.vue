@@ -5,7 +5,7 @@
     <el-table-column property="producer" label="Ražotājs" sortable />
     <el-table-column property="quantity" label="Daudzums" sortable />
     <el-table-column property="price" label="Cena" sortable />
-    <el-table-column>
+    <el-table-column v-if="enableControls">
       <template #default="scope">
         <el-popconfirm
           confirm-button-text="Dzēst"
@@ -38,6 +38,10 @@ export default defineComponent({
     cartData: {
       type: Object as PropType<Cart>,
       required: true,
+    },
+    enableControls: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ["refresh"],

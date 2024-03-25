@@ -41,10 +41,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, type PropType } from "vue";
 
 interface OptionItem {
   [key: string]: string | number;
+}
+
+interface OptionGroup {
+  label: string;
+  options: OptionItem[];
 }
 
 export default defineComponent({
@@ -52,6 +57,7 @@ export default defineComponent({
   props: {
     options: {
       required: false,
+      type: Object as PropType<OptionItem[] | OptionGroup[]>,
     },
     modelValue: {
       required: true,

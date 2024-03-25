@@ -12,3 +12,10 @@ export interface Cart {
   created_timestamp?: string;
   products?: newCartItem[];
 }
+
+export interface CartDocument {
+  orderid: string;
+  orderdate: string;
+  comment: string;
+  grouping: string;
+}

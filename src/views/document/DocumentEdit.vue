@@ -558,6 +558,7 @@ export default defineComponent({
       deletedItems: [],
       paymentRecipient: "",
       paymentType: "",
+      cartId: null,
     };
 
     // Overwrite values from query
@@ -917,6 +918,8 @@ export default defineComponent({
       } else {
         // Load from database or store
         await fetchDocument(use_store);
+        // Add cart items
+        if (use_store) await addCartItems();
       }
 
       importStoreChecked = true;
@@ -1008,6 +1011,45 @@ export default defineComponent({
         .finally(() => {
           loading.value = false;
         });
+    };
+
+    const addCartItems = async () => {
+      if (route.query.cart) {
+        loading.value = true;
+        await ApiService.get("cart", String(route.query.cart))
+          .then((response) => {
+            // Add products
+            response.data.products.forEach((item) => {
+              document.value.products.push({
+                ...blankProduct,
+                productid: item.product_id,
+                quantity: item.quantity,
+                priceVAT: item.price,
+                price: new Decimal(item.price)
+                  .dividedBy(vatDecimal.value)
+                  .toDecimalPlaces(4)
+                  .toNumber(),
+              });
+
+              // Run ID search
+              const lastIndex = document.value.products.length - 1;
+              searchProduct("id", lastIndex, false);
+            });
+
+            // Add cart id to document
+            document.value.cartId = response.data.cart_id;
+
+            // Notify user
+            push.info(`Pievienots grozs: ${response.data.title}`);
+          })
+          .catch((error) => {
+            console.error("Error fetching data:", error);
+            push.error("Neizdevās ielādēt grozu");
+          })
+          .finally(() => {
+            loading.value = false;
+          });
+      }
     };
 
     // Watch for changes in id
@@ -1187,6 +1229,9 @@ export default defineComponent({
       if (!this.document) {
         return;
       }
+
+      console.log(this.document);
+      return;
 
       // Drop products that match blank product
       this.document.products = this.document.products.filter(

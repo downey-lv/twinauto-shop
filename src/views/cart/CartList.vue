@@ -52,6 +52,7 @@
     @delete="removeCart(cartId)"
     @sell="sellCart(cartId)"
   />
+  <CartSellModal ref="cartSellModalRef" :cart-id="cartId" />
 </template>
 
 <script lang="ts">
@@ -61,9 +62,10 @@ import type { Cart } from "@/types/Cart";
 import { push } from "@/main";
 import { DateTime } from "luxon";
 import CartViewModal from "@/components/cart/CartViewModal.vue";
+import CartSellModal from "@/components/cart/CartSellModal.vue";
 
 export default defineComponent({
-  components: { CartViewModal },
+  components: { CartSellModal, CartViewModal },
   computed: {
     DateTime() {
       return DateTime;
@@ -122,8 +124,8 @@ export default defineComponent({
       (this.$refs.cartViewModalRef as any).show();
     },
     sellCart(cartId) {
-      // TODO: Implement choice: new document / existing document
-      console.log("sell", cartId);
+      this.cartId = cartId;
+      (this.$refs.cartSellModalRef as any).show();
     },
     filterUsers(value: string, row) {
       return row.owner_name === value;

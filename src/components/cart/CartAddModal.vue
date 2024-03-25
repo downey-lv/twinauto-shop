@@ -29,74 +29,67 @@
         <!--begin::Form-->
         <el-form
           @submit.prevent="submit()"
-          model=""
+          :model="formData"
           :rules="rules"
+          @keydown.enter.prevent
           ref="formRef"
+          label-width="120px"
         >
           <!--begin::Modal body-->
           <div class="modal-body py-10 px-lg-10">
-            <el-form
-              @submit.prevent="submit()"
-              :model="formData"
-              :rules="rules"
-              @keydown.enter.prevent
-              ref="formRef"
-              label-width="120px"
-            >
-              <SelectComponent
-                v-model="formData.selectedCart"
-                :options="carts"
-                label="Grozs"
-                allow-create
-                grouped
-                clearable
-                placeholder="Izvēlies, ievadi jaunā nosaukumu vai atstāj tukšu"
-              />
-              <el-form-item prop="amount" label="Cena">
-                <el-tooltip
-                  :content="product.priceDetails || ``"
-                  raw-content
-                  placement="left"
-                  :disabled="!product.priceDetails"
-                >
-                  <template #content>
-                    <div
-                      v-for="(price, label) in product.priceDetailsList || []"
-                      :key="label"
-                      class="d-flex"
-                    >
-                      <div class="flex-grow-1 me-2">{{ label }}</div>
-                      <div>
-                        <a href="#" @click.prevent="setPrice(price)">{{
-                          price
-                        }}</a>
-                        €
-                      </div>
+            <SelectComponent
+              v-model="formData.selectedCart"
+              :options="carts"
+              label="Grozs"
+              allow-create
+              grouped
+              clearable
+              placeholder="Izvēlies, ievadi jaunā nosaukumu vai atstāj tukšu"
+            />
+            <el-form-item prop="amount" label="Cena">
+              <el-tooltip
+                :content="product.priceDetails || ``"
+                raw-content
+                placement="left"
+                :disabled="!product.priceDetails"
+              >
+                <template #content>
+                  <div
+                    v-for="(price, label) in product.priceDetailsList || []"
+                    :key="label"
+                    class="d-flex"
+                  >
+                    <div class="flex-grow-1 me-2">{{ label }}</div>
+                    <div>
+                      <a href="#" @click.prevent="setPrice(price)">{{
+                        price
+                      }}</a>
+                      €
                     </div>
-                  </template>
-                  <el-input-number
-                    v-model="formData.amount"
-                    :precision="2"
-                    class="w-50"
-                    :controls="false"
-                  />
-                </el-tooltip>
-              </el-form-item>
-              <el-form-item prop="quantity" label="Daudzums">
+                  </div>
+                </template>
                 <el-input-number
-                  v-model="formData.quantity"
-                  :step="1"
+                  v-model="formData.amount"
+                  :precision="2"
                   class="w-50"
+                  :controls="false"
                 />
-              </el-form-item>
-              <el-form-item>
-                <el-button type="success" @click="submit(true)"
-                  >Pievienot un pārdot</el-button
-                >
-                <el-button type="primary" @click="submit">Pievienot</el-button>
-                <el-button @click="hide()">Atcelt</el-button>
-              </el-form-item>
-            </el-form>
+              </el-tooltip>
+            </el-form-item>
+            <el-form-item prop="quantity" label="Daudzums">
+              <el-input-number
+                v-model="formData.quantity"
+                :step="1"
+                class="w-50"
+              />
+            </el-form-item>
+            <el-form-item>
+              <el-button type="success" @click="submit(true)"
+                >Pievienot un pārdot</el-button
+              >
+              <el-button type="primary" @click="submit()">Pievienot</el-button>
+              <el-button @click="hide()">Atcelt</el-button>
+            </el-form-item>
           </div>
           <!--end::Modal body-->
         </el-form>
@@ -104,10 +97,11 @@
       </div>
     </div>
   </div>
+  <CartSellModal ref="cartSellModalRef" :cart-id="formData.selectedCart" />
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, ref, watch } from "vue";
+import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
@@ -117,10 +111,11 @@ import type { FormInstance } from "element-plus";
 import type { PropType } from "vue";
 import type { Product } from "@/types/Product";
 import type { newCartItem } from "@/types/Cart";
+import CartSellModal from "@/components/cart/CartSellModal.vue";
 
 export default defineComponent({
   name: "cart-add-modal",
-  components: { SelectComponent },
+  components: { CartSellModal, SelectComponent },
   props: {
     product: {
       type: Object as PropType<Product>,
@@ -235,7 +230,7 @@ export default defineComponent({
   },
 
   methods: {
-    submit(createDocument = false) {
+    submit(sellCart = false) {
       (this.$refs.formRef as FormInstance).validate((valid: boolean) => {
         if (valid) {
           this.loading = true;
@@ -251,7 +246,8 @@ export default defineComponent({
               localStorage.setItem("cartId", cartId);
 
               // Create document
-              if (createDocument) {
+              if (sellCart) {
+                (this.$refs.cartSellModalRef as any).show();
               }
             })
             .catch(() => {
