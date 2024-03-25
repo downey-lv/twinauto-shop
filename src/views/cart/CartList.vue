@@ -73,7 +73,7 @@ export default defineComponent({
   },
   setup() {
     const loading = ref<boolean>(false);
-    const cartId = ref<string | null>(null);
+    const cartId = ref<number>(0);
     const carts = ref<Cart[]>([]);
     const cartUsers = ref<any>([]);
     function loadCarts() {

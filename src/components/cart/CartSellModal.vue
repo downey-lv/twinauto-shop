@@ -82,19 +82,19 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, ref, watch } from "vue";
+import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
 import ApiService from "@/core/services/ApiService";
 import "@/assets/uploader.css";
 import { Modal } from "bootstrap";
 import type { FormInstance } from "element-plus";
 import type { Company } from "@/types/Document";
-import type {CartDocument} from "@/types/Cart";
+import type { CartDocument } from "@/types/Cart";
 import CartView from "@/components/cart/CartView.vue";
 
 export default defineComponent({
   name: "cart-sell-modal",
-  components: {CartView, SelectComponent },
+  components: { CartView, SelectComponent },
   props: {
     cartId: {
       type: Number,
@@ -228,7 +228,10 @@ export default defineComponent({
             const document = this.documentsObj[this.formData.documentId];
             this.$router.push({
               name: "document-edit",
-              params: { editId: this.formData.documentId, type: document.grouping },
+              params: {
+                editId: this.formData.documentId,
+                type: document.grouping,
+              },
               query: {
                 cart: this.cartId,
               },
