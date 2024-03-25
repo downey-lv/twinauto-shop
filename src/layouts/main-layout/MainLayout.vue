@@ -41,12 +41,7 @@
   </div>
   <!-- end:: Body -->
   <KTScrollTop />
-  <KTDrawerMessenger />
-  <KTActivityDrawer />
   <ProductDrawer />
-  <KTCreateApp />
-  <KTInviteFriendsModal />
-
 </template>
 
 <script lang="ts">
@@ -63,10 +58,6 @@ import KTHeader from "@/layouts/main-layout/header/Header.vue";
 import KTFooter from "@/layouts/main-layout/footer/Footer.vue";
 import KTToolbar from "@/layouts/main-layout//toolbar/Toolbar.vue";
 import KTScrollTop from "@/layouts/main-layout/extras/ScrollTop.vue";
-import KTActivityDrawer from "@/layouts/main-layout/drawers/ActivityDrawer.vue";
-import KTCreateApp from "@/components/demo/modals/wizards/create-app-modal/CreateAppModal.vue";
-import KTInviteFriendsModal from "@/components/demo/modals/general/InviteFriendsModal.vue";
-import KTDrawerMessenger from "@/layouts/main-layout/extras/MessengerDrawer.vue";
 import ProductDrawer from "@/components/product/ProductDrawer.vue";
 import { reinitializeComponents } from "@/core/plugins/keenthemes";
 import {
@@ -91,11 +82,7 @@ export default defineComponent({
     KTFooter,
     KTToolbar,
     KTScrollTop,
-    KTCreateApp,
-    KTInviteFriendsModal,
-    KTActivityDrawer,
     ProductDrawer,
-    KTDrawerMessenger,
   },
   setup() {
     const route = useRoute();

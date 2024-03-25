@@ -58,9 +58,6 @@ import Vue3Tour from "vue3-tour";
 import "vue3-tour/dist/vue3-tour.css";
 app.use(Vue3Tour);
 
-// Import prismjs (REMOVE)
-import "@/core/plugins/prismjs";
-
 ApiService.init(app);
 initApexCharts(app);
 initInlineSvg(app);
