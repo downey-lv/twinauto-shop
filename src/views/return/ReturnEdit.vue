@@ -585,7 +585,8 @@ export default defineComponent({
       productService.searchProduct(
         type,
         idx,
-        document.value.return_type !== "1"
+        document.value.return_type !== "1",
+        true
       );
 
     const selectMatch = (product, match) =>

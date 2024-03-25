@@ -28,9 +28,9 @@ export class ProductService {
     this.cancelToken = null;
   }
 
-  searchProduct(type, idx, extendedHistory = false) {
+  searchProduct(type, idx, extendedHistory = false, enableCancel = false) {
     // Cancel the previous request if it exists
-    if (this.cancelToken) {
+    if (enableCancel && this.cancelToken) {
       this.cancelToken.cancel("Canceled due to new request");
     }
 

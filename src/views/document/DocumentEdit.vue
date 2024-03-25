@@ -931,7 +931,7 @@ export default defineComponent({
       // Re-run searchProduct
       document.value.products.forEach((product, index) => {
         if (product.productid === "") {
-          searchProduct("code", index);
+          searchProduct("code", index, false);
         }
       });
     };
@@ -1046,8 +1046,8 @@ export default defineComponent({
       route,
       router
     );
-    const searchProduct = (type, idx) =>
-      productService.searchProduct(type, idx);
+    const searchProduct = (type, idx, enableCancel = true) =>
+      productService.searchProduct(type, idx, false, enableCancel);
     const addMatch = (product, matches) =>
       productService.addMatch(product, matches);
     const selectMatch = (product, match) =>
