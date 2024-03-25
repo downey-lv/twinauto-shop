@@ -13,7 +13,9 @@
         <!--begin::Modal header-->
         <div class="modal-header">
           <!--begin::Modal title-->
-          <h2 class="fw-bold">Labot klientu</h2>
+          <h2 class="fw-bold">
+            {{ companyId ? `Labot klientu` : `Jauns klients` }}
+          </h2>
           <!--end::Modal title-->
 
           <!--begin::Close-->
@@ -48,7 +50,9 @@
                   <el-form-item label="Tips" prop="is_supplier">
                     <el-radio-group v-model="formData.is_supplier">
                       <el-radio-button :value="false">Pircējs</el-radio-button>
-                      <el-radio-button :value="true">Piegādātājs</el-radio-button>
+                      <el-radio-button :value="true"
+                        >Piegādātājs</el-radio-button
+                      >
                     </el-radio-group>
                   </el-form-item>
                   <el-form-item prop="companyname" label="Nosaukums">
@@ -165,6 +169,11 @@ export default defineComponent({
     companyId: {
       type: String,
       required: false,
+    },
+    noRedirect: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   setup(props) {
@@ -327,9 +336,9 @@ export default defineComponent({
               push.success("Saglabāts");
               this.hide();
 
-              if (this.companyId) {
+              if (this.noRedirect || this.companyId) {
                 // Emit refresh for current company
-                this.$emit("refresh");
+                this.$emit("refresh", response.data.companyId);
               } else {
                 // Redirect to new company
                 this.$router.push({

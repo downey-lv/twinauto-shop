@@ -90,7 +90,11 @@
                     v-model="document.companyid"
                     @change="updatePayterm()"
                     prop="companyid"
-                  />
+                  >
+                    <template #comment>
+                      <a href="#" @click.prevent="newClient()">Jauns</a>
+                    </template>
+                  </SelectComponent>
                 </div>
                 <div class="fv-row" v-if="!dailyDocument">
                   <label class="fs-6">Dokumenta numurs</label>
@@ -459,6 +463,7 @@
     :steps="tourSteps as any[]"
     :options="tourOptions"
   ></v-tour>
+  <ClientModal ref="editModal" no-redirect @refresh="refreshCompany" />
 </template>
 
 <script lang="ts">
@@ -512,9 +517,11 @@ import "@/assets/hover-icon.css";
 import type { Product } from "@/types/Product";
 import { DateTime } from "luxon";
 import { getOption } from "@/core/services/OptionService";
+import ClientModal from "@/components/clients/ClientModal.vue";
 
 export default defineComponent({
   components: {
+    ClientModal,
     DocumentHeader,
     SelectComponent,
     Notice,
@@ -1279,6 +1286,13 @@ export default defineComponent({
           return false;
         }
       });
+    },
+    newClient() {
+      (this.$refs.editModal as any).show();
+    },
+    refreshCompany(newId) {
+      this.loadData(`company/`, `companies`);
+      this.document.companyid = newId;
     },
   },
 });
