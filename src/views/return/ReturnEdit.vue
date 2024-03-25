@@ -321,6 +321,7 @@ import {
 } from "@/components/documents/validators";
 import type { ReturnDocument, ReturnProduct, ReturnType } from "@/types/Return";
 import "@/assets/hover-icon.css";
+import { getOption } from "@/core/services/OptionService";
 
 export default defineComponent({
   components: {
@@ -627,7 +628,10 @@ export default defineComponent({
   methods: {
     debounceSearch(type, idx) {
       if (!this.debouncedSearch) {
-        this.debouncedSearch = debounce(this.searchProduct, 700);
+        this.debouncedSearch = debounce(
+          this.searchProduct,
+          Number(getOption("search_speed"))
+        );
       }
       this.debouncedSearch(type, idx);
     },
