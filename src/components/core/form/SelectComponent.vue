@@ -37,6 +37,9 @@
         ></el-option>
       </template>
     </el-select>
+    <div class="fs-7 fw-semibold text-muted">
+      <slot name="comment"></slot>
+    </div>
   </el-form-item>
 </template>
 
