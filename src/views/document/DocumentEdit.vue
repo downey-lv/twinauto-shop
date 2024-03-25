@@ -1230,9 +1230,6 @@ export default defineComponent({
         return;
       }
 
-      console.log(this.document);
-      return;
-
       // Drop products that match blank product
       this.document.products = this.document.products.filter(
         (product) => !isEqual(product, this.blankProduct)
