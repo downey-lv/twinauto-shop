@@ -107,7 +107,11 @@
                 :options="groups"
                 v-model="product.productgroupid"
                 prop="productgroupid"
-              />
+              >
+                <template #comment>
+                  <a href="#" @click.prevent="newGroup()">Jauns</a>
+                </template>
+              </SelectComponent>
               <template v-for="(name, id) in groupSuggestions" :key="id">
                 <div class="fs-7 fw-semibold text-muted text-info">
                   <a
@@ -475,6 +479,11 @@
       </div>
     </div>
   </el-form>
+  <EditSettingsModal
+    ref="groupModal"
+    :pData="blankGroupData"
+    @refresh="refreshGroup"
+  />
 </template>
 
 <style scoped>
@@ -506,10 +515,12 @@ import { isEqual } from "lodash";
 import "@/assets/uploader.css";
 import type { FormInstance } from "element-plus";
 import { QuillEditor } from "@vueup/vue-quill";
+import EditSettingsModal from "@/components/settings/EditSettingsModal.vue";
 
 export default defineComponent({
   name: "product-edit",
   components: {
+    EditSettingsModal,
     Notice,
     SelectComponent,
     Plus,
@@ -536,6 +547,19 @@ export default defineComponent({
     const groupSuggestions = ref([]);
     const locationSuggestions = ref([]);
     const formRef = ref<FormInstance>();
+
+    const blankGroup = {
+      type: `group`,
+      settingData: {
+        id: ``,
+        name: ``,
+        tecdoc_name: ``,
+        image: ``,
+        parentid: ``,
+        upload_to_web: true,
+      },
+    };
+    const blankGroupData = ref({ ...blankGroup });
 
     const defaultProduct = {
       productid: "",
@@ -815,6 +839,8 @@ export default defineComponent({
       groupSuggestions,
       locationSuggestions,
       formRef,
+      blankGroup,
+      blankGroupData,
     };
   },
   async mounted() {
@@ -1168,6 +1194,14 @@ export default defineComponent({
       this.product.images[newIndex] = image;
       this.product.imagesweb[newIndex] = imageWeb;
       this.product.image_ids[newIndex] = imageId;
+    },
+    newGroup() {
+      this.blankGroupData = { ...this.blankGroup };
+      (this.$refs.groupModal as any).show();
+    },
+    async refreshGroup(newId) {
+      await this.loadData(`group`, `groups`);
+      this.product.productgroupid = newId;
     },
   },
 });

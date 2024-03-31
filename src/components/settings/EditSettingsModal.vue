@@ -330,10 +330,13 @@ export default defineComponent({
         if (valid) {
           this.loading = true;
           ApiService.post(this.type + "/", this.formData)
-            .then(() => {
+            .then((response) => {
               this.loadData();
               push.success("Saglabāts");
-              this.$emit("refresh");
+
+              const id = response.data.id ?? null;
+              this.$emit("refresh", id);
+
               this.hide();
             })
             .catch(() => {
