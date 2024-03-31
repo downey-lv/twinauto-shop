@@ -336,6 +336,7 @@
             >
               <i
                 v-if="
+                  !$route.params.returnId &&
                   $route.params.type !== `in` &&
                   scope.row.priceVAT < (scope.row.data.priceBuy ?? 0) * 1.1
                 "

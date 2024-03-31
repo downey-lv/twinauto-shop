@@ -764,6 +764,7 @@ export default defineComponent({
       product.priceWarning = computed(
         () =>
           route.params.type !== "in" &&
+          route.params.type !== "return" &&
           product.priceVAT < (product.data?.priceBuy ?? 0) * 1.1
       );
     };
