@@ -6,6 +6,19 @@
           {{ returnDoc.direction }} atgriešana - {{ returnDoc.title }}
         </h3>
         <div class="card-toolbar">
+          <el-popconfirm
+            v-if="!returnDoc.hasSupplier && !returnDoc.hasClient"
+            confirm-button-text="Dzēst"
+            cancel-button-text="Atcelt"
+            confirm-button-type="danger"
+            :title="`Izdzēst atgriešanu?`"
+            :width="300"
+            @confirm="deleteReturn()"
+          >
+            <template #reference>
+              <button class="btn btn-sm btn-light-danger me-2">Dzēst</button>
+            </template>
+          </el-popconfirm>
           <router-link
             class="btn btn-sm btn-light-info me-2"
             type="button"
@@ -165,6 +178,18 @@ export default defineComponent({
   },
   mounted() {
     this.fetchReturn();
+  },
+  methods: {
+    deleteReturn() {
+      ApiService.delete(`return/${this.$route.params.returnId}`)
+        .then(() => {
+          push.success("Atgriešana izdzēsta");
+          this.$router.push({ name: "return-list" });
+        })
+        .catch(() => {
+          push.error("Neizdevās izdzēst atgriešanu");
+        });
+    },
   },
 });
 </script>
