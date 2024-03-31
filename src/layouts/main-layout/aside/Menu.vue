@@ -42,7 +42,7 @@
                     icon-class="fs-2"
                   />
                 </span>
-                <span class="menu-title">{{ translate(item.heading) }}</span>
+                <span class="menu-title">{{ item.heading }}</span>
               </router-link>
             </div>
           </template>
@@ -71,7 +71,7 @@
                   icon-class="fs-2"
                 />
               </span>
-              <span class="menu-title">{{ translate(item.sectionTitle) }}</span>
+              <span class="menu-title">{{ item.sectionTitle }}</span>
             </span>
             <div
               class="menu-sub menu-sub-dropdown menu-sub-indention px-2 py-4 w-250px"
@@ -88,9 +88,7 @@
                     <span class="menu-bullet">
                       <span class="bullet bullet-dot"></span>
                     </span>
-                    <span class="menu-title">{{
-                      translate(menuItem.sectionTitle)
-                    }}</span>
+                    <span class="menu-title">{{ menuItem.sectionTitle }}</span>
                     <span class="menu-arrow"></span>
                   </span>
                   <div class="menu-sub menu-sub-accordion">
@@ -107,7 +105,7 @@
                             <span class="bullet bullet-dot"></span>
                           </span>
                           <span class="menu-title">{{
-                            translate(item2.sectionTitle)
+                            item2.sectionTitle
                           }}</span>
                           <span class="menu-arrow"></span>
                         </span>
@@ -128,7 +126,7 @@
                                   <span class="bullet bullet-dot"></span>
                                 </span>
                                 <span class="menu-title">{{
-                                  translate(item3.heading)
+                                  item3.heading
                                 }}</span>
                               </router-link>
                             </div>
@@ -145,9 +143,7 @@
                           <span class="menu-bullet">
                             <span class="bullet bullet-dot"></span>
                           </span>
-                          <span class="menu-title">{{
-                            translate(item2.heading)
-                          }}</span>
+                          <span class="menu-title">{{ item2.heading }}</span>
                         </router-link>
                       </div>
                     </template>
@@ -163,9 +159,7 @@
                     <span class="menu-bullet">
                       <span class="bullet bullet-dot"></span>
                     </span>
-                    <span class="menu-title">{{
-                      translate(menuItem.heading)
-                    }}</span>
+                    <span class="menu-title">{{ menuItem.heading }}</span>
                   </router-link>
                 </div>
               </template>
@@ -181,7 +175,6 @@
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
-import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 import { version } from "@/core/helpers/documentation";
 import { asideMenuIcons } from "@/core/helpers/config";
@@ -191,7 +184,6 @@ export default defineComponent({
   name: "kt-menu",
   components: {},
   setup() {
-    const { t, te } = useI18n();
     const route = useRoute();
     const scrollElRef = ref<null | HTMLElement>(null);
 
@@ -200,14 +192,6 @@ export default defineComponent({
         scrollElRef.value.scrollTop = 0;
       }
     });
-
-    const translate = (text: string) => {
-      if (te(text)) {
-        return t(text);
-      } else {
-        return text;
-      }
-    };
 
     const hasActiveChildren = (match: string) => {
       return route.path.indexOf(match) !== -1;
@@ -223,7 +207,6 @@ export default defineComponent({
       MainMenuConfig,
       asideMenuIcons,
       version,
-      translate,
       getAssetPath,
     };
   },

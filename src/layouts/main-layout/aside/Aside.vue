@@ -60,7 +60,6 @@
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent } from "vue";
-import { useI18n } from "vue-i18n";
 import KTMenu from "@/layouts/main-layout/aside/Menu.vue";
 import QuickActions from "@/components/core/menu/QuickActions.vue";
 import { asideTheme } from "@/core/helpers/config";
@@ -76,11 +75,8 @@ export default defineComponent({
     darkLogo: String,
   },
   setup() {
-    const { t } = useI18n();
-
     return {
       asideTheme,
-      t,
       getAssetPath,
     };
   },
