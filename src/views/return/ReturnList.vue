@@ -99,6 +99,18 @@ export default defineComponent({
             return `<i class="fa-solid fa-fw fa-${icon} me-2"></i> ${data}`;
           },
         },
+        title: {
+          render: function (data, type, row) {
+            const icons = {
+              Garantija: "award text-warning",
+              "Vecā detaļa": "engine text-danger",
+              Atgriešana: "person-walking-arrow-loop-left",
+            };
+            const icon = icons[data] ?? null;
+            if (!icon) return data;
+            return `<i class="fa-solid fa-fw fa-${icon} me-2"></i> ${data}`;
+          },
+        },
         status: {
           render: function (data, type, row) {
             return `<span style="display:none;">${data.priority}</span><span class="badge bg-${data.bg}">${data.name}</span>`;
