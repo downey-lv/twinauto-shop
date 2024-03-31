@@ -77,18 +77,20 @@
                   type="textarea"
                   rows="2"
                 />
-                <template v-for="(item, idx) in nameSuggestions" :key="idx">
-                  <div class="fs-7 fw-semibold text-muted text-info">
-                    <a
-                      href="#"
-                      @click.prevent="
-                        product.productname = item;
-                        nameSuggestions = [];
-                      "
-                      >{{ item }}</a
-                    >
-                  </div>
-                </template>
+                <div>
+                  <template v-for="(item, idx) in nameSuggestions" :key="idx">
+                    <div class="fs-7 fw-semibold text-muted text-info">
+                      <a
+                        href="#"
+                        @click.prevent="
+                          product.productname = item;
+                          nameSuggestions = [];
+                        "
+                        >{{ item }}</a
+                      >
+                    </div>
+                  </template>
+                </div>
               </el-form-item>
             </div>
           </div>
@@ -284,18 +286,16 @@
         </div>
         <!-- Analogues and codes -->
         <div class="row mb-5">
-          <div class="col-12">
-            <Notice
-              classes="rounded-3 mb-3"
-              color="warning"
-              body="Nav TecDoc prece"
-              v-if="tecdoc_warning"
-              icon="fa fa-solid fa-exclamation-triangle"
-            ></Notice>
-          </div>
           <div class="col-lg-3">
             <div class="card h-100">
               <div class="card-body">
+                <Notice
+                  classes="rounded-3 mb-3"
+                  color="warning"
+                  body="Nav TecDoc prece"
+                  v-if="tecdoc_warning"
+                  icon="fa fa-solid fa-exclamation-triangle"
+                ></Notice>
                 <label class="fs-5 mb-2">TecDoc analogs</label>
                 <div class="fv-row mb-2">
                   <label class="fs-6 mb-2">Kods</label>
@@ -493,8 +493,8 @@
 </style>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import type { WatchStopHandle } from "vue";
+import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import ApiService from "@/core/services/ApiService";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
 import { Plus } from "@element-plus/icons-vue";
@@ -988,6 +988,8 @@ export default defineComponent({
       let producerId;
       let tecdocId;
 
+      this.tecdoc_warning = false;
+
       if (analogue) {
         productCode = this.product.td_code;
         tecdocId = this.product.td_producer;
@@ -1015,21 +1017,26 @@ export default defineComponent({
 
         tecdocId = producer.tecdocid;
 
-        // If no tecdocid, add warning
+        // Check tecdoc ID
         if (!tecdocId) {
+          // No TecDoc ID, stop here
           this.tecdoc_warning = true;
           return;
+        } else if (tecdocId > 100000000) {
+          // Not a TecDoc ID
+          this.tecdoc_warning = true;
         }
       }
 
-      this.tecdoc_warning = false;
       this.loading.tecdoc = true;
 
       // Load tecdoc data
       const code = encodeURIComponent(String(productCode));
       ApiService.get("tecdoc", `article/${tecdocId}/${code}?newProduct`)
         .then((response) => {
-          const article = response.data.articles[0] ?? null;
+          const article = response.data ?? null;
+
+          console.log(article);
 
           if (!article) {
             this.tecdoc_warning = true;
@@ -1046,32 +1053,38 @@ export default defineComponent({
           }
 
           // Grab criteria
-          let criteria = article.articleCriteria.reduce((accumulator, obj) => {
+          let criteria = article.articleCriteria?.reduce((accumulator, obj) => {
             accumulator[obj.criteriaId] = obj.rawValue;
             return accumulator;
           }, {});
 
           // Set volume (ml)
-          if (criteria[684]) {
+          if (criteria && criteria[684]) {
             this.product.volume = parseFloat(criteria[684]) / 1000;
             this.product.unitid = "2";
           }
 
           // Set OE codes
-          const oe = article.oemNumbers
-            .map((item) => {
-              // item[0] is the OEM number, item[1] is the array of manufacturers
-              return `${item[0]} - ${item[1].join(", ")}`;
-            })
-            .join("\n");
+          let oe;
+          if (article.oemNumbers) {
+            oe = article.oemNumbers
+              .map((item) => {
+                // item[0] is the OEM number, item[1] is the array of manufacturers
+                return `${item[0]} - ${item[1].join(", ")}`;
+              })
+              .join("\n");
+          }
           if (oe) this.product.oecode = this.product.oecode + oe;
 
           // Set analogues
-          const crosses = article.tecdocCrosses
-            .map((item) => {
-              return `${item.code} - ${item.producer}`;
-            })
-            .join("\n");
+          let crosses;
+          if (article.tecdocCrosses) {
+            crosses = article.tecdocCrosses
+              .map((item) => {
+                return `${item.code} - ${item.producer}`;
+              })
+              .join("\n");
+          }
           if (crosses) this.product.analogi = this.product.analogi + crosses;
 
           // Set name
@@ -1100,8 +1113,9 @@ export default defineComponent({
             this.product.productgroupid == "" &&
             Object.keys(article.groupSuggestions).length === 1
           ) {
-            const key = Object.keys(article.groupSuggestions)[0];
-            this.product.productgroupid = key;
+            this.product.productgroupid = Object.keys(
+              article.groupSuggestions
+            )[0];
           } else {
             this.groupSuggestions = article.groupSuggestions;
           }
@@ -1111,11 +1125,9 @@ export default defineComponent({
             if (article.gtins?.length > 0) this.product.ean = article.gtins[0];
 
             // Set image
-            if (article.images[0].imageURL400) {
-              const imageURL = article.images[0].imageURL400;
-
+            if (article.images?.[0]) {
               // Stage image for upload
-              ApiService.get("tecdoc", "image", { url: imageURL })
+              ApiService.get("tecdoc", "image", { url: article.images[0] })
                 .then((response) => {
                   this.uploadImage(1)({ file: response.data });
                 })
