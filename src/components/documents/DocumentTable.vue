@@ -151,6 +151,12 @@ export default defineComponent({
 
               if ("paymentName" in newFilters)
                 table.value.dt.columns(8).search(newFilters.paymentName ?? "");
+
+              if ("paid" in newFilters)
+                table.value.dt.columns(7).search(newFilters.paid ?? "");
+
+              if ("issued" in newFilters)
+                table.value.dt.columns(8).search(newFilters.issued ?? "");
             } else {
               table.value.dt.columns().search("");
             }

@@ -54,6 +54,34 @@
               clearable
             />
           </div>
+          <template v-if="showStateFilter">
+            <div class="col-2 d-flex align-items-center">
+              <el-form-item
+                prop="documentPaid"
+                label="Apmaksāts"
+                style="margin-bottom: 0"
+              >
+                <el-radio-group v-model="filterPaid" @change="updateParent">
+                  <el-radio-button label="Visi" value="" />
+                  <el-radio-button label="Jā" :value="true" />
+                  <el-radio-button label="Nē" :value="false" />
+                </el-radio-group>
+              </el-form-item>
+            </div>
+            <div class="col-2 d-flex align-items-center">
+              <el-form-item
+                prop="documentIssued"
+                label="Pavadzīme"
+                style="margin-bottom: 0"
+              >
+                <el-radio-group v-model="filterIssued" @change="updateParent">
+                  <el-radio-button label="Visi" value="" />
+                  <el-radio-button label="Jā" :value="true" />
+                  <el-radio-button label="Nē" :value="false" />
+                </el-radio-group>
+              </el-form-item>
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -82,6 +110,10 @@ export default defineComponent({
       default: true,
     },
     showPaymentFilter: {
+      type: Boolean,
+      default: false,
+    },
+    showStateFilter: {
       type: Boolean,
       default: false,
     },
@@ -118,6 +150,13 @@ export default defineComponent({
       if (props.showPaymentFilter) {
         data["payment"] = filterPayment.value;
         data["paymentName"] = getName(filterPayment.value, paymentTypes.value);
+      }
+
+      if (props.showStateFilter) {
+        data["paid"] = filterPaid.value;
+        data["issued"] = filterIssued.value;
+        if (filterPaid.value === null) delete data["paid"];
+        if (filterIssued.value === null) delete data["issued"];
       }
 
       emit("updateFilters", data);
@@ -189,6 +228,10 @@ export default defineComponent({
       { id: "3", name: "Bankas karte" },
     ]);
 
+    // State selection
+    const filterPaid = ref(null);
+    const filterIssued = ref(null);
+
     // Default values
     const setDefaults = () => {
       const authStore = useAuthStore();
@@ -202,6 +245,8 @@ export default defineComponent({
       filterRecipient.value = defaultRecipient;
       filterUser.value = "";
       filterPayment.value = "";
+      filterPaid.value = null;
+      filterIssued.value = null;
     };
 
     onMounted(async () => {
@@ -216,6 +261,8 @@ export default defineComponent({
       filterRecipient,
       filterUser,
       filterPayment,
+      filterPaid,
+      filterIssued,
       disabledDate,
       shortcuts,
       users,

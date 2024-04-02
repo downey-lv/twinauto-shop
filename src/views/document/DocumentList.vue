@@ -10,6 +10,7 @@
     v-else
     :show-user-filter="false"
     :show-recipient-filter="false"
+    show-state-filter
     :pre-select-date="false"
     @updateFilters="updateFilters"
   />
