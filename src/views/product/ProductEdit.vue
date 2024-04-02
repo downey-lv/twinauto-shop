@@ -1014,7 +1014,11 @@ export default defineComponent({
       let producerId;
       let tecdocId;
 
+      // Reset warning and suggestions
       this.tecdoc_warning = false;
+      this.nameSuggestions = [];
+      this.groupSuggestions = [];
+      this.locationSuggestions = [];
 
       if (analogue) {
         productCode = this.product.td_code;
