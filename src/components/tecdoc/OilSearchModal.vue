@@ -27,7 +27,9 @@
         </div>
         <!--end::Modal header-->
         <!--begin::Modal body-->
-        <div class="modal-body py-10 px-lg-10" v-loading>
+        <div class="modal-body py-10 px-lg-10" v-loading="loading">
+          <a href="https://lv.wolflubes.com/en-us/oil-finder" target="_blank"
+          >Atvērt Wolf meklētāju</a>
           <ul>
             <li v-for="(item, key) in results" :key="key">
               <a :href="item.url" target="_blank">{{ item.name }}</a>
@@ -84,6 +86,9 @@ export default defineComponent({
 
     const results = ref<any[]>([]);
     function loadData() {
+      if (!props.vin) return;
+
+      loading.value = true;
       // Load oil
       ApiService.get("/api/oil", props.vin)
         .then((response) => {
@@ -92,6 +97,9 @@ export default defineComponent({
         .catch((error) => {
           console.error(`Error fetching data from oil:`, error);
           push.error(`Neizdevās ielādēt rezultātus`);
+        })
+        .finally(() => {
+          loading.value = false;
         });
     }
     // Setup data load
