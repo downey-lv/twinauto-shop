@@ -2,8 +2,8 @@
   <div class="card mb-5">
     <div class="card-body ps-9 p-5">
       <div class="row">
-        <div class="col-8 row">
-          <div class="col-3">
+        <div class="col-lg-8 row">
+          <div class="col-lg-3 mb-2 mg-lg-0">
             <el-date-picker
               class="me-2 w-100"
               v-model="filterDate"
@@ -16,7 +16,7 @@
               value-format="YYYY-MM-DD"
             />
           </div>
-          <div class="col-3" v-if="showUserFilter">
+          <div class="col-lg-3 mb-2 mg-lg-0" v-if="showUserFilter">
             <SelectComponent
               v-loading="loadingUsers"
               class="me-2"
@@ -29,7 +29,7 @@
               clearable
             />
           </div>
-          <div class="col-3" v-if="showRecipientFilter">
+          <div class="col-lg-3 mb-2 mg-lg-0" v-if="showRecipientFilter">
             <SelectComponent
               v-loading="loadingRecipients"
               class="me-2"
@@ -42,7 +42,7 @@
               clearable
             />
           </div>
-          <div class="col-3" v-if="showPaymentFilter">
+          <div class="col-lg-3 mb-2 mg-lg-0" v-if="showPaymentFilter">
             <SelectComponent
               class="me-2"
               element-class="mb-0"
@@ -55,7 +55,7 @@
             />
           </div>
           <template v-if="showStateFilter">
-            <div class="col-2 d-flex align-items-center">
+            <div class="col-lg-3 mb-2 mg-lg-0 d-flex align-items-center">
               <el-form-item
                 prop="documentPaid"
                 label="Apmaksāts"
@@ -68,7 +68,7 @@
                 </el-radio-group>
               </el-form-item>
             </div>
-            <div class="col-2 d-flex align-items-center">
+            <div class="col-lg-3 mb-2 mg-lg-0 d-flex align-items-center">
               <el-form-item
                 prop="documentIssued"
                 label="Pavadzīme"
