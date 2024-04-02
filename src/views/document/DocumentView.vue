@@ -48,13 +48,19 @@
                   class="dropdown-item"
                   :href="`https://vide.twinauto.lv/shop/invoice/new_${$route.params.documentId}`"
                   target="_blank"
-                  >{{ documentData.ordertypeid === '8' ? 'Kredītrēķins' : 'Pavadzīme' }}</a
+                  >{{
+                    documentData.ordertypeid === "8"
+                      ? "Kredītrēķins"
+                      : "Pavadzīme"
+                  }}</a
                 >
               </li>
               <li>
                 <a
                   v-if="
-                    !documentData.links?.invoice && !documentData.links?.prepaid && documentData.ordertypeid !== '8'
+                    !documentData.links?.invoice &&
+                    !documentData.links?.prepaid &&
+                    documentData.ordertypeid !== '8'
                   "
                   class="dropdown-item"
                   :href="`https://vide.twinauto.lv/shop/documents/?document_id=${$route.params.documentId}`"
@@ -329,7 +335,7 @@
             </el-tooltip>
             <el-tooltip
               :content="
-                scope.row.priceVAT < (scope.row.data.priceBuy ?? 0)
+                scope.row.priceVAT < (scope.row.documentBuyPrice ?? 0)
                   ? `Zem iepirkuma`
                   : `Peļņa zem 10%`
               "
@@ -338,11 +344,11 @@
                 v-if="
                   !$route.params.returnId &&
                   $route.params.type !== `in` &&
-                  scope.row.priceVAT < (scope.row.data.priceBuy ?? 0) * 1.1
+                  scope.row.priceVAT < (scope.row.documentBuyPrice ?? 0) * 1.1
                 "
                 class="fa-solid fa-triangle-exclamation ms-3"
                 :class="
-                  scope.row.priceVAT < (scope.row.data.priceBuy ?? 0)
+                  scope.row.priceVAT < (scope.row.documentBuyPrice ?? 0)
                     ? 'text-danger'
                     : 'text-warning'
                 "
@@ -512,6 +518,20 @@ export default defineComponent({
             ApiService.get("product/find", `id/${product.productid}`).then(
               (response) => {
                 product.data = response.data[0];
+
+                // Choose buy price
+                product.documentBuyPrice = Number(
+                  product.buy_price || product.data?.priceBuy
+                );
+
+                // Add to priceDetails
+                if (
+                  product.data &&
+                  product.documentBuyPrice !== Number(product.data.priceBuy)
+                )
+                  product.data.priceDetails =
+                    `Dokumenta iepirkums: ${product.documentBuyPrice} €<br/>` +
+                    product.data.priceDetails;
               }
             );
           });
