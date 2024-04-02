@@ -57,7 +57,16 @@
               class="bullet w-8px h-3px rounded-2 me-3"
               :class="`bg-` + item.color"
             ></div>
-            <div class="text-gray-500 flex-grow-1 me-4">{{ item.title }}</div>
+            <div class="text-gray-500 flex-grow-1 me-4">
+              <a
+                href="#"
+                @click.prevent="viewDetails(item.data)"
+                class="text-gray-500 text-decoration-underline"
+                v-if="item.data"
+                >{{ item.title }}</a
+              >
+              <template v-else>{{ item.title }}</template>
+            </div>
             <div class="fw-bolder text-gray-700 text-xxl-end">
               € {{ item.amount }}
             </div>
@@ -68,15 +77,17 @@
     </div>
     <!--end::Card body-->
   </div>
+  <DailyRevenueModal :revenue-data="revenueData" ref="revenueModal" />
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import ApiService from "@/core/services/ApiService";
-import { push } from "@/main";
 import { labelService } from "@/core/services/LabelService";
+import DailyRevenueModal from "@/components/data/DailyRevenueModal.vue";
 
 export default defineComponent({
+  components: { DailyRevenueModal },
   props: {
     widgetClasses: String,
     type: String,
@@ -85,12 +96,14 @@ export default defineComponent({
     const loading = ref<boolean>(false);
     const data = ref();
     const amounts = ref();
+    const revenueData = ref();
 
     return {
       data,
       amounts,
       loading,
       workstation: props.type,
+      revenueData,
     };
   },
   mounted() {
@@ -109,11 +122,21 @@ export default defineComponent({
             title: "Veikals",
             amount: this.data.veikals_kase,
             color: "secondary",
+            data: {
+              source: "veikals",
+              type: "kase",
+              header: "Veikals - Skaidra nauda",
+            },
           },
           {
             title: "Internets",
             amount: this.data.online_kase,
             color: "secondary",
+            data: {
+              source: "online",
+              type: "kase",
+              header: "Internets - Skaidra nauda",
+            },
           },
           { separator: 1 },
           {
@@ -125,11 +148,21 @@ export default defineComponent({
             title: "Veikals",
             amount: this.data.veikals_karte,
             color: "secondary",
+            data: {
+              source: "veikals",
+              type: "karte",
+              header: "Veikals - Karte",
+            },
           },
           {
-            title: " Internets",
+            title: "Internets",
             amount: this.data.online_karte,
             color: "secondary",
+            data: {
+              source: "online",
+              type: "karte",
+              header: "Internets - Karte",
+            },
           },
           { separator: 1 },
           {
@@ -141,6 +174,7 @@ export default defineComponent({
             title: "Atlikums",
             amount: this.data.cash,
             color: "warning",
+            data: { source: "veikals", type: "skaidra", header: "Atlikums" },
           },
         ];
       })
@@ -163,6 +197,11 @@ export default defineComponent({
       } finally {
         el.innerHTML = value;
       }
+    },
+    viewDetails(data) {
+      data.workstation = this.workstation;
+      this.revenueData = data;
+      (this.$refs.revenueModal as any).show();
     },
   },
 });
