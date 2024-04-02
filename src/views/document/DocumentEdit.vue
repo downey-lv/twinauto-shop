@@ -312,13 +312,16 @@
             </div>
 
             <div class="col-lg-1 pb-1">
-              <el-form-item :prop="`products[${idx}].quantity`">
+              <el-form-item :prop="`products[${idx}].quantity`" style="margin-bottom: 0">
                 <el-input-number
                   v-model="item.quantity"
                   size="large"
                   placeholder="Daudzums"
                   @keydown.enter.prevent="nextRow(idx)"
                 />
+                <div class="fs-7 fw-semibold text-muted" v-if="item.data?.rest">
+                  Atlikums: {{ item.data?.rest }}
+                </div>
               </el-form-item>
             </div>
 
