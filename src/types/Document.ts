@@ -31,6 +31,7 @@ export interface DocumentProduct {
   priceWarning?: boolean;
   buy_price?: number;
   documentBuyPrice?: number;
+  index?: number;
 }
 
 export interface Document {

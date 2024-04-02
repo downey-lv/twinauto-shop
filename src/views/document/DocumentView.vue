@@ -293,7 +293,7 @@
               <span>{{ scope.row.productcode }}</span>
               <button
                 class="btn btn-icon btn-sm btn-active-primary"
-                @click="viewProduct(scope.$index)"
+                @click="viewProduct(scope.row.index)"
                 :onmouseover="`showImage('${scope.row.data.images?.[0]}')`"
                 onmouseleave="showImage()"
               >
@@ -518,6 +518,9 @@ export default defineComponent({
             ApiService.get("product/find", `id/${product.productid}`).then(
               (response) => {
                 product.data = response.data[0];
+
+                // Add index
+                product.index = products.indexOf(product);
 
                 // Choose buy price
                 product.documentBuyPrice = Number(
