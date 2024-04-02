@@ -189,7 +189,7 @@ export default defineComponent({
     });
 
     const setSource = (newType, oldType) => {
-      if (newType !== "daily" && oldType !== "daily") return false;
+      // if (newType !== "daily" && oldType !== "daily") return false;
 
       const dailySource = {
         payments: "Apmaksa",
@@ -197,10 +197,14 @@ export default defineComponent({
         created_date: "Izveidots",
       };
 
+      const otherSource = {
+        issued: "Pavadzīme",
+      };
+
       if (props.type === "daily") {
         dtSource.value.documents = { ...documentSource, ...dailySource };
       } else {
-        dtSource.value.documents = documentSource;
+        dtSource.value.documents = { ...documentSource, ...otherSource };
       }
 
       tabsKey.value += 1;
@@ -225,6 +229,15 @@ export default defineComponent({
           width: "180px",
         },
         is_paid: {
+          render: function (data) {
+            if (data) {
+              return '<span class="badge badge-light-success">Jā</span>';
+            } else {
+              return '<span class="badge badge-light-danger">Nē</span>';
+            }
+          },
+        },
+        issued: {
           render: function (data) {
             if (data) {
               return '<span class="badge badge-light-success">Jā</span>';
