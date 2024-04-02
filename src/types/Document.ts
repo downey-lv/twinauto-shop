@@ -23,13 +23,13 @@ export interface DocumentProduct {
   price: number;
   priceVAT: number;
   total: number;
-  buy_price: number;
   comment: string;
   matches: Product[];
   selectedMatch?: number;
   imported?: ImportedProduct;
   data?: Product;
   priceWarning?: boolean;
+  buy_price?: number;
   documentBuyPrice?: number;
 }
 
