@@ -18,6 +18,10 @@
         {{ cartData.created_timestamp }}
       </div>
     </div>
+    <div class="row mt-5">
+      <div class="col-5 fw-bold">Summa</div>
+      <div class="col">{{ cartData.total }} €</div>
+    </div>
     <div class="separator separator-dashed my-6"></div>
     <CartProducts
       :cart-data="cartData"
@@ -33,6 +37,7 @@ import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
 import type { Cart } from "@/types/Cart";
 import CartProducts from "@/components/cart/CartProducts.vue";
+import { Decimal } from "decimal.js";
 
 export default defineComponent({
   name: "cart-view",
@@ -56,6 +61,7 @@ export default defineComponent({
       cart_id: "",
       title: "",
       owner_name: "",
+      total: 0,
       products: [],
     };
     const cartData = ref({ ...blankCart });
@@ -71,6 +77,14 @@ export default defineComponent({
       ApiService.get(`cart/${props.cartId}`)
         .then((response) => {
           cartData.value = response.data;
+
+          // Calculate total
+          const total = cartData.value.products?.reduce(
+            (acc, item) =>
+              acc.plus(new Decimal(item.price ?? 0).times(item.quantity)),
+            new Decimal(0)
+          );
+          cartData.value.total = total?.toNumber() ?? 0;
         })
         .catch(() => {
           push.error("Neizdevās ielādēt grozu");

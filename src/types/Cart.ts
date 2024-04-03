@@ -3,12 +3,14 @@ export interface newCartItem {
   amount: number | null;
   quantity: number;
   productId: string;
+  price?: number;
 }
 
 export interface Cart {
   cart_id: string;
   title: string;
   owner_name: string;
+  total?: number;
   created_timestamp?: string;
   products?: newCartItem[];
 }
