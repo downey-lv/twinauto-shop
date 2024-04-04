@@ -3,7 +3,7 @@
     <div class="card-body ps-9 p-5">
       <div class="row">
         <div class="col-lg-8 row">
-          <div class="col-lg-3 mb-2 mg-lg-0">
+          <div class="col-lg-3 mb-2 mg-lg-0" v-if="showDateFilter">
             <el-date-picker
               class="me-2 w-100"
               v-model="filterDate"
@@ -82,6 +82,20 @@
               </el-form-item>
             </div>
           </template>
+          <div class="col-lg-6" v-if="showRangeFilter">
+            <el-date-picker
+              v-model="filterRange"
+              type="daterange"
+              unlink-panels
+              range-separator="Līdz"
+              start-placeholder="Sākums"
+              end-placeholder="Beigas"
+              :shortcuts="rangeShortcuts"
+              size="large"
+              :disabled-date="disabledDate"
+              @change="updateParent"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -117,6 +131,14 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    showDateFilter: {
+      type: Boolean,
+      default: true,
+    },
+    showRangeFilter: {
+      type: Boolean,
+      default: false,
+    },
     preSelectDate: {
       type: Boolean,
       default: true,
@@ -131,9 +153,15 @@ export default defineComponent({
 
     // Emit selection
     const updateParent = () => {
-      const data = {
-        date: filterDate.value,
-      };
+      const data = {};
+
+      if (props.showDateFilter) {
+        data["date"] = filterDate.value;
+      }
+
+      if (props.showRangeFilter) {
+        data["range"] = filterRange.value;
+      }
 
       if (props.showUserFilter) {
         data["user"] = filterUser.value;
@@ -182,6 +210,41 @@ export default defineComponent({
     const disabledDate = (time: Date) => {
       return time.getTime() > Date.now();
     };
+
+    // Date range selection
+    const filterRange = ref("");
+    const rangeShortcuts = [
+      {
+        text: "Šonedēļ",
+        value: () => {
+          const end = new Date();
+          const start = new Date();
+          start.setTime(
+            start.getTime() - 3600 * 1000 * 24 * (start.getDay() - 1)
+          );
+          return [start, end];
+        },
+      },
+      {
+        text: "Iepr. ned.",
+        value: () => {
+          const end = new Date();
+          const start = new Date();
+          start.setDate(start.getDate() - start.getDay() - 6);
+          end.setDate(end.getDate() - end.getDay()); // Sunday of the previous week
+          return [start, end];
+        },
+      },
+      {
+        text: "30 dienas",
+        value: () => {
+          const end = new Date();
+          const start = new Date();
+          start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+          return [start, end];
+        },
+      },
+    ];
 
     // User selection
     const loadingUsers = ref(false);
@@ -247,6 +310,7 @@ export default defineComponent({
       filterPayment.value = "";
       filterPaid.value = null;
       filterIssued.value = null;
+      filterRange.value = "";
     };
 
     onMounted(async () => {
@@ -263,8 +327,10 @@ export default defineComponent({
       filterPayment,
       filterPaid,
       filterIssued,
+      filterRange,
       disabledDate,
       shortcuts,
+      rangeShortcuts,
       users,
       paymentRecipients,
       paymentTypes,
