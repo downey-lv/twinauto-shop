@@ -220,6 +220,15 @@ const routes: Array<RouteRecordRaw> = [
           breadcrumbs: [],
         },
       },
+      {
+        path: "/report/",
+        name: "daily-sold",
+        component: () => import("@/views/reports/DailySold.vue"),
+        meta: {
+          pageTitle: "Ietirgotais",
+          breadcrumbs: [],
+        },
+      },
     ],
   },
   {

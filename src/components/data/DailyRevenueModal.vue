@@ -118,11 +118,16 @@ export default defineComponent({
       // Set header
       header.value = `${d.workstation} - ${d.header}`;
 
+      // Set query
+      const query = {};
+      if (d.date) query["date"] = d.date;
+
       loading.value = true;
       // Load payments
       ApiService.get(
         "data/daily/revenue",
-        `${d.workstation}/${d.source}/${d.type}/`
+        `${d.workstation}/${d.source}/${d.type}/`,
+        query
       )
         .then((response) => {
           data.value = response.data;

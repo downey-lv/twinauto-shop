@@ -28,6 +28,16 @@
 
     <div class="separator m-3 opacity-75"></div>
 
+    <template v-if="user.permissions?.includes(`profits`)">
+      <div class="menu-item px-5">
+        <router-link :to="{ name: 'daily-sold' }" class="menu-link px-5"
+          >Dienā ietirgotais</router-link
+        >
+      </div>
+
+      <div class="separator m-3 opacity-75"></div>
+    </template>
+
     <!--begin::Menu item-->
     <div
       v-for="(item, key) in options"
@@ -99,6 +109,7 @@ export default defineComponent({
       router.push({ name: "sign-in" });
     };
 
+    // Options
     const optionValues = ref({});
     Object.keys(options).forEach((key) => {
       optionValues.value[key] = getOption(key);
