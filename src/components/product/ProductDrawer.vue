@@ -939,6 +939,8 @@ export default defineComponent({
         pricewithvat: "Cena",
         comment: "Komentārs",
         workstation: "Darba vieta",
+        orderid: "",
+        directionOrder: "",
       },
     };
 
@@ -946,6 +948,13 @@ export default defineComponent({
       history: {
         orderdate: {
           width: "110px",
+          orderData: [0, 8, 7], // Order by date and then orderid, prioritize sell orders
+        },
+        orderid: {
+          visible: false,
+        },
+        directionOrder: {
+          visible: false,
         },
       },
     };
