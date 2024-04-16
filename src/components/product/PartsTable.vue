@@ -289,6 +289,12 @@ export default defineComponent({
         },
         priceSell: {
           width: "90px",
+          render: function (data, type, row) {
+            if (row.hasDeposit) {
+              return `${data} <i class="fa-solid fa-money-bill-transfer text-info"></i>`;
+            }
+            return data;
+          },
         },
         rest: {
           width: "90px",

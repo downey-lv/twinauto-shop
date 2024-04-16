@@ -104,6 +104,12 @@ export interface Supplier {
   code_supplier: string;
   search_url: string | null;
   supplier_autoshop_id: number;
+  order_date: string;
+  delivery_days: number;
+  delivery_warehouse: string;
+  delivery_info: string;
+  deposit_price: number;
+  deposit_details: string;
 }
 
 export interface Product {
@@ -135,6 +141,7 @@ export interface Product {
   exactMatch: number;
   priceDetails: string;
   priceDetailsList: string[];
+  hasDeposit: boolean;
 }
 
 export interface Price {

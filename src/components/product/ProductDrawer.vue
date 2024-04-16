@@ -272,6 +272,13 @@
                   :body="p.tecdoc.articleState"
                 ></Notice>
               </div>
+              <div class="d-flex flex-wrap fs-6 mb-4 pe-2" v-if="p.hasDeposit">
+                <Notice
+                  classes="rounded-3"
+                  color="info"
+                  body="Ir depozīts par veco detaļu"
+                ></Notice>
+              </div>
               <!--end::Product name-->
 
               <!--begin::Stats-->
@@ -603,6 +610,12 @@
                   v-tooltip
                 >
                   {{ item.supplier_price }} €
+                  <span v-if="item.deposit_price > 0" :title="item.deposit_details" v-tooltip>
+                    <br /><i
+                      class="fa-solid fa-money-bill-transfer text-info"
+                    ></i>
+                    {{ item.deposit_price }} €
+                  </span>
                 </label>
               </div>
             </div>
@@ -739,7 +752,7 @@ import {
 import { labelService } from "@/core/services/LabelService";
 import { push } from "@/main";
 import ApiService from "@/core/services/ApiService";
-import type { Product } from "@/types/Product";
+import type { Product, Supplier } from "@/types/Product";
 import LogModal from "@/components/data/LogModal.vue";
 import ReportIssue from "@/components/product/ReportIssue.vue";
 import LinkageModal from "@/components/product/ProductLinkages.vue";
@@ -763,7 +776,7 @@ export default defineComponent({
     const loading = ref(false);
     const stats = ref();
     const title = ref();
-    const suppliers = ref();
+    const suppliers = ref<Supplier[]>();
     const historyData = ref();
 
     const updateValues = (p) => {
