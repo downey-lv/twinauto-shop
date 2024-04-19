@@ -62,7 +62,7 @@ import { push } from "@/main";
 import { Modal } from "bootstrap";
 import { labelService } from "@/core/services/LabelService";
 import { cloneDeep } from "lodash";
-import type {DocumentProduct} from "@/types/Document";
+import type { DocumentProduct } from "@/types/Document";
 
 export default defineComponent({
   name: "document-labels-modal",
@@ -104,6 +104,16 @@ export default defineComponent({
     // Load data
     const loadData = () => {
       products.value = cloneDeep(props.pData) as DocumentProduct[];
+
+      // Check if rest is lower than quantity
+      products.value.forEach((product) => {
+        if (
+          product.data &&
+          Number(product.data.rest ?? 0) < Number(product.quantity)
+        ) {
+          product.quantity = Math.max(Number(product.data.rest), 0);
+        }
+      });
     };
 
     return {
