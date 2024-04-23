@@ -610,12 +610,19 @@
                   v-tooltip
                 >
                   {{ item.supplier_price }} €
-                  <span v-if="item.deposit_price > 0" :title="item.deposit_details" v-tooltip>
+                  <span
+                    v-if="item.deposit_price > 0"
+                    :title="item.deposit_details"
+                    v-tooltip
+                  >
                     <br /><i
                       class="fa-solid fa-money-bill-transfer text-info"
                     ></i>
                     {{ item.deposit_price }} €
                   </span>
+                  <span v-if="item.min_order"
+                    ><br />Min. {{ item.min_order }} gab.</span
+                  >
                 </label>
               </div>
             </div>

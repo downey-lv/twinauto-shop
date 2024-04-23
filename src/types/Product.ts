@@ -110,6 +110,7 @@ export interface Supplier {
   delivery_info: string;
   deposit_price: number;
   deposit_details: string;
+  min_order?: number;
 }
 
 export interface Product {
