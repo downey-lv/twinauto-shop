@@ -602,7 +602,7 @@
                 <label
                   class="col-lg-1"
                   :class="item.supplier_rest == 0 ? `text-danger` : ``"
-                  >{{ item.supplier_rest }}</label
+                  ><template v-if="item.rest_overflow">> </template>{{ item.supplier_rest }}</label
                 >
                 <label
                   class="col-lg-2"

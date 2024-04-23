@@ -104,6 +104,7 @@ interface Cross {
 
 export interface Supplier {
   supplier_rest: number;
+  rest_overflow: number;
   supplier_id: number;
   supplier_name: string;
   supplier_price: string;
