@@ -24,7 +24,9 @@
             />
           </template>
         </el-table-column>
-        <el-table-column label="Apraksts" property="description" />
+        <el-table-column label="Kods" property="productcode" width="200" />
+        <el-table-column label="Ražotājs" property="producer" width="150" />
+        <el-table-column label="Problēmas apraksts" property="description" />
         <el-table-column label="Lietotājs" property="user" width="150" />
         <el-table-column width="130">
           <template #default="scope">
