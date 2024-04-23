@@ -91,8 +91,15 @@ export interface Vide {
   sell_price_3: number;
   sell_price_shop: number;
   sell_price_service: number;
-  cross: any[]; // Define based on actual structure if needed
+  cross: Cross[];
   suppliers: Supplier[];
+}
+
+interface Cross {
+  code: string;
+  nextis_name: string;
+  title: string;
+  subtitle: string;
 }
 
 export interface Supplier {

@@ -611,8 +611,8 @@
                 >
                   {{ item.supplier_price }} €
                   <i
-                      v-if="item.volume_pricing_string"
-                      class="fa-solid fa-badge-percent text-warning"
+                    v-if="item.volume_pricing_string"
+                    class="fa-solid fa-badge-percent text-warning"
                   ></i>
                   <span
                     v-if="item.deposit_price > 0"
@@ -832,7 +832,7 @@ export default defineComponent({
 
       // Set title
       if (p.productid) title.value = `ID: ${p.productid}`;
-      else title.value = "TecDoc produkts";
+      else title.value = "Produkts";
 
       // Load supplier data
       if (p.producer.startsWith("OE "))
