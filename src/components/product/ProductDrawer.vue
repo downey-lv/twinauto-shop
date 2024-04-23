@@ -606,10 +606,14 @@
                 >
                 <label
                   class="col-lg-2"
-                  :title="item.order_date || ''"
-                  v-tooltip
+                  :title="item.volume_pricing_string || item.order_date || ''"
+                  v-tooltip-html
                 >
                   {{ item.supplier_price }} €
+                  <i
+                      v-if="item.volume_pricing_string"
+                      class="fa-solid fa-badge-percent text-warning"
+                  ></i>
                   <span
                     v-if="item.deposit_price > 0"
                     :title="item.deposit_details"
