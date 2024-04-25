@@ -636,8 +636,8 @@
                 v-for="(item, index) in p.prices"
                 :key="index"
               >
-                <label class="col-lg-4 fw-light">{{ item.label }}</label>
-                <label class="col-lg-8 fw-bold fs-6 text-dark"
+                <label class="col-lg-6 fw-light">{{ item.label }}</label>
+                <label class="col-lg-6 fw-bold fs-6 text-dark"
                   >{{ item.value }} €</label
                 >
               </div>
