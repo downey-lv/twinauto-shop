@@ -36,6 +36,17 @@
   <div class="card mb-2" v-loading="loading">
     <div class="card-header border-0 pt-5">
       <h3 class="card-title">Produkti</h3>
+      <div class="card-toolbar">
+        <button
+          type="button"
+          class="btn btn-sm btn-light btn-icon"
+          title="Drukāt uzlīmes"
+          v-tooltip
+          @click="printLabels"
+        >
+          <i class="fa-solid fa-note-sticky"></i>
+        </button>
+      </div>
     </div>
     <div class="card-body">
       <el-input
@@ -123,6 +134,8 @@
       </div>
     </div>
   </div>
+
+  <DocumentLabelsModal ref="modalLabels" :pData="selectedProducts" />
 </template>
 
 <script lang="ts">
@@ -131,9 +144,10 @@ import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
 import type { Products } from "@/types/ProductEditor";
+import DocumentLabelsModal from "@/components/documents/DocumentLabels.vue";
 
 export default defineComponent({
-  components: { SelectComponent },
+  components: { DocumentLabelsModal, SelectComponent },
   setup() {
     const loading = ref<boolean>(false);
     const loadingFilters = ref<boolean>(false);
@@ -275,6 +289,28 @@ export default defineComponent({
         .finally(() => {
           this.loading = false;
         });
+    },
+    printLabels() {
+      // Format data for labels
+      this.selectedProducts = this.selectedProducts.map((product) => {
+        // Add price
+        product.priceSell = product.saleprice;
+
+        // Add name for labels
+        const name = product.productname.split("\r\n");
+        product.productTitle = name[0];
+        product.productSubtitle = name[1] ?? "";
+
+        // Copy information data keys
+        product.data = product;
+        product.data.shop = product;
+
+        // Set printing quantity
+        product.quantity = 1;
+        return product;
+      });
+
+      (this.$refs.modalLabels as any).show();
     },
   },
 });
