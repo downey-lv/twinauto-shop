@@ -41,11 +41,30 @@
             </div>
           </template>
 
+          <div class="d-flex flex-row justify-content-center mt-5">
+            <div class="form-check form-switch me-5">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                v-model="showCode"
+              />
+              <label class="form-check-label"> Rādīt kodu </label>
+            </div>
+            <div class="form-check form-switch me-5">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                v-model="showPrice"
+              />
+              <label class="form-check-label"> Rādīt cenu </label>
+            </div>
+          </div>
+
           <div class="text-center mt-5">
             <button
               class="btn btn-primary"
               type="button"
-              @click="printLabel($event)"
+              @click="printLabel($event, !showPrice, !showCode)"
             >
               Drukāt
             </button>
@@ -77,6 +96,8 @@ export default defineComponent({
     const documentLabelsModalRef = ref();
     const loading = ref<boolean>(false);
     const products = ref<DocumentProduct[]>([]);
+    const showCode = ref(true);
+    const showPrice = ref(false);
 
     // Init modal
     const initModal = () => {
@@ -123,6 +144,8 @@ export default defineComponent({
       documentLabelsModalRef,
       show,
       hide,
+      showCode,
+      showPrice,
     };
   },
 
