@@ -337,14 +337,14 @@
               :content="
                 scope.row.priceVAT < (scope.row.documentBuyPrice ?? 0)
                   ? `Zem iepirkuma`
-                  : `Peļņa zem 10%`
+                  : `Zem interneta`
               "
             >
               <i
                 v-if="
                   !$route.params.returnId &&
                   $route.params.type !== `in` &&
-                  scope.row.priceVAT < (scope.row.documentBuyPrice ?? 0) * 1.1
+                  scope.row.priceVAT < (scope.row.data?.priceOnline?.[1] ?? 0)
                 "
                 class="fa-solid fa-triangle-exclamation ms-3"
                 :class="

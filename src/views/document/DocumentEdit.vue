@@ -312,7 +312,10 @@
             </div>
 
             <div class="col-lg-1 pb-1">
-              <el-form-item :prop="`products[${idx}].quantity`" style="margin-bottom: 0">
+              <el-form-item
+                :prop="`products[${idx}].quantity`"
+                style="margin-bottom: 0"
+              >
                 <el-input-number
                   v-model="item.quantity"
                   size="large"
@@ -346,7 +349,7 @@
                   item.priceWarning
                     ? item.priceVAT < (item.data?.priceBuy ?? 0)
                       ? `Zem iepirkuma`
-                      : `Peļņa < 10%`
+                      : `Zem interneta`
                     : ``
                 "
               >
@@ -768,7 +771,7 @@ export default defineComponent({
         () =>
           route.params.type !== "in" &&
           route.params.type !== "return" &&
-          product.priceVAT < (product.data?.priceBuy ?? 0) * 1.1
+          product.priceVAT < (product.data?.priceOnline?.[1] ?? 0)
       );
     };
 
