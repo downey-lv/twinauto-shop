@@ -900,6 +900,7 @@ export default defineComponent({
           }
         })
         .catch((error) => {
+          updateValues(data);
           console.error("Error fetching data:", error);
         })
         .finally(() => {
