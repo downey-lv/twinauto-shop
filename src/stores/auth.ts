@@ -12,6 +12,7 @@ export interface User {
   password: string;
   api_token: string;
   permissions: string[];
+  internetStatus: boolean;
 }
 
 export const useAuthStore = defineStore("auth", () => {
