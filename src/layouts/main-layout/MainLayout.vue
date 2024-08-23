@@ -1,6 +1,11 @@
 <template>
   <link
     rel="stylesheet"
+    href="/fontawesome/css/all.min.css"
+    crossorigin="anonymous"
+  />
+  <link
+    rel="stylesheet"
     href="https://kit.fontawesome.com/7a4b6f554e.css"
     crossorigin="anonymous"
   />
