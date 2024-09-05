@@ -172,7 +172,14 @@
             </div>
 
             <div class="fv-row mb-2">
-              <label class="fs-6 mb-2">Izmērs</label>
+              <label class="fs-6 mb-2">
+                Izmērs
+                <i
+                  class="fa-solid fa-globe ms-2 text-info"
+                  title="Redzams e-veikalā"
+                  v-tooltip
+                ></i>
+              </label>
               <el-form-item prop="dimensions">
                 <el-input v-model="product.dimensions" />
               </el-form-item>
