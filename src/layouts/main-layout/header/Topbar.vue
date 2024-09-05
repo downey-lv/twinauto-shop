@@ -157,7 +157,7 @@ export default defineComponent({
   },
   setup() {
     const store = useAuthStore();
-    let internetStatus = ref(false);
+    let internetStatus = ref(true);
 
     const connectivityWatcher = watch(
       () => store.user.internetStatus,
