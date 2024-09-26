@@ -145,9 +145,10 @@ export default defineComponent({
       else if (selected && this.companies[selected])
         query = { clientId: this.companies[selected].id };
 
+      const timestamp = Date.now();
       this.$router.push({
         name: "document-edit",
-        params: { editId: "new", type: "in" },
+        params: { editId: `new_${timestamp}`, type: "in" },
         query: query,
       });
     },

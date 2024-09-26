@@ -151,10 +151,7 @@
                 </div>
                 <div
                   class="fv-row"
-                  v-if="
-                    $route.params.type === 'in' &&
-                    newDocument
-                  "
+                  v-if="$route.params.type === 'in' && newDocument"
                 >
                   <label class="fs-6">Piegādes izdevumi, bez PVN</label>
                   <el-form-item>
@@ -961,11 +958,15 @@ export default defineComponent({
       if (route.query.import) {
         const importStore = useDocumentImportStore();
 
+        console.log(importStore.data);
+
         if (importStore.data) {
           const data: Imported = importStore.data;
           document.value.ordertypeid = "1";
           document.value.companyid = String(data.company) ?? "";
           document.value.waybillno = data.bill ?? "";
+          document.value.deliveryCost = data.shipping ?? 0;
+          document.value.grouping = "in";
           document.value.orderdate = DateTime.fromISO(data.date).toJSDate();
           document.value.payterm = DateTime.fromISO(data.term).toJSDate();
           document.value.comment = data.comment ?? "";
@@ -1106,6 +1107,8 @@ export default defineComponent({
     };
 
     const addCartItems = async () => {
+      if (route.params.editId == "new") return;
+
       if (route.query.cart) {
         loading.value = true;
         await ApiService.get("cart", String(route.query.cart))

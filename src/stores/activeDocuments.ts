@@ -12,7 +12,12 @@ export const useDocumentStore = defineStore({
   }),
   actions: {
     updateStorage() {
-      sessionStorage.setItem("documentStore", JSON.stringify(this.documents));
+      try {
+        sessionStorage.setItem("documentStore", JSON.stringify(this.documents));
+      } catch (e) {
+        sessionStorage.setItem("documentStore", "");
+        console.log("Quota exceeded");
+      }
     },
     addDocument(id: string, title: string, documentData: Document) {
       this.documents[id] = { title: title, data: documentData };

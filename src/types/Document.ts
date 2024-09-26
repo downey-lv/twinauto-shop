@@ -76,6 +76,7 @@ export interface Imported {
   bill: string;
   date: string;
   term: string;
+  shipping: number;
   comment: string;
   items: ImportedProduct[];
 }
