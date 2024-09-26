@@ -958,8 +958,6 @@ export default defineComponent({
       if (route.query.import) {
         const importStore = useDocumentImportStore();
 
-        console.log(importStore.data);
-
         if (importStore.data) {
           const data: Imported = importStore.data;
           document.value.ordertypeid = "1";
@@ -1015,11 +1013,20 @@ export default defineComponent({
       preSelectType();
 
       // Re-run searchProduct
+      const products_to_search: number[] = [];
       document.value.products.forEach((product, index) => {
         if (product.productid === "") {
-          searchProduct("code", index, false);
+          products_to_search.push(index);
         }
       });
+
+      if (products_to_search.length < 30) {
+        products_to_search.forEach((index) => {
+          searchProduct("id", index, false);
+        });
+      } else {
+        push.warning("Pārāk daudz preču, lai meklētu automātiski");
+      }
     };
 
     const fetchDocument = async (use_store = true) => {
