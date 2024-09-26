@@ -505,7 +505,7 @@ import type {
   Header,
   Document,
 } from "@/types/Document";
-import type { FormInstance, FormRules } from "element-plus";
+import type {FormInstance, FormItemRule, FormRules} from "element-plus";
 import {
   calculateTotalPrice,
   calculateTotalPriceVAT,
@@ -538,6 +538,7 @@ export default defineComponent({
     const router = useRouter();
     const formRef = ref<FormInstance>();
     const watcherHandles: WatchStopHandle[] = [];
+    const productWatchers: WatchStopHandle[] = [];
 
     // Initialize dropdowns
     const companies = ref<Company[]>([]);
@@ -776,10 +777,12 @@ export default defineComponent({
     };
 
     // Initialize price watcher and rules for existing products
-    document.value.products.forEach((product, index) => {
-      useProductWatcher(product);
-      addProductRules(index);
-    });
+    function initializeProducts() {
+      document.value.products.forEach((product, index) => {
+        useProductWatcher(product);
+        addProductRules(index);
+      });
+    }
 
     // Watch for new products
     let previousProductsLength = document.value.products.length;
@@ -895,6 +898,9 @@ export default defineComponent({
       // Prepare products
       let products = [{ ...blankProduct }] as any[];
 
+      // Destroy rules
+      rules.value.products = [];
+
       // Process import
       if (route.query.import) {
         const importStore = useDocumentImportStore();
@@ -935,6 +941,8 @@ export default defineComponent({
         // Add cart items
         if (use_store) await addCartItems();
       }
+
+      initializeProducts();
 
       importStoreChecked = true;
     };
@@ -1204,11 +1212,19 @@ export default defineComponent({
       else this.moveCursortoField(idx + 1, field);
     },
     deleteRow(idx) {
+      // Get entry
       const entryId = this.document.products[idx].entryid;
+
+      // Add to deleted items if was saved
       if (entryId && entryId !== "") {
         this.document.deletedItems.push(entryId);
       }
+
+      // Remove from products
       this.document.products.splice(idx, 1);
+
+      // Remove from rules
+      (this.rules.products as FormItemRule[]).splice(idx, 1);
     },
     viewProduct(idx) {
       const productStore = useProductStore();
