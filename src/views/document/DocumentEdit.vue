@@ -29,7 +29,7 @@
           <a
             @click="loadDocument(false)"
             class="btn btn-sm btn-light-danger me-3"
-            v-if="!documentMatches"
+            v-if="!documentMatches && !newDocument"
           >
             Atcelt izmaiņas
           </a>
@@ -153,7 +153,7 @@
                   class="fv-row"
                   v-if="
                     $route.params.type === 'in' &&
-                    $route.params.editId === 'new'
+                    newDocument
                   "
                 >
                   <label class="fs-6">Piegādes izdevumi, bez PVN</label>
@@ -481,6 +481,7 @@ import {
   toRefs,
   watch,
   onBeforeUnmount,
+  nextTick,
 } from "vue";
 import type { WatchStopHandle } from "vue";
 import ApiService from "@/core/services/ApiService";
@@ -496,7 +497,6 @@ import { useRoute, useRouter, onBeforeRouteLeave } from "vue-router";
 import tourSteps from "@/tours/DocumentEditTour";
 import tourOptions from "@/tours/TourOptions";
 import { useProductStore } from "@/stores/product";
-import { useWindowStore } from "@/stores/activewindows";
 import type {
   Company,
   Type,
@@ -524,6 +524,7 @@ import type { Product } from "@/types/Product";
 import { DateTime } from "luxon";
 import { getOption } from "@/core/services/OptionService";
 import ClientModal from "@/components/clients/ClientModal.vue";
+import { useDocumentStore } from "@/stores/activeDocuments";
 
 export default defineComponent({
   components: {
@@ -572,6 +573,7 @@ export default defineComponent({
       paymentRecipient: "",
       paymentType: "",
       cartId: null,
+      grouping: String(route.params.type),
     };
 
     // Overwrite values from query
@@ -593,13 +595,18 @@ export default defineComponent({
     } else if (route.query.clientId)
       blankDocument.companyid = String(route.query.clientId);
 
-    const document = ref({ ...blankDocument });
+    const document = ref(cloneDeep(blankDocument));
 
     // Daily document
     const dailyDocument = ref(false);
     function setDailyDocument() {
       dailyDocument.value = route.params.type === "daily";
     }
+
+    // New Document
+    const newDocument = computed(() =>
+      String(route.params.editId).startsWith("new")
+    );
 
     // Custom validators
     const validateWaybillno = async (rule, value, callback) => {
@@ -718,7 +725,6 @@ export default defineComponent({
         // Add invoiceRules
         for (const key in invoiceRules) rules.value[key] = invoiceRules[key];
       }
-      console.log(rules.value);
     }
 
     const addProductRules = (idx) => {
@@ -854,7 +860,7 @@ export default defineComponent({
     // Store window
     let importStoreChecked = false;
     const menuData = ref<Header[]>([]);
-    const windowStore = useWindowStore();
+    const documentStore = useDocumentStore();
     const wWatcher = watch(
       document,
       (newValue) => {
@@ -867,12 +873,23 @@ export default defineComponent({
         if (!headerData) return;
 
         let documentTitle = "Jauns";
-        if (newValue.orderid) {
-          documentTitle = `${newValue.companyname}`;
+
+        // Get company
+        const company = companies.value.find(
+          (company) => company.id === newValue.companyid
+        );
+
+        // Set company name as title
+        if (company?.name) {
+          documentTitle = `${company?.name}`;
+
+          if (!newValue.orderid) {
+            documentTitle = `${documentTitle} (jauns)`;
+          }
         }
 
-        windowStore.addWindow(
-          route.path,
+        documentStore.addDocument(
+          String(route.params.editId),
           `${headerData.title}: ${documentTitle}`,
           newValue
         );
@@ -931,8 +948,11 @@ export default defineComponent({
     const loadDocument = async (use_store = true) => {
       importStoreChecked = false;
 
+      // Push new route
+      timestampNew();
+
       // Prepare products
-      let products = [{ ...blankProduct }] as any[];
+      let products = [cloneDeep(blankProduct)] as any[];
 
       // Destroy rules
       rules.value.products = [];
@@ -953,7 +973,7 @@ export default defineComponent({
 
           products = [];
           for (const item of data.items) {
-            let product = { ...blankProduct };
+            let product = cloneDeep(blankProduct);
             product.productcode = item.code;
             product.productname = item.name;
             product.quantity = item.quantity;
@@ -985,6 +1005,10 @@ export default defineComponent({
     const setDocument = (data, originalData) => {
       document.value = cloneDeep(data);
       originalDocument = cloneDeep(originalData);
+
+      // Set current type as grouping
+      document.value.grouping = String(route.params.type);
+
       initializeProducts();
       checkOriginal();
       preSelectType();
@@ -1001,18 +1025,18 @@ export default defineComponent({
       let loadedDocument;
 
       // Grab data from windowStore
-      let window;
+      let stored;
       if (use_store) {
-        const windowStore = useWindowStore();
-        window = windowStore.getWindow(route.path);
-        if (window) {
-          loadedDocument = window.data;
+        const store = useDocumentStore();
+        stored = store.getDocument(String(route.params.editId));
+        if (stored) {
+          loadedDocument = stored.data;
         }
       }
 
       // Set new document
-      if (route.params.editId === "new") {
-        if (!loadedDocument) loadedDocument = { ...blankDocument };
+      if (newDocument.value) {
+        if (!loadedDocument) loadedDocument = cloneDeep(blankDocument);
         setDocument(loadedDocument, blankDocument);
         return;
       }
@@ -1049,7 +1073,17 @@ export default defineComponent({
           // Add deleted items placeholder
           response.data.deletedItems = [];
 
-          if (!loadedDocument) loadedDocument = response.data;
+          if (!loadedDocument) {
+            loadedDocument = response.data;
+
+            // Change route grouping
+            if (!use_store) {
+              router.push({
+                ...route,
+                params: { ...route.params, type: loadedDocument.grouping },
+              });
+            }
+          }
 
           // Set document
           setDocument(loadedDocument, response.data);
@@ -1079,7 +1113,7 @@ export default defineComponent({
             // Add products
             response.data.products.forEach((item) => {
               document.value.products.push({
-                ...blankProduct,
+                ...cloneDeep(blankProduct),
                 productid: item.product_id,
                 quantity: item.quantity,
                 priceVAT: item.price,
@@ -1138,6 +1172,16 @@ export default defineComponent({
         .toJSDate();
     };
 
+    const timestampNew = () => {
+      if (route.params.editId === "new") {
+        const timestamp = Date.now();
+        router.push({
+          ...route,
+          params: { ...route.params, editId: `new_${timestamp}` },
+        });
+      }
+    };
+
     // Handle product search
     const productService = new ProductService(
       document,
@@ -1191,6 +1235,8 @@ export default defineComponent({
       formRef,
       hasPriceIssues,
       dailyDocument,
+      newDocument,
+      timestampNew,
     };
   },
   async mounted() {
@@ -1231,7 +1277,7 @@ export default defineComponent({
         });
     },
     newRow(field = "id") {
-      this.document.products.push({ ...this.blankProduct });
+      this.document.products.push(cloneDeep(this.blankProduct));
       this.moveCursortoField(this.document.products.length - 1, field);
     },
     moveCursortoField(idx, field = "id") {
@@ -1270,13 +1316,24 @@ export default defineComponent({
     headerUpdate(data) {
       this.menuData = data;
     },
-    destroyWindow() {
-      const windowStore = useWindowStore();
-      windowStore.closeWindow(this.$route.path);
+    destroyStore() {
+      const documentStore = useDocumentStore();
+      documentStore.removeDocument(String(this.$route.params.editId));
     },
     closeDocument() {
-      this.destroyWindow();
-      this.$router.go(-1);
+      this.destroyStore();
+
+      if (this.newDocument) {
+        this.$router.push({ name: "dashboard" });
+      } else {
+        this.$router.push({
+          name: "document-view",
+          params: {
+            type: this.$route.params.type,
+            documentId: this.$route.params.editId,
+          },
+        });
+      }
     },
     codeEnter(idx) {
       const product = this.document.products[idx];
@@ -1303,7 +1360,7 @@ export default defineComponent({
 
       (this.$refs.formRef as FormInstance).validate((valid: boolean) => {
         if (valid) {
-          const data = { ...this.document } as any;
+          const data = cloneDeep(this.document) as any;
 
           // Format dates
           if (!data.orderdate || !data.payterm) return;
@@ -1314,7 +1371,7 @@ export default defineComponent({
           ApiService.post("document/", data)
             .then((response) => {
               push.success("Dokuments saglabāts");
-              this.destroyWindow();
+              this.destroyStore();
 
               const orderId = response.data.orderid;
               const { returnId } = response.data;

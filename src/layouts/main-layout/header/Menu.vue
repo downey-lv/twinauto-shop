@@ -21,7 +21,26 @@
     >
       <template v-for="(item, i) in activeWindows" :key="i">
         <div class="menu-item me-lg-1">
-          <router-link class="menu-link fs-8" :to="item.path" active-class="active">
+          <router-link
+            class="menu-link fs-8"
+            :to="item.path"
+            active-class="active"
+          >
+            <span class="menu-title">{{ item.title }}</span>
+          </router-link>
+        </div>
+      </template>
+
+      <template v-for="(item, i) in activeDocuments" :key="i">
+        <div class="menu-item me-lg-1">
+          <router-link
+            :to="{
+              name: 'document-edit',
+              params: { editId: i, type: item.data.grouping },
+            }"
+            class="menu-link fs-8"
+            active-class="active"
+          >
             <span class="menu-title">{{ item.title }}</span>
           </router-link>
         </div>
@@ -35,25 +54,21 @@
 
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import { useRoute } from "vue-router";
 import { useWindowStore } from "@/stores/activewindows";
+import { useDocumentStore } from "@/stores/activeDocuments";
 
 export default defineComponent({
   name: "KTMenu",
   components: {},
   setup() {
-    const route = useRoute();
-
-    const hasActiveChildren = (match: string) => {
-      return route.path.indexOf(match) !== -1;
-    };
-
     const windowStore = useWindowStore();
     const activeWindows = computed(() => windowStore.getActiveWindows());
+    const documentStore = useDocumentStore();
+    const activeDocuments = computed(() => documentStore.getActiveDocuments());
 
     return {
-      hasActiveChildren,
       activeWindows,
+      activeDocuments,
     };
   },
 });
