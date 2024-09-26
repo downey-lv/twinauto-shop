@@ -487,7 +487,7 @@ import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
 import { useDocumentImportStore } from "@/stores/documentImport";
 import { Decimal } from "decimal.js";
-import { debounce, isEqual } from "lodash";
+import { cloneDeep, debounce, isEqual } from "lodash";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import Notice from "@/components/core/Notice.vue";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
@@ -505,7 +505,7 @@ import type {
   Header,
   Document,
 } from "@/types/Document";
-import type {FormInstance, FormItemRule, FormRules} from "element-plus";
+import type { FormInstance, FormItemRule, FormRules } from "element-plus";
 import {
   calculateTotalPrice,
   calculateTotalPriceVAT,
@@ -538,7 +538,6 @@ export default defineComponent({
     const router = useRouter();
     const formRef = ref<FormInstance>();
     const watcherHandles: WatchStopHandle[] = [];
-    const productWatchers: WatchStopHandle[] = [];
 
     // Initialize dropdowns
     const companies = ref<Company[]>([]);
@@ -888,7 +887,44 @@ export default defineComponent({
     let originalDocument;
     const documentMatches = ref(true);
     function checkOriginal() {
-      documentMatches.value = isEqual(document.value, originalDocument);
+      const stripKeys = (obj, keysToExclude, seen = new WeakSet()) => {
+        if (typeof obj !== "object" || obj === null || seen.has(obj))
+          return obj;
+
+        // Mark this object as seen to avoid circular references
+        seen.add(obj);
+
+        // Create a shallow copy to avoid mutating the original object
+        const copy = Array.isArray(obj) ? [...obj] : { ...obj };
+
+        Object.keys(copy).forEach((key) => {
+          // If the key is in the exclusion list, delete it
+          if (keysToExclude.includes(key)) {
+            delete copy[key];
+          } else if (typeof copy[key] === "object") {
+            // Recursively process nested objects
+            copy[key] = stripKeys(copy[key], keysToExclude, seen);
+          }
+        });
+
+        return copy;
+      };
+
+      // Define reactive keys
+      const keysToExclude = ["priceVAT", "priceWarning", "total"];
+
+      // Filter documents
+      const filteredDocument = stripKeys(document.value, keysToExclude);
+      const filteredOriginalDocument = stripKeys(
+        originalDocument,
+        keysToExclude
+      );
+
+      // Check if document matches
+      documentMatches.value = isEqual(
+        filteredDocument,
+        filteredOriginalDocument
+      );
     }
 
     // Document load
@@ -933,7 +969,8 @@ export default defineComponent({
         }
 
         document.value.products = products;
-        originalDocument = { ...document.value };
+        originalDocument = cloneDeep(document.value);
+        initializeProducts();
         checkOriginal();
       } else {
         // Load from database or store
@@ -942,14 +979,13 @@ export default defineComponent({
         if (use_store) await addCartItems();
       }
 
-      initializeProducts();
-
       importStoreChecked = true;
     };
 
     const setDocument = (data, originalData) => {
-      document.value = { ...data };
-      originalDocument = { ...originalData };
+      document.value = cloneDeep(data);
+      originalDocument = cloneDeep(originalData);
+      initializeProducts();
       checkOriginal();
       preSelectType();
 
