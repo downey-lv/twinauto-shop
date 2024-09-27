@@ -1111,7 +1111,12 @@ export default defineComponent({
               })
               .join("\n");
           }
-          if (oe) this.product.oecode = this.product.oecode + oe;
+          if (oe) {
+            // Add new line
+            if (this.product.oecode != "")
+              this.product.oecode = this.product.oecode + "\n";
+            this.product.oecode = this.product.oecode + oe;
+          }
 
           // Set analogues
           let crosses;
@@ -1122,7 +1127,13 @@ export default defineComponent({
               })
               .join("\n");
           }
-          if (crosses) this.product.analogi = this.product.analogi + crosses;
+          if (crosses) {
+            // Add new line
+            if (this.product.analogi != "")
+              this.product.analogi = this.product.analogi + "\n";
+
+            this.product.analogi = this.product.analogi + crosses;
+          }
 
           // Set name
           if (
