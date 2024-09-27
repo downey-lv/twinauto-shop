@@ -36,6 +36,14 @@
           </template>
         </el-collapse-item>
       </el-collapse>
+      <div class="form-check form-switch form-check-custom form-check-solid">
+        <input
+          class="form-check-input h-20px w-30px"
+          type="checkbox"
+          v-model="showImages"
+        />
+        <label class="form-check-label"> Rādīt attēlus </label>
+      </div>
       <Notice
         v-if="countWarning"
         classes="rounded-3 mb-3"
@@ -45,7 +53,7 @@
       <DataTable
         ref="table"
         id="parts"
-        :columns="dt.parts.columns"
+        :columns="selectedColumns"
         :data="parts"
         :options="dtOptions"
         class="table table-hover table-row-bordered gy-5 align-middle"
@@ -88,7 +96,7 @@ import ApiService from "@/core/services/ApiService";
 import ImageHover from "@/components/product/ImageHover.vue";
 import type { WatchStopHandle } from "vue";
 import type { Criteria, CriteriaFiltered } from "@/types/FilterCriteria";
-import {getOption, getOptionLabel} from "@/core/services/OptionService";
+import { getOption, getOptionLabel } from "@/core/services/OptionService";
 
 export default defineComponent({
   components: {
@@ -124,6 +132,7 @@ export default defineComponent({
     const criteria = ref<Criteria[]>([]);
     const filterCriteria = ref<CriteriaFiltered>({});
     const watcherHandles: WatchStopHandle[] = [];
+    const showImages = ref(true);
 
     // Setup data load
     const loadData = async () => {
@@ -214,10 +223,10 @@ export default defineComponent({
       let options = getDtOptions(+props.focusSearch);
       options["select"] = true;
       options["order"] = [
-        [10, "desc"],
-        [6, "desc"],
-        [0, "desc"],
+        [11, "desc"],
         [7, "desc"],
+        [1, "desc"],
+        [8, "desc"],
       ];
       let existingFunction = options["initComplete"];
 
@@ -241,6 +250,7 @@ export default defineComponent({
     const priceKey = getOption("default_price");
     let dtSource = {
       parts: {
+        images: "",
         productid: "ID",
         code: "Kods",
         producer: "Ražotājs",
@@ -258,7 +268,9 @@ export default defineComponent({
 
     const columnOptions = {
       parts: {
-        productid: {
+        images: {
+          width: "100px",
+          className: "text-center",
           createdCell: function (td, cellData, rowData, row, col) {
             if (rowData.images?.[0]) {
               td.setAttribute(
@@ -267,6 +279,11 @@ export default defineComponent({
               );
               td.setAttribute("onmouseleave", `showImage()`);
             }
+          },
+          render: function (data, type, row) {
+            if (row.images?.[0])
+              return `<div class="bg-white"><img src="${row.images?.[0]}" style="max-width: 100px; max-height: 100px;"></div>`;
+            return "";
           },
         },
         name: {
@@ -351,6 +368,24 @@ export default defineComponent({
 
     const dt = transformDtSource(dtSource, columnOptions);
 
+    // Return dt.parts.columns filtered based on showImages
+    const selectedColumns = computed(() => {
+      let columns = [...dt.parts.columns];
+
+      if (!showImages.value) {
+        columns = columns.filter((column) => column.data !== "images");
+      }
+
+      update();
+
+      return columns;
+    });
+
+    // Trigger update
+    const update = () => {
+      tabsKey.value += 1;
+    };
+
     onBeforeUnmount(() => {
       watcherHandles.forEach((stop) => stop());
     });
@@ -367,6 +402,8 @@ export default defineComponent({
       criteria,
       filterCriteria,
       filterCount,
+      showImages,
+      selectedColumns,
     };
   },
   methods: {
