@@ -16,7 +16,7 @@
               <a
                 @click="loadProduct(null, false)"
                 class="btn btn-sm btn-light-danger me-3"
-                v-if="!productMatches"
+                v-if="!productMatches && product.productidstr != 'Jauns'"
               >
                 Atcelt izmaiņas
               </a>
