@@ -121,7 +121,7 @@ const focusInput = (settings) => {
     }
 }
 
-export const getDtOptions = (focus = 0, stateSave = true) => {
+export const getDtOptions = (focus = 0, stateSave = false, stateKey = '') => {
     let options = {
         pageLength: 50,
         stateSave: stateSave,
@@ -134,6 +134,19 @@ export const getDtOptions = (focus = 0, stateSave = true) => {
         if (focus) {
             focusInput(settings);
         }
+    }
+
+    if (stateSave && stateKey) {
+        options["stateSaveCallback"] = function(settings, data) {
+            return;
+        };
+
+        options["stateLoadCallback"] = function(settings) {
+            const storage = sessionStorage.getItem(stateKey);
+            const data = storage ? JSON.parse(storage) : null;
+            console.log(data);
+            return data;
+        };
     }
 
     return options;

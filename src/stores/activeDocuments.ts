@@ -12,6 +12,7 @@ export const useDocumentStore = defineStore({
   }),
   actions: {
     updateStorage() {
+      // TODO: Use IndexedDB (Dexie)
       try {
         sessionStorage.setItem("documentStore", JSON.stringify(this.documents));
       } catch (e) {

@@ -36,13 +36,23 @@
           </template>
         </el-collapse-item>
       </el-collapse>
-      <div class="form-check form-switch form-check-custom form-check-solid">
-        <input
-          class="form-check-input h-20px w-30px"
-          type="checkbox"
-          v-model="showImages"
-        />
-        <label class="form-check-label"> Rādīt attēlus </label>
+      <div class="d-flex">
+        <a
+          href="javascript:"
+          @click="destroyState"
+          class="btn btn-sm btn-light me-5"
+          v-if="stateActive"
+        >
+          Atjaunot tabulu
+        </a>
+        <div class="form-check form-switch form-check-custom form-check-solid">
+          <input
+            class="form-check-input h-20px w-30px"
+            type="checkbox"
+            v-model="showImages"
+          />
+          <label class="form-check-label"> Rādīt attēlus </label>
+        </div>
       </div>
       <Notice
         v-if="countWarning"
@@ -59,6 +69,10 @@
         class="table table-hover table-row-bordered gy-5 align-middle"
         @select="onSelect"
         @deselect="onSelect"
+        @page="updateState"
+        @order="updateState"
+        @search="updateState"
+        @length="updateState"
         :key="tabsKey"
       >
         <thead>
@@ -133,6 +147,8 @@ export default defineComponent({
     const filterCriteria = ref<CriteriaFiltered>({});
     const watcherHandles: WatchStopHandle[] = [];
     const showImages = ref(true);
+    const stateKey = ref(`dtState_${props.resource}-${props.slug}`);
+    const stateActive = ref(false);
 
     // Setup data load
     const loadData = async () => {
@@ -169,9 +185,10 @@ export default defineComponent({
             console.error("Error fetching data:", error);
           })
           .finally(() => {
+            // const dtObj = table.value.dt;
+
             // Reset table to the default order
-            const dtObj = table.value.dt;
-            dtObj.order(dtOptions.value["order"]).draw();
+            // dtObj.order(dtOptions.value["order"]).draw();
 
             loading.value = false;
           });
@@ -220,7 +237,7 @@ export default defineComponent({
 
     // Define datatable
     let dtOptions = computed(function () {
-      let options = getDtOptions(+props.focusSearch);
+      let options = getDtOptions(+props.focusSearch, true, stateKey.value);
       options["select"] = true;
       options["order"] = [
         [11, "desc"],
@@ -381,6 +398,10 @@ export default defineComponent({
       return columns;
     });
 
+    // Check if state is saved
+    const state = sessionStorage.getItem(stateKey.value);
+    if (state) stateActive.value = true;
+
     // Trigger update
     const update = () => {
       tabsKey.value += 1;
@@ -404,13 +425,78 @@ export default defineComponent({
       filterCount,
       showImages,
       selectedColumns,
+      stateKey,
+      stateActive,
     };
   },
   methods: {
     onSelect(e, dt, type, indexes) {
+      this.updateState(indexes);
+
       const rowData = handleSelect(dt, indexes);
       const productStore = useProductStore();
       productStore.setProduct(rowData);
+    },
+    updateState(selected = []) {
+      // No updates while loading
+      if (this.loading) return;
+
+      const dtObj = this.table.dt;
+
+      const page = dtObj.page();
+      const length = dtObj.page.len();
+
+      // Create column object
+      const columns = [] as any[];
+      const dtColumns = dtObj.columns();
+      const dtVisible = dtColumns.visible().toArray();
+      const dtSearch = dtColumns.search().toArray();
+
+      for (let i = 0; i < dtVisible.length; i++) {
+        columns.push({
+          visible: dtVisible[i],
+          search: {
+            search: dtSearch[i],
+            regex: false,
+            smart: true,
+            caseInsensitive: true,
+          },
+        });
+      }
+
+      // Check if selected is an array
+      if (!Array.isArray(selected)) {
+        selected = [];
+      }
+
+      const state = {
+        time: new Date().getTime(),
+        start: page * length,
+        length: length,
+        order: dtObj.order(),
+        search: {
+          search: dtObj.search(),
+          regex: false,
+          smart: true,
+          caseInsensitive: true,
+        },
+        // columns: columns,  // Skipping columns for now to save storage, not used
+        select: {
+          cells: [],
+          columns: [],
+          rows: selected,
+        },
+      };
+
+      try {
+        sessionStorage.setItem(this.stateKey, JSON.stringify(state));
+      } catch (e) {
+        console.error("Error saving state:", e);
+      }
+    },
+    destroyState() {
+      sessionStorage.removeItem(this.stateKey);
+      window.location.reload();
     },
   },
 });
