@@ -1021,9 +1021,9 @@ export default defineComponent({
       });
 
       if (products_to_search.length < 30) {
-        products_to_search.forEach((index) => {
-          searchProduct("id", index, false);
-        });
+        for (const index of products_to_search) {
+          searchProduct("code", index, false);
+        }
       } else {
         push.warning("Pārāk daudz preču, lai meklētu automātiski");
       }
