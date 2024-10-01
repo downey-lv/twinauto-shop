@@ -256,11 +256,13 @@
 
               <!--begin::Product name-->
               <div class="d-flex flex-wrap fw-semibold fs-6 mb-4 pe-2">
-                <span
-                  class="d-flex align-items-center text-gray-800 text-hover-primary me-5 mb-2"
-                  v-html="p.name"
-                >
-                </span>
+                <editable-field
+                  v-model="p.name"
+                  field="productname"
+                  :product-id="p.productid"
+                  div-class="d-flex flex-wrap"
+                  span-class="d-flex align-items-center text-gray-800 text-hover-primary mb-2"
+                ></editable-field>
               </div>
               <div
                 class="d-flex flex-wrap fs-6 mb-4 pe-2"
@@ -298,7 +300,23 @@
                         class="d-flex align-items-center"
                         :class="item.class"
                       >
-                        <div class="fs-2 fw-bold">{{ item.value }}</div>
+                        <editable-field
+                          v-if="item.editField"
+                          v-model="item.rawValue"
+                          :formatted-value="item.value"
+                          :field="item.editField"
+                          :product-id="p.productid"
+                          div-class="fs-2 fw-bold"
+                          :input-type="item.editType"
+                          :multiple-limit="2"
+                          @update:formattedValue="
+                            (newFormattedValue) =>
+                              updateFormattedValue(newFormattedValue, item)
+                          "
+                        ></editable-field>
+                        <div class="fs-2 fw-bold" v-else>
+                          {{ item.value }}
+                        </div>
                       </div>
                       <!--end::Number-->
 
@@ -424,16 +442,37 @@
             >
               <div class="row mb-3" v-if="p.shop.productgroupid">
                 <label class="col-lg-4 fw-light">Grupa</label>
-                <label class="col-lg-8 fs-6 text-dark">
-                  <router-link
-                    :to="{
-                      name: `search-parts`,
-                      params: { type: `all` },
-                      query: { groups: p.shop.productgroupid },
-                    }"
+                <label class="col-lg-8">
+                  <editable-field
+                    v-model="p.shop.productgroupid"
+                    :formatted-value="p.shop.productgroupname"
+                    field="productgroupid"
+                    :product-id="p.productid"
+                    div-class="fs-2 fw-bold"
+                    input-type="select"
+                    @update:formattedValue="
+                      (newFormattedValue) =>
+                        updateFormattedValue(
+                          newFormattedValue,
+                          p?.shop,
+                          'productgroupname'
+                        )
+                    "
                   >
-                    {{ p.shop.productgroupname }}
-                  </router-link>
+                    <template #display>
+                      <span class="fs-6 text-dark">
+                        <router-link
+                          :to="{
+                            name: `search-parts`,
+                            params: { type: `all` },
+                            query: { groups: p.shop.productgroupid },
+                          }"
+                        >
+                          {{ p.shop.productgroupname }}
+                        </router-link>
+                      </span>
+                    </template>
+                  </editable-field>
                 </label>
               </div>
 
@@ -448,6 +487,13 @@
                     v-if="item.label == `Specifikācija`"
                     v-html="item.value"
                   ></span>
+                  <editable-field
+                    v-if="item.field"
+                    v-model="item.value"
+                    :field="item.field"
+                    :product-id="p.productid"
+                    div-class="d-flex flex-wrap"
+                  ></editable-field>
                   <span
                     v-else
                     v-for="(line, lineNumber) of item.value.split('\n')"
@@ -602,7 +648,8 @@
                 <label
                   class="col-lg-1"
                   :class="item.supplier_rest == 0 ? `text-danger` : ``"
-                  ><template v-if="item.rest_overflow">> </template>{{ item.supplier_rest }}</label
+                  ><template v-if="item.rest_overflow">> </template
+                  >{{ item.supplier_rest }}</label
                 >
                 <label
                   class="col-lg-2"
@@ -769,6 +816,7 @@ import ReportIssue from "@/components/product/ReportIssue.vue";
 import LinkageModal from "@/components/product/ProductLinkages.vue";
 import CartAddModal from "@/components/cart/CartAddModal.vue";
 import { getOption, getOptionLabel } from "@/core/services/OptionService";
+import EditableField from "./EditableField.vue";
 
 export default defineComponent({
   components: {
@@ -779,6 +827,7 @@ export default defineComponent({
     ReportIssue,
     LinkageModal,
     CartAddModal,
+    EditableField,
   },
   setup() {
     const productStore = useProductStore();
@@ -798,6 +847,9 @@ export default defineComponent({
         title: string;
         value: string;
         class?: string;
+        editField?: string;
+        editType?: string;
+        rawValue?: string;
       };
 
       let newStats: Stat[] = [];
@@ -822,8 +874,18 @@ export default defineComponent({
             class: restClass,
           });
         }
+
         if (p.shop.locations)
-          newStats.push({ title: "Novietne", value: p.shop.locations });
+          newStats.push({
+            title: "Novietne",
+            value: p.shop.locations,
+            editField: "location",
+            editType: "select",
+            rawValue: p.shop.location_list,
+          });
+
+        if (p.shop.productgroupid)
+          p.shop.productgroupid = String(p.shop.productgroupid);
 
         loadHistoryData(p.productid);
       }
@@ -1095,6 +1157,9 @@ export default defineComponent({
     addtoCart() {
       // return false;
       (this.$refs.cartAddModalRef as any).show();
+    },
+    updateFormattedValue(newFormattedValue, item, key = "value") {
+      item[key] = newFormattedValue;
     },
   },
 });

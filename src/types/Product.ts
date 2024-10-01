@@ -163,6 +163,7 @@ export interface Price {
 export interface Detail {
   label: string;
   value: string;
+  field?: string;
 }
 
 export interface Product {
