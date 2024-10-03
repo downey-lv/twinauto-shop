@@ -6,7 +6,6 @@
       :multiple="multipleLimit > 1"
       :multiple-limit="multipleLimit"
       :size="size"
-      default-first-option
       :placeholder="placeholder"
       class="w-100"
       @update:modelValue="(val) => $emit('update:modelValue', val)"

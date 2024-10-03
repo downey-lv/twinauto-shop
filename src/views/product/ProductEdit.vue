@@ -54,7 +54,7 @@
 
             <div class="fv-row mb-2" v-loading="loading.producers">
               <label class="required fs-6 mb-2">Ražotājs</label>
-              <SelectComponent
+              <SelectComponentVirtualized
                 :options="producers"
                 v-model="product.producerid"
                 prop="producerid"
@@ -103,7 +103,7 @@
               v-loading="loading.groups || loading.tecdoc"
             >
               <label class="required fs-6 mb-2">Grupa</label>
-              <SelectComponent
+              <SelectComponentVirtualized
                 :options="groups"
                 v-model="product.productgroupid"
                 prop="productgroupid"
@@ -111,7 +111,7 @@
                 <template #comment>
                   <a href="#" @click.prevent="newGroup()">Jauns</a>
                 </template>
-              </SelectComponent>
+              </SelectComponentVirtualized>
               <template v-for="(name, id) in groupSuggestions" :key="id">
                 <div class="fs-7 fw-semibold text-muted text-info">
                   <a
@@ -131,10 +131,9 @@
               v-loading="loading.locations || loading.tecdoc"
             >
               <label class="fs-6 mb-2">Novietnes</label>
-              <SelectComponent
+              <SelectComponentVirtualized
                 :options="locations"
                 v-model="product.location_list"
-                :multiple="true"
                 :multipleLimit="2"
                 prop="location_list"
               />
@@ -202,7 +201,7 @@
               <div class="col-lg-6">
                 <div class="fv-row mb-2" v-loading="loading.units">
                   <label class="fs-6 mb-2">Vienība</label>
-                  <SelectComponent
+                  <SelectComponentVirtualized
                     :options="units"
                     v-model="product.unitid"
                     prop="unitid"
@@ -320,7 +319,7 @@
 
                 <div class="fv-row mb-2" v-loading="loading.producers">
                   <label class="fs-6 mb-2">Ražotājs</label>
-                  <SelectComponent
+                  <SelectComponentVirtualized
                     :options="producersTecdoc"
                     v-model="product.td_producer"
                     prop="producerid"
@@ -512,7 +511,7 @@
 import type { WatchStopHandle } from "vue";
 import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import ApiService from "@/core/services/ApiService";
-import SelectComponent from "@/components/core/form/SelectComponent.vue";
+import SelectComponentVirtualized from "@/components/core/form/SelectComponentVirtualized.vue";
 import { Plus } from "@element-plus/icons-vue";
 import { push } from "@/main";
 import { useWindowStore } from "@/stores/activewindows";
@@ -529,7 +528,7 @@ export default defineComponent({
   components: {
     EditSettingsModal,
     Notice,
-    SelectComponent,
+    SelectComponentVirtualized,
     Plus,
     QuillEditor,
   },
