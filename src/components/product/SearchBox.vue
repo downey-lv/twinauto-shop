@@ -15,6 +15,7 @@
                 @blur="suggestionsActive = ''"
                 placeholder="ID"
                 autocomplete="off"
+                enterkeyhint="search"
               />
               <label>ID</label>
 
@@ -55,6 +56,7 @@
                 @blur="suggestionsActive = ''"
                 placeholder="Kods"
                 autocomplete="off"
+                enterkeyhint="search"
               />
               <label>Kods</label>
 
@@ -111,6 +113,7 @@
                     @blur="suggestionsActive = ''"
                     placeholder="Teksts"
                     autocomplete="off"
+                    enterkeyhint="search"
                   />
                   <label>Teksts</label>
 

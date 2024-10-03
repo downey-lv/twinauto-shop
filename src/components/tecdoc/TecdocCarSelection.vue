@@ -21,6 +21,7 @@
             v-model="selectedVIN"
             @keyup.enter="findVIN()"
             placeholder="VIN vai reģistrācijas numurs"
+            enterkeyhint="search"
             ref="VIN"
           ></el-input>
         </el-form-item>
