@@ -11,10 +11,26 @@
                 name="id"
                 v-model="searchData.id"
                 @keyup.enter="search('id')"
+                @focus="suggestionsActive = 'id'"
+                @blur="suggestionsActive = ''"
                 placeholder="ID"
                 autocomplete="off"
               />
               <label>ID</label>
+
+              <!-- Dropdown with suggestions -->
+              <ul
+                v-if="suggestions.id?.length && suggestionsActive == 'id'"
+                class="suggestions-list"
+              >
+                <li
+                  v-for="(suggestion, index) in suggestions.id"
+                  :key="index"
+                  @mousedown="selectSuggestion('id', suggestion)"
+                >
+                  {{ suggestion }}
+                </li>
+              </ul>
             </div>
             <button
               class="btn btn-outline-secondary"
@@ -35,10 +51,26 @@
                 name="code"
                 v-model="searchData.code"
                 @keyup.enter="search('code')"
+                @focus="suggestionsActive = 'code'"
+                @blur="suggestionsActive = ''"
                 placeholder="Kods"
                 autocomplete="off"
               />
               <label>Kods</label>
+
+              <!-- Dropdown with suggestions -->
+              <ul
+                v-if="suggestions.code?.length && suggestionsActive == 'code'"
+                class="suggestions-list"
+              >
+                <li
+                  v-for="(suggestion, index) in suggestions.code"
+                  :key="index"
+                  @mousedown="selectSuggestion('code', suggestion)"
+                >
+                  {{ suggestion }}
+                </li>
+              </ul>
             </div>
             <button
               class="btn btn-outline-secondary"
@@ -75,10 +107,26 @@
                     name="code"
                     v-model="searchData.text"
                     @keyup.enter="search('text')"
+                    @focus="suggestionsActive = 'text'"
+                    @blur="suggestionsActive = ''"
                     placeholder="Teksts"
                     autocomplete="off"
                   />
                   <label>Teksts</label>
+
+                  <!-- Dropdown with suggestions -->
+                  <ul
+                    v-if="suggestions.text?.length && suggestionsActive == 'text'"
+                    class="suggestions-list"
+                  >
+                    <li
+                      v-for="(suggestion, index) in suggestions.text"
+                      :key="index"
+                      @mousedown="selectSuggestion('text', suggestion)"
+                    >
+                      {{ suggestion }}
+                    </li>
+                  </ul>
                 </div>
                 <button
                   class="btn btn-outline-secondary"
@@ -149,6 +197,11 @@ export default defineComponent({
     const groups = ref();
     const loading = ref(false);
     const watcherHandles: WatchStopHandle[] = [];
+
+    const suggestionsActive = ref("");
+    const suggestions = ref(
+      JSON.parse(localStorage.getItem("suggestions") || "{}")
+    );
 
     const searchData = reactive({
       id: "",
@@ -227,6 +280,8 @@ export default defineComponent({
       groups,
       loading,
       componentKey,
+      suggestions,
+      suggestionsActive,
     };
   },
   mounted() {
@@ -242,6 +297,8 @@ export default defineComponent({
             query: this.searchData[field],
           },
         };
+
+        this.addSuggestion(field, this.searchData[field]);
 
         let query = {};
         if (field === "code") {
@@ -277,6 +334,64 @@ export default defineComponent({
           this.loading = false;
         });
     },
+    addSuggestion(field, suggestion) {
+      let suggestions = this.suggestions[field];
+
+      // Check if the suggestions object exists
+      if (!suggestions) suggestions = [];
+
+      // Remove suggestion if it already exists
+      if (suggestions.includes(suggestion))
+        suggestions.splice(suggestions.indexOf(suggestion), 1);
+
+      // Add suggestion to the beginning of the list
+      suggestions.unshift(suggestion);
+
+      // Limit the list to 20 suggestions
+      if (suggestions.length > 20) suggestions.pop();
+
+      // Save the suggestions to the component data
+      this.suggestions[field] = suggestions;
+
+      // Save the suggestions to the localStorage
+      try {
+        localStorage.setItem("suggestions", JSON.stringify(this.suggestions));
+      } catch (e) {
+        console.error("Error saving suggestions to localStorage:", e);
+      }
+    },
+    selectSuggestion(field, suggestion) {
+      console.log(field, suggestion);
+      this.searchData[field] = suggestion;
+      this.search(field);
+    },
   },
 });
 </script>
+
+<style>
+.suggestions-list {
+  position: absolute;
+  color: var(--bs-gray-700);
+  background-color: var(--bs-gray-100);
+  border-color: var(--bs-gray-100);
+  border-radius: 0.475rem;
+  border: 0px solid;
+  width: 100%;
+  max-height: 150px;
+  overflow-y: auto;
+  list-style-type: none;
+  padding: 0;
+  margin-top: 5px;
+  z-index: 999;
+}
+
+.suggestions-list li {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.suggestions-list li:hover {
+  background-color: var(--bs-gray-200);
+}
+</style>
