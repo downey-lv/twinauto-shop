@@ -62,8 +62,31 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
+        <el-table-column label="" width="100" sortable>
+          <template #default="scope">
+            <img
+              v-if="scope.row.imageUrl"
+              :onmouseover="`showImage('${scope.row.imageUrl}')`"
+              onmouseleave="showImage()"
+              :src="scope.row.imageUrl"
+              style="max-width: 100px"
+            />
+          </template>
+        </el-table-column>
         <el-table-column property="productidstr" label="ID" sortable />
-        <el-table-column property="productcode" label="Kods" sortable />
+        <el-table-column property="productcode" label="Kods" sortable>
+          <template #default="scope">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>{{ scope.row.productcode }}</span>
+              <button
+                class="btn btn-icon btn-sm btn-active-primary"
+                @click="viewProduct(scope.row.index)"
+              >
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column property="producer" label="Ražotājs" sortable />
         <el-table-column label="Nosaukums" width="350" sortable>
           <template #default="scope">
@@ -135,6 +158,7 @@
     </div>
   </div>
 
+  <ImageHover />
   <DocumentLabelsModal ref="modalLabels" :pData="selectedProducts" />
 </template>
 
@@ -145,9 +169,11 @@ import { push } from "@/main";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
 import type { Products } from "@/types/ProductEditor";
 import DocumentLabelsModal from "@/components/documents/DocumentLabels.vue";
+import { useProductStore } from "@/stores/product";
+import ImageHover from "@/components/product/ImageHover.vue";
 
 export default defineComponent({
-  components: { DocumentLabelsModal, SelectComponent },
+  components: { ImageHover, DocumentLabelsModal, SelectComponent },
   setup() {
     const loading = ref<boolean>(false);
     const loadingFilters = ref<boolean>(false);
@@ -185,6 +211,11 @@ export default defineComponent({
       selectedProducts.value = [];
       ApiService.get("product/editor", "products", filters.value)
         .then((response) => {
+          // Add index for each product
+          response.data.forEach((product, index) => {
+            product.index = index;
+          });
+
           products.value = response.data;
         })
         .catch((error) => {
@@ -311,6 +342,11 @@ export default defineComponent({
       });
 
       (this.$refs.modalLabels as any).show();
+    },
+    viewProduct(idx) {
+      const productStore = useProductStore();
+      const data = this.products[idx].data;
+      if (data) productStore.setProduct([data]);
     },
   },
 });
