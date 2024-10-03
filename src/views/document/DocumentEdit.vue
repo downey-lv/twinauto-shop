@@ -77,7 +77,7 @@
               <div class="col-lg">
                 <div class="fv-row" id="containerType" v-if="!dailyDocument">
                   <label class="fs-6 required">Tips</label>
-                  <SelectComponent
+                  <SelectComponentVirtualized
                     :options="typesFiltered"
                     v-model="document.ordertypeid"
                     prop="ordertypeid"
@@ -85,7 +85,7 @@
                 </div>
                 <div class="fv-row" id="containerCompany">
                   <label class="fs-6 required">Klients</label>
-                  <SelectComponent
+                  <SelectComponentVirtualized
                     :options="companies"
                     v-model="document.companyid"
                     @change="updatePayterm()"
@@ -94,7 +94,7 @@
                     <template #comment>
                       <a href="#" @click.prevent="newClient()">Jauns</a>
                     </template>
-                  </SelectComponent>
+                  </SelectComponentVirtualized>
                 </div>
                 <div class="fv-row" v-if="!dailyDocument">
                   <label class="fs-6">Dokumenta numurs</label>
@@ -488,7 +488,7 @@ import { Decimal } from "decimal.js";
 import { cloneDeep, debounce, isEqual } from "lodash";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import Notice from "@/components/core/Notice.vue";
-import SelectComponent from "@/components/core/form/SelectComponent.vue";
+import SelectComponentVirtualized from "@/components/core/form/SelectComponentVirtualized.vue";
 import DocumentHeader from "@/components/documents/DocumentHeader.vue";
 import { useRoute, useRouter, onBeforeRouteLeave } from "vue-router";
 import tourSteps from "@/tours/DocumentEditTour";
@@ -527,7 +527,7 @@ export default defineComponent({
   components: {
     ClientModal,
     DocumentHeader,
-    SelectComponent,
+    SelectComponentVirtualized,
     Notice,
   },
   setup() {
