@@ -7,7 +7,7 @@
       <div class="row">
         <div class="col-lg">
           <label class="fs-6 mb-2">Grupa</label>
-          <SelectComponent
+          <SelectComponentVirtualized
             :options="settings.group"
             v-model="filters.productgroupid"
             :clearable="true"
@@ -15,7 +15,7 @@
         </div>
         <div class="col-lg">
           <label class="fs-6 mb-2">Ražotājs</label>
-          <SelectComponent
+          <SelectComponentVirtualized
             :options="settings.producer"
             v-model="filters.producerid"
             :clearable="true"
@@ -23,7 +23,7 @@
         </div>
         <div class="col-lg">
           <label class="fs-6 mb-2">Novietne</label>
-          <SelectComponent
+          <SelectComponentVirtualized
             :options="settings.location"
             v-model="filters.locationid"
             :clearable="true"
@@ -103,7 +103,7 @@
       <div class="row mb-2" v-loading="loadingFilters">
         <div class="col-lg">
           <label class="fs-6 mb-2">Jaunā grupa</label>
-          <SelectComponent
+          <SelectComponentVirtualized
             :options="settings.group"
             v-model="updateFields.productgroupid"
             :clearable="true"
@@ -111,7 +111,7 @@
         </div>
         <div class="col-lg">
           <label class="fs-6 mb-2">Jaunais ražotājs</label>
-          <SelectComponent
+          <SelectComponentVirtualized
             :options="settings.producer"
             v-model="updateFields.producerid"
             :clearable="true"
@@ -119,7 +119,7 @@
         </div>
         <div class="col-lg">
           <label class="fs-6 mb-2">Jaunā novietne</label>
-          <SelectComponent
+          <SelectComponentVirtualized
             :options="settings.location"
             v-model="updateFields.locationid"
             :clearable="true"
@@ -166,14 +166,14 @@
 import { computed, defineComponent, ref, watch, onBeforeUnmount } from "vue";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
-import SelectComponent from "@/components/core/form/SelectComponent.vue";
+import SelectComponentVirtualized from "@/components/core/form/SelectComponentVirtualized.vue";
 import type { Products } from "@/types/ProductEditor";
 import DocumentLabelsModal from "@/components/documents/DocumentLabels.vue";
 import { useProductStore } from "@/stores/product";
 import ImageHover from "@/components/product/ImageHover.vue";
 
 export default defineComponent({
-  components: { ImageHover, DocumentLabelsModal, SelectComponent },
+  components: { ImageHover, DocumentLabelsModal, SelectComponentVirtualized },
   setup() {
     const loading = ref<boolean>(false);
     const loadingFilters = ref<boolean>(false);
@@ -209,6 +209,14 @@ export default defineComponent({
     function loadProducts() {
       loading.value = true;
       selectedProducts.value = [];
+
+      // Stop search if all filters are empty
+      if (!Object.values(filters.value).some((value) => (value || "") !== "")) {
+        products.value = [];
+        loading.value = false;
+        return;
+      }
+
       ApiService.get("product/editor", "products", filters.value)
         .then((response) => {
           // Add index for each product

@@ -5,4 +5,5 @@ export interface Products {
   productname: string;
   productgroup: string;
   locations: string;
+  data: Object;
 }
