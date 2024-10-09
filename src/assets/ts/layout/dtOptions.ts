@@ -144,7 +144,6 @@ export const getDtOptions = (focus = 0, stateSave = false, stateKey = '') => {
         options["stateLoadCallback"] = function(settings) {
             const storage = sessionStorage.getItem(stateKey);
             const data = storage ? JSON.parse(storage) : null;
-            console.log(data);
             return data;
         };
     }
