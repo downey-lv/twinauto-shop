@@ -18,12 +18,15 @@
           node-key="id"
           :default-expand-all="isFiltered"
           :key="treeKey"
+          @node-expand="treeUpdate"
+          @node-collapse="treeUpdate"
+          ref="treeRef"
         >
           <template #default="{ node, data }">
             <span
               class="custom-tree-node"
-              @dblclick.stop="openCategory(data.data)"
-              @click="data.children ? '' : openCategory(data.data)"
+              @dblclick.stop="openCategory(data.data, data)"
+              @click="data.children ? '' : openCategory(data.data, data)"
             >
               {{ node.label }}
             </span>
@@ -46,7 +49,7 @@
 </style>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, nextTick, ref } from "vue";
 import TecdocCar from "@/components/tecdoc/TecdocCar.vue";
 import { useBreadcrumbStore } from "@/stores/breadcrumb";
 import ApiService from "@/core/services/ApiService";
@@ -64,6 +67,8 @@ export default defineComponent({
     const filterText = ref("");
     const isFiltered = ref(false);
     const treeKey = ref(0);
+    const treeRef = ref();
+    const currentNode = ref();
 
     return {
       categories,
@@ -71,6 +76,8 @@ export default defineComponent({
       loading,
       isFiltered,
       treeKey,
+      treeRef,
+      currentNode,
     };
   },
   mounted() {
@@ -79,6 +86,12 @@ export default defineComponent({
       if (this.$refs.filterTextRef)
         (this.$refs.filterTextRef as HTMLElement).focus();
     });
+
+    // Get currentNode from sessionStorage
+    const nodeData = sessionStorage.getItem("tecdoc-categories");
+    if (nodeData) {
+      this.currentNode = JSON.parse(nodeData);
+    }
 
     // Load data
     this.loading = true;
@@ -91,6 +104,14 @@ export default defineComponent({
       })
       .finally(() => {
         this.loading = false;
+
+        // Set current node
+        nextTick(() => {
+          if (this.treeRef && this.currentNode) {
+            const node = this.treeRef.getNode(this.currentNode);
+            if (node) this.treeRef.setCurrentNode(node.data as Node, true);
+          }
+        });
       });
   },
   computed: {
@@ -135,10 +156,16 @@ export default defineComponent({
     },
   },
   methods: {
-    openCategory(data) {
+    openCategory(data, node) {
+      // Update current node
+      this.treeUpdate(node);
+
+      // Update breadcrumbs
+      this.updateBreadcrumbs(data.name);
+
+      // Create route
       let params = this.$route.params;
       params.groupId = data.id;
-      this.updateBreadcrumbs(data.name);
 
       this.$router.push({
         name: "tecdoc-parts",
@@ -152,6 +179,13 @@ export default defineComponent({
         { groupId: selectedCategoryName },
         ["tecdoc-car", "tecdoc-groups"]
       );
+    },
+    treeUpdate(nodeData) {
+      try {
+        sessionStorage.setItem("tecdoc-categories", JSON.stringify(nodeData));
+      } catch (e) {
+        console.error("Error saving current node:", e);
+      }
     },
   },
 });
