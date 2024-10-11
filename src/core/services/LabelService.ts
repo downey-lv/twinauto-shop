@@ -1,5 +1,6 @@
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
+import { cloneDeep } from "lodash";
 
 const shop_template = `
 N
@@ -75,10 +76,10 @@ export const labelService = {
     return [result];
   },
   labelProduct: async function (data, params) {
-    const replacePlaceholders = (template, data) => {
-      const hidePrice = params.hidePrice || false;
-      const hideCode = params.hideCode || false;
+    const hidePrice = params.hidePrice || false;
+    const hideCode = params.hideCode || false;
 
+    const replacePlaceholders = (template, data) => {
       // Use a regular expression to find placeholders in the format {key}
       return template.replace(/{([^}]+)}/g, function (match, key) {
         if (key === "productcode" && hideCode) {
@@ -104,9 +105,21 @@ export const labelService = {
       });
     };
 
+    let dataSorted = cloneDeep(data);
+    // Sort labels
+    try {
+      if (hideCode) {
+        dataSorted = dataSorted.sort((a, b) => parseInt(a.productid) - parseInt(b.productid));
+      } else {
+        dataSorted = dataSorted.sort((a, b) => a.code.localeCompare(b.code));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
     // Prepare labels
     const labels: object[] = [];
-    for (const item of data) {
+    for (const item of dataSorted) {
       const product = item.shop;
       product.priceSell = item.priceSell;
 
