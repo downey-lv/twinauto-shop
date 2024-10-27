@@ -380,14 +380,6 @@
                   >OE kodi</a
                 >
               </li>
-              <li class="nav-item" v-if="replacements.length > 0">
-                <a
-                  class="nav-link"
-                  data-bs-toggle="tab"
-                  href="#tab_replacements"
-                  >Aizvietotāji</a
-                >
-              </li>
               <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#tab_vehicles"
                   >Automašīnas</a
@@ -425,6 +417,14 @@
             <li class="nav-item" v-if="p.productid != ``">
               <a class="nav-link" data-bs-toggle="tab" href="#tab_history"
                 >Vēsture</a
+              >
+            </li>
+            <li class="nav-item" v-if="replacements.length > 0">
+              <a
+                class="nav-link"
+                data-bs-toggle="tab"
+                href="#tab_replacements"
+              >Saistītās preces</a
               >
             </li>
           </ul>
@@ -905,6 +905,7 @@ export default defineComponent({
       else setSuppliers(p.suppliers);
 
       // Load partslist
+      replacements.value = [];
       if (
         p.tecdoc &&
         ((p.tecdoc.partsList && p.tecdoc.partsList.length > 0) ||
