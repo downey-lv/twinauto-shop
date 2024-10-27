@@ -60,6 +60,12 @@ export interface Shop {
   stale: boolean;
 }
 
+export interface PartListEntry {
+  code: string;
+  name: string;
+  description: string;
+}
+
 export interface Tecdoc {
   manufacturerId: number;
   manufacturerName: string;
@@ -69,7 +75,7 @@ export interface Tecdoc {
   articleState: string;
   details: Detail[];
   oemNumbers: (string | string[])[][];
-  partsList: any[]; // Define based on actual structure if needed
+  partsList: PartListEntry[];
   byEan: boolean;
   images: {
     withFrame: Record<string, unknown>; // Adjust based on actual structure
@@ -164,6 +170,7 @@ export interface Detail {
   label: string;
   value: string;
   field?: string;
+  search?: boolean;
 }
 
 export interface Product {

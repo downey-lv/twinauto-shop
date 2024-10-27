@@ -380,10 +380,7 @@
                   >OE kodi</a
                 >
               </li>
-              <li
-                class="nav-item"
-                v-if="p.tecdoc.partsList && p.tecdoc.partsList.length > 0"
-              >
+              <li class="nav-item" v-if="replacements.length > 0">
                 <a
                   class="nav-link"
                   data-bs-toggle="tab"
@@ -518,9 +515,14 @@
                   :key="key"
                 >
                   <label class="col-lg-4 fw-light">{{ item.label }}</label>
-                  <label class="col-lg-8 fw-bold fs-6 text-dark">{{
-                    item.value
-                  }}</label>
+                  <label class="col-lg-8 fw-bold fs-6 text-dark"
+                    >{{ item.value }}
+                    <Search
+                      v-if="item.search"
+                      :value="String(item.value)"
+                      font-size="3"
+                    />
+                  </label>
                 </div>
               </div>
 
@@ -547,7 +549,7 @@
               >
                 <div
                   class="row mb-3"
-                  v-for="(item, index) in p.tecdoc.partsList"
+                  v-for="(item, index) in replacements"
                   :key="index"
                 >
                   <label class="col-lg-3 fw-bold fs-6 text-dark">
@@ -555,10 +557,10 @@
                     <Copy :value="item.code" font-size="3" trim-spaces />
                     <Search :value="item.code" font-size="3" />
                   </label>
-                  <label class="col-lg-4 fs-6 text-dark">
+                  <label class="col-lg-4 fs-7 text-dark">
                     {{ item.name }}
                   </label>
-                  <label class="col-lg-5 fs-6 text-dark">
+                  <label class="col-lg-5 fs-7 text-dark">
                     {{ item.description }}
                   </label>
                 </div>
@@ -810,7 +812,7 @@ import {
 import { labelService } from "@/core/services/LabelService";
 import { push } from "@/main";
 import ApiService from "@/core/services/ApiService";
-import type { Product, Supplier } from "@/types/Product";
+import type { PartListEntry, Product, Supplier } from "@/types/Product";
 import LogModal from "@/components/data/LogModal.vue";
 import ReportIssue from "@/components/product/ReportIssue.vue";
 import LinkageModal from "@/components/product/ProductLinkages.vue";
@@ -838,6 +840,7 @@ export default defineComponent({
     const title = ref();
     const suppliers = ref<Supplier[]>();
     const historyData = ref();
+    const replacements = ref<PartListEntry[]>([]);
 
     const updateValues = (p) => {
       // Force to render tabs again
@@ -902,12 +905,16 @@ export default defineComponent({
       else setSuppliers(p.suppliers);
 
       // Load partslist
-      if (p.tecdoc && p.tecdoc.partsList && p.tecdoc.partsList.length > 0) {
+      if (
+        p.tecdoc &&
+        ((p.tecdoc.partsList && p.tecdoc.partsList.length > 0) ||
+          p.tecdoc.hasPartsListParent)
+      ) {
         ApiService.get(
           `tecdoc/article`,
-          `${p.tecdocId}/${p.codeAlphanum}/partslist`
+          `${p.tecdocId}/${p.codeAlphanum}/partslist?parent=${p.tecdoc.hasPartsListParent}`
         ).then((response) => {
-          p.tecdoc.partsList = response.data;
+          replacements.value = response.data;
         });
       }
     };
@@ -1063,6 +1070,7 @@ export default defineComponent({
       dtOptions,
       dt,
       historyData,
+      replacements,
     };
   },
   computed: {
