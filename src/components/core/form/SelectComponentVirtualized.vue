@@ -13,12 +13,23 @@
       :clearable="clearable"
       :allow-create="allowCreate"
       :options="formattedOptions"
-    />
+    >
+      <template #default="{ item }">
+        {{ item.label }}
+      </template>
+    </el-select-v2>
     <div class="fs-7 fw-semibold text-muted">
       <slot name="comment"></slot>
     </div>
   </el-form-item>
 </template>
+
+<style>
+.el-select-dropdown__item {
+  direction: rtl;
+  text-overflow: ellipsis;
+}
+</style>
 
 <script lang="ts">
 import { computed, defineComponent, type PropType, ref, watch } from "vue";
