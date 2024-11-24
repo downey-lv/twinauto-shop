@@ -15,7 +15,7 @@
       :options="formattedOptions"
     >
       <template #default="{ item }">
-        {{ item.label }}
+        {{ item.label }}&lrm;
       </template>
     </el-select-v2>
     <div class="fs-7 fw-semibold text-muted">
