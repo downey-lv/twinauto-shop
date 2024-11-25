@@ -151,7 +151,7 @@
                 </div>
                 <div
                   class="fv-row"
-                  v-if="$route.params.type === 'in' && newDocument"
+                  v-if="$route.params.type === 'in'"
                 >
                   <label class="fs-6">Piegādes izdevumi, bez PVN</label>
                   <el-form-item>
@@ -163,7 +163,7 @@
                       class="w-100"
                     />
                     <div class="fs-7 fw-semibold text-muted">
-                      Pēc saglabāšanas pārbaudi kopsummu
+                      Pievieno tikai tad, kad ir ievadīta visa pavadzīme. Pēc saglabāšanas pārbaudi kopsummu
                     </div>
                   </el-form-item>
                 </div>
