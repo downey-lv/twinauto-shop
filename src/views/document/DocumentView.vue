@@ -92,19 +92,24 @@
             <i class="fa-solid fa-cash-register"></i>
           </button>
           <button
+            v-if="documentData.islocked"
             type="button"
-            class="btn btn-sm"
-            :class="documentData.islocked ? 'btn-warning' : 'btn-light'"
-            :title="
-              documentData.islocked ? 'Atslēgt dokumentu' : 'Slēgt dokumentu'
-            "
+            class="btn btn-sm btn-warning"
+            title="Atslēgt dokumentu"
             v-tooltip
             @click="lockDocument(documentData.islocked)"
           >
-            <i
-              class="fa-solid fa-fw"
-              :class="documentData.islocked ? 'fa-lock' : 'fa-lock-open'"
-            ></i>
+            <i class="fa-solid fa-fw fa-lock"></i>
+          </button>
+          <button
+            v-else
+            type="button"
+            class="btn btn-sm btn-light"
+            title="Slēgt dokumentu"
+            v-tooltip
+            @click="lockDocument(documentData.islocked)"
+          >
+            <i class="fa-solid fa-fw fa-lock-open"></i>
           </button>
         </div>
         <div class="btn-group me-2" role="group">
