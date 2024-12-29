@@ -149,6 +149,15 @@
 
           <!--begin::Modal footer-->
           <div class="modal-footer flex-center">
+            <button
+              type="button"
+              class="btn btn-light-info"
+              @click="printLabel()"
+              v-if="type === 'location'"
+            >
+              Uzlīme
+            </button>
+
             <button type="button" class="btn btn-light" @click="hide()">
               Aizvērt
             </button>
@@ -209,6 +218,7 @@ import { Plus } from "@element-plus/icons-vue";
 import "@/assets/uploader.css";
 import { Modal } from "bootstrap";
 import type { FormInstance } from "element-plus";
+import { labelService } from "@/core/services/LabelService";
 
 export default defineComponent({
   name: "edit-settings-modal",
@@ -418,6 +428,13 @@ export default defineComponent({
         .catch(() => {
           push.error("Neizdevās dzēst attēlu");
         });
+    },
+    printLabel() {
+      const labelData = {
+        name: this.formData.name,
+        barcode: `#NOVIETNE-${this.formData.id}`,
+      };
+      labelService.print("location", labelData);
     },
   },
 });

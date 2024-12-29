@@ -31,6 +31,15 @@ A15,200,0,e,1,1,N,"Atlikums: {cash}"
 A15,235,0,a,1,1,N,"{total}"
 `;
 
+const location_template = `
+N
+ZB
+q464
+Q320,16
+A50,50,0,{fontSize},1,1,N,"{name}"
+B50,200,0,1,2,30,90,N,"{barcode}"
+`;
+
 export const labelService = {
   print: async function (type, data, params = {}) {
     let label;
@@ -43,6 +52,9 @@ export const labelService = {
       case "revenue":
         label = await this.labelRevenue(data);
         labelsPerRow = 2;
+        break;
+      case "location":
+        label = await this.labelLocation(data);
         break;
       default:
         throw new Error("Unknown label type.");
@@ -63,23 +75,29 @@ export const labelService = {
     // Print
     // return qzInstance.print(config, label);
   },
+  replacePlaceholders: function (template, data) {
+    // Use a regular expression to find placeholders in the format {key}
+    return template.replace(/{([^}]+)}/g, function (match, key) {
+      return key in data ? data[key] : match;
+    });
+  },
   labelRevenue: async function (data) {
-    const replacePlaceholders = (template, data) => {
-      // Use a regular expression to find placeholders in the format {key}
-      return template.replace(/{([^}]+)}/g, function (match, key) {
-        return key in data ? data[key] : match;
-      });
-    };
-
-    let result = replacePlaceholders(revenue_template, data);
+    let result = this.replacePlaceholders(revenue_template, data);
     result += "\nP2,1\n "; // Print - number of label sets, number of copies
+    return [result];
+  },
+  labelLocation: async function (data) {
+    data.fontSize = data.name.length > 11 ? 4 : 5;
+
+    let result = this.replacePlaceholders(location_template, data);
+    result += "\nP1,1\n "; // Print - number of label sets, number of copies
     return [result];
   },
   labelProduct: async function (data, params) {
     const hidePrice = params.hidePrice || false;
     const hideCode = params.hideCode || false;
 
-    const replacePlaceholders = (template, data) => {
+    const replacePlaceholdersProduct = (template, data) => {
       // Use a regular expression to find placeholders in the format {key}
       return template.replace(/{([^}]+)}/g, function (match, key) {
         if (key === "productcode" && hideCode) {
@@ -123,7 +141,7 @@ export const labelService = {
       const product = item.shop;
       product.priceSell = item.priceSell;
 
-      let result = replacePlaceholders(shop_template, product);
+      let result = replacePlaceholdersProduct(shop_template, product);
 
       result += "\nP1,1\n "; // Print - number of label sets, number of copies
       labels.push(result);
