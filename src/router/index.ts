@@ -229,6 +229,33 @@ const routes: Array<RouteRecordRaw> = [
           breadcrumbs: [],
         },
       },
+      {
+        path: "/stock/scan/:scanId?",
+        name: "stock-scan",
+        component: () => import("@/views/stock/StockScan.vue"),
+        meta: {
+          pageTitle: "Preču skaitīšana",
+          breadcrumbs: [],
+        },
+      },
+      {
+        path: "/stock/locations",
+        name: "stock-locations",
+        component: () => import("@/views/stock/StockLocations.vue"),
+        meta: {
+          pageTitle: "Saskaitītās novietnes",
+          breadcrumbs: [],
+        },
+      },
+      {
+        path: "/stock/",
+        name: "stock-dashboard",
+        component: () => import("@/views/stock/StockDashboard.vue"),
+        meta: {
+          pageTitle: "Inventarizācija",
+          breadcrumbs: [],
+        },
+      },
     ],
   },
   {

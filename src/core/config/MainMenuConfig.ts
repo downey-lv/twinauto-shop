@@ -73,6 +73,11 @@ const MainMenuConfig: Array<MenuItem> = [
       },
     ],
   },
+  {
+    heading: "Inventarizācija",
+    route: "/stock/",
+    faIcon: "abacus",
+  },
 ];
 
 const devMenu: Array<MenuItem> = [];
