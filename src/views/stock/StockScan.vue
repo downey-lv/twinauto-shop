@@ -40,8 +40,15 @@
     </div>
     <div class="card-body">
       <div class="row">
-        <div class="col-md-2">
+        <div class="col-xl-2">
           <div class="input-group">
+            <button
+              class="btn btn-outline-secondary d-xl-none"
+              type="button"
+              @click="barcodeModalState = true"
+            >
+              <i class="fa-solid fa-camera"></i>
+            </button>
             <div class="form-floating">
               <Field
                 type="text"
@@ -80,8 +87,14 @@
                 class="mb-2"
                 v-html="props.row.productname.replace(/\n/g, '<br/>')"
               ></p>
-              <h4>Atlikums veikalā: <el-tag type="info">{{ props.row.rest }}</el-tag></h4>
-              <h4>Saskaitīts šeit: <el-tag type="info">{{ props.row.quantity }}</el-tag></h4>
+              <h4>
+                Atlikums veikalā:
+                <el-tag type="info">{{ props.row.rest }}</el-tag>
+              </h4>
+              <h4>
+                Saskaitīts šeit:
+                <el-tag type="info">{{ props.row.quantity }}</el-tag>
+              </h4>
 
               <el-table :data="props.row.entries">
                 <el-table-column label="Daudzums" prop="quantity" />
@@ -108,7 +121,9 @@
 
               <h4 class="mt-5">
                 Saskaitīts citur:
-                <el-tag type="info">{{ props.row.totalQuantity - props.row.quantity }}</el-tag>
+                <el-tag type="info">{{
+                  props.row.totalQuantity - props.row.quantity
+                }}</el-tag>
               </h4>
               <el-table :data="props.row.otherEntries">
                 <el-table-column label="Daudz." prop="quantity" />
@@ -172,6 +187,10 @@
 
   <EditEntryModal :entry-id="editId" @refresh="getProducts()" ref="editModal" />
 
+  <CameraScanner
+    v-model="barcodeScanned"
+    v-model:open-modal="barcodeModalState"
+  />
 </template>
 
 <script lang="ts">
@@ -185,13 +204,14 @@ import { DateTime } from "luxon";
 import { useRoute } from "vue-router";
 import Notice from "@/components/core/Notice.vue";
 import EditEntryModal from "@/components/stock/EditEntryModal.vue";
+import CameraScanner from "@/components/stock/CameraScanner.vue";
 export default defineComponent({
   computed: {
     DateTime() {
       return DateTime;
     },
   },
-  components: { EditEntryModal, Notice, Field },
+  components: { EditEntryModal, Notice, Field, CameraScanner },
   setup() {
     const route = useRoute();
 
@@ -205,6 +225,9 @@ export default defineComponent({
     const locations = ref();
     const locations_select = ref();
     const editId = ref(null);
+
+    const barcodeScanned = ref("");
+    const barcodeModalState = ref(false);
 
     // Load locations
     loadingLocations.value = true;
@@ -270,10 +293,12 @@ export default defineComponent({
       // Get products
       getProducts();
 
-      // Focus input field
-      await nextTick();
-      const input_field = document.getElementById("barcode_input");
-      if (input_field) input_field.focus();
+      // Focus input field if not using camera scanner
+      if (!barcodeModalState.value) {
+        await nextTick();
+        const input_field = document.getElementById("barcode_input");
+        if (input_field) input_field.focus();
+      }
     };
 
     watch(
@@ -299,7 +324,17 @@ export default defineComponent({
       editId,
       loadingProducts,
       loadingLocations,
+      barcodeScanned,
+      barcodeModalState,
     };
+  },
+  watch: {
+    barcodeScanned(newVal) {
+      if (newVal) {
+        this.current_barcode = newVal;
+        this.addBarcode();
+      }
+    },
   },
   methods: {
     addBarcode() {
@@ -311,6 +346,7 @@ export default defineComponent({
 
       // Clear input field
       this.current_barcode = "";
+      this.barcodeScanned = "";
 
       // Check if location barcode
       if (barcode.startsWith("#NOVIETNE-")) {
@@ -473,6 +509,9 @@ export default defineComponent({
         const productStore = useProductStore();
         if (data) productStore.setProduct([data]);
       });
+    },
+    onDecode(result) {
+      console.log(result);
     },
   },
 });
