@@ -36,7 +36,7 @@ N
 ZB
 q464
 Q320,16
-A50,50,0,{fontSize},1,1,N,"{name}"
+A50,{textPosition},0,{fontSize},1,1,N,"{name}"
 B50,200,0,1,2,30,90,N,"{barcode}"
 `;
 
@@ -87,7 +87,12 @@ export const labelService = {
     return [result];
   },
   labelLocation: async function (data) {
-    data.fontSize = data.name.length > 11 ? 4 : 5;
+    data.fontSize = 5;
+    data.textPosition = 50;
+    if (data.name.length > 11) {
+      data.fontSize = 4;
+      data.textPosition = 170;
+    }
 
     let result = this.replacePlaceholders(location_template, data);
     result += "\nP1,1\n "; // Print - number of label sets, number of copies
