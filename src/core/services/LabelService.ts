@@ -37,7 +37,7 @@ ZB
 q464
 Q320,16
 A50,{textPosition},0,{fontSize},1,1,N,"{name}"
-B50,200,0,1,2,30,90,N,"{barcode}"
+B50,200,0,1,2,{barcodeWidth},{barcodeHeight},N,"{barcode}"
 `;
 
 export const labelService = {
@@ -87,16 +87,29 @@ export const labelService = {
     return [result];
   },
   labelLocation: async function (data) {
-    data.fontSize = 5;
-    data.textPosition = 50;
-    if (data.name.length > 11) {
-      data.fontSize = 4;
-      data.textPosition = 170;
+    // Sort labels by name
+    const dataSorted = data.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Prepare labels
+    const labels: object[] = [];
+    for (const item of dataSorted) {
+      item.fontSize = 5;
+      item.textPosition = 50;
+      item.barcodeWidth = 30;
+      item.barcodeHeight = 90;
+
+      if (item.name.length > 10) {
+        item.fontSize = 4;
+        item.textPosition = 170;
+        item.barcodeWidth = 25;
+        item.barcodeHeight = 70;
+      }
+      let result = this.replacePlaceholders(location_template, item);
+      result += "\nP1,1\n "; // Print - number of label sets, number of copies
+      labels.push(result);
     }
 
-    let result = this.replacePlaceholders(location_template, data);
-    result += "\nP1,1\n "; // Print - number of label sets, number of copies
-    return [result];
+    return labels;
   },
   labelProduct: async function (data, params) {
     const hidePrice = params.hidePrice || false;

@@ -434,7 +434,7 @@ export default defineComponent({
         name: this.formData.name,
         barcode: `#NOVIETNE-${this.formData.id}`,
       };
-      labelService.print("location", labelData);
+      labelService.print("location", [labelData]);
     },
   },
 });

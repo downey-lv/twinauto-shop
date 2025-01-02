@@ -3,6 +3,13 @@
     <div class="card-header border-0 pt-5">
       <h3 class="card-title">{{ title }}</h3>
       <div class="card-toolbar">
+        <button
+          v-if="type === 'location'"
+          class="btn btn-light-warning me-2"
+          @click="confirmAndPrint"
+        >
+          <i class="fa-solid fa-print"></i> Drukāt visas uzlīmes
+        </button>
         <button class="btn btn-light-info" @click="openModal(null)">
           <i class="fa-solid fa-plus"></i> Jauns
         </button>
@@ -123,6 +130,8 @@ import { useRoute } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import EditSettingsModal from "@/components/settings/EditSettingsModal.vue";
 import type { WatchStopHandle } from "vue";
+import { labelService } from "@/core/services/LabelService";
+import Swal from "sweetalert2/dist/sweetalert2.js";
 
 export default defineComponent({
   components: {
@@ -343,6 +352,38 @@ export default defineComponent({
     },
     treeUpdate(nodeData) {
       this.currentNode = nodeData.id;
+    },
+    async confirmAndPrint() {
+      // Extract settings that have print_label enabled
+      const locations = this.settings.filter((setting) => setting.print_label);
+      const count = locations.length;
+
+      const result = await Swal.fire({
+        title: "Vai esi pārliecināts?",
+        text: `Tiks izdrukātas ${count} uzlīmes`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Jā, drukāt",
+        cancelButtonText: "Atcelt",
+      });
+
+      if (result.isConfirmed) {
+        this.printAllLabels(locations);
+      }
+    },
+    printAllLabels(locations) {
+      const labels: any[] = [];
+
+      // Prepare fields
+      locations.forEach((l) => {
+        const labelData = {
+          name: l.name,
+          barcode: `#NOVIETNE-${l.id}`,
+        };
+        labels.push(labelData);
+      });
+
+      labelService.print("location", labels);
     },
   },
 });
