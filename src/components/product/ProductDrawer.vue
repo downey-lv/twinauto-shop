@@ -420,11 +420,8 @@
               >
             </li>
             <li class="nav-item" v-if="replacements.length > 0">
-              <a
-                class="nav-link"
-                data-bs-toggle="tab"
-                href="#tab_replacements"
-              >Saistītās preces</a
+              <a class="nav-link" data-bs-toggle="tab" href="#tab_replacements"
+                >Saistītās preces</a
               >
             </li>
           </ul>
@@ -480,24 +477,25 @@
               >
                 <label class="col-lg-4 fw-light">{{ item.label }}</label>
                 <label class="col-lg-8 fs-6 text-dark" v-if="item.value">
-                  <span
-                    v-if="item.label == `Specifikācija`"
-                    v-html="item.value"
-                  ></span>
-                  <editable-field
-                    v-if="item.field"
-                    v-model="item.value"
-                    :field="item.field"
-                    :product-id="p.productid"
-                    div-class="d-flex flex-wrap"
-                  ></editable-field>
-                  <span
-                    v-else
-                    v-for="(line, lineNumber) of item.value.split('\n')"
-                    v-bind:key="lineNumber"
-                  >
-                    {{ line }}<br />
-                  </span>
+                  <template v-if="item.label == `Specifikācija`">
+                    <span v-html="item.value"></span>
+                  </template>
+                  <template v-else>
+                    <editable-field
+                      v-if="item.field"
+                      v-model="item.value"
+                      :field="item.field"
+                      :product-id="p.productid"
+                      div-class="d-flex flex-wrap"
+                    ></editable-field>
+                    <span
+                      v-else
+                      v-for="(line, lineNumber) of item.value.split('\n')"
+                      v-bind:key="lineNumber"
+                    >
+                      {{ line }}<br />
+                    </span>
+                  </template>
                 </label>
               </div>
             </div>
