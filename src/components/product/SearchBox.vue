@@ -4,6 +4,13 @@
       <div class="row g-5 g-xl-8">
         <div class="col-md-2">
           <div class="input-group">
+            <button
+              class="btn btn-outline-secondary d-xl-none"
+              type="button"
+              @click="openScanner('id')"
+            >
+              <i class="fa-solid fa-camera"></i>
+            </button>
             <div class="form-floating">
               <Field
                 type="text"
@@ -45,6 +52,13 @@
 
         <div class="col-md-3">
           <div class="input-group">
+            <button
+              class="btn btn-outline-secondary d-xl-none"
+              type="button"
+              @click="openScanner('code')"
+            >
+              <i class="fa-solid fa-camera"></i>
+            </button>
             <div class="form-floating">
               <Field
                 type="text"
@@ -168,6 +182,12 @@
       </div>
     </div>
   </div>
+
+  <CameraScanner
+    v-model="barcodeScanned"
+    v-model:open-modal="barcodeModalState"
+    close-after-decode
+  />
 </template>
 
 <script lang="ts">
@@ -185,10 +205,12 @@ import Treeselect from "@reside-ic/vue3-treeselect";
 import "/src/assets/vue3-treeselect.css";
 import ApiService from "@/core/services/ApiService";
 import type { WatchStopHandle } from "vue";
+import CameraScanner from "@/components/stock/CameraScanner.vue";
 
 export default defineComponent({
   name: "search-box",
   components: {
+    CameraScanner,
     Field,
     Treeselect,
   },
@@ -200,6 +222,10 @@ export default defineComponent({
     const groups = ref();
     const loading = ref(false);
     const watcherHandles: WatchStopHandle[] = [];
+
+    const barcodeScanned = ref("");
+    const barcodeModalState = ref(false);
+    const barcodeType = ref("");
 
     const suggestionsActive = ref("");
     const suggestions = ref(
@@ -285,12 +311,28 @@ export default defineComponent({
       componentKey,
       suggestions,
       suggestionsActive,
+      barcodeScanned,
+      barcodeModalState,
+      barcodeType,
     };
   },
   mounted() {
     this.loadGroups();
   },
+  watch: {
+    barcodeScanned(value) {
+      if (value && this.barcodeType) {
+        this.searchData[this.barcodeType] = value;
+        this.search(this.barcodeType);
+        this.barcodeScanned = "";
+      }
+    },
+  },
   methods: {
+    openScanner(type) {
+      this.barcodeType = type;
+      this.barcodeModalState = true;
+    },
     search(field: string) {
       if (this.searchData[field]) {
         let route = {

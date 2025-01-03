@@ -102,6 +102,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    closeAfterDecode: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     const barcodeScannedAudio = new Audio(
@@ -168,7 +172,9 @@ export default defineComponent({
     onDecode(decodedText) {
       this.barcodeScannedAudio.play();
       this.$emit("update:modelValue", decodedText);
-      // this.modalClose();
+      if (this.closeAfterDecode) {
+        this.modalClose();
+      }
     },
     switchInputDevice() {
       const length = this.videoDevices?.devices?.length;
