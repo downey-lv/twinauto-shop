@@ -255,6 +255,15 @@ export default defineComponent({
         loadingLocations.value = false;
       });
 
+    const focusInput = async () => {
+      // Focus input field if not using camera scanner
+      if (!barcodeModalState.value) {
+        await nextTick();
+        const input_field = document.getElementById("barcode_input");
+        if (input_field) input_field.focus();
+      }
+    };
+
     // Load products
     const getProducts = () => {
       const scanId = route.params.scanId;
@@ -293,12 +302,8 @@ export default defineComponent({
       // Get products
       getProducts();
 
-      // Focus input field if not using camera scanner
-      if (!barcodeModalState.value) {
-        await nextTick();
-        const input_field = document.getElementById("barcode_input");
-        if (input_field) input_field.focus();
-      }
+      // Focus input field
+      await this.focusInput();
     };
 
     watch(
@@ -326,6 +331,7 @@ export default defineComponent({
       loadingLocations,
       barcodeScanned,
       barcodeModalState,
+      focusInput,
     };
   },
   watch: {
@@ -435,6 +441,9 @@ export default defineComponent({
 
           // Store product
           this.storeProduct(product);
+
+          // Focus input field
+          this.focusInput();
         })
         .catch((error) => {
           console.error(
@@ -491,10 +500,15 @@ export default defineComponent({
     },
     notifyFailed(barcode, error = "Produkts nav atrasts") {
       // Show notification
-      Swal.fire({
+      const result = Swal.fire({
         title: error,
         text: barcode,
         icon: "error",
+      });
+
+      // Focus input field after dismissed
+      result.then(() => {
+        this.focusInput();
       });
 
       // Play chime
