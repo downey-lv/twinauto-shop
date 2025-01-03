@@ -32,6 +32,7 @@
 import { defineComponent, ref } from "vue";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
+import Swal from "sweetalert2/dist/sweetalert2.js";
 
 export default defineComponent({
   name: "stock-dashboard",
@@ -58,6 +59,18 @@ export default defineComponent({
             route: {
               name: "stock-locations",
             },
+          },
+          {
+            title: "Mainīt produktu novietnes",
+            subtitle: "",
+            icon: "location-crosshairs",
+            action: "update_locations",
+          },
+          {
+            title: "Pārtraukt inventarizāciju",
+            subtitle: "",
+            icon: "hand",
+            action: "deactivate_stocktake",
           },
         ];
       } else {
@@ -98,25 +111,90 @@ export default defineComponent({
     };
   },
   methods: {
-    handleClick(item) {
+    updateLocations() {
+      this.loading = true;
+      // Update stocktake locations
+      ApiService.post(`/stocktake/update-locations`, {})
+        .then(() => {
+          push.success("Produktu novietnes veiksmīgi atjaunotas");
+        })
+        .catch((error) => {
+          console.error(`Error updating stocktake locations:`, error);
+          const message =
+            error.response?.data?.message ||
+            "Neizdevās atjaunot produktu novietnes";
+          push.error(message);
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    deactivateStocktake() {
+      this.loading = true;
+      // Deactivate active stocktake
+      ApiService.post(`/stocktake/deactivate`, {})
+        .then(() => {
+          this.setActive(null);
+        })
+        .catch((error) => {
+          console.error(`Error deactivating stocktake:`, error);
+          const message =
+            error.response?.data?.message ||
+            "Neizdevās pārtraukt inventarizāciju";
+          push.error(message);
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    newStocktake() {
+      this.loading = true;
+      // Create active stocktake
+      ApiService.post(`/stocktake/create`, {})
+        .then((response) => {
+          const activeStocktake = response.data.stocktakeId || null;
+          this.setActive(activeStocktake);
+        })
+        .catch((error) => {
+          console.error(`Error creating new stocktake:`, error);
+          const message =
+            error.response?.data?.message ||
+            "Neizdevās izveidot inventarizāciju";
+          push.error(message);
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    async handleClick(item) {
       if (item.action === "new_stocktake") {
-        this.loading = true;
-        // Create active stocktake
-        ApiService.post(`/stocktake/create`, {})
-          .then((response) => {
-            const activeStocktake = response.data.stocktakeId || null;
-            this.setActive(activeStocktake);
-          })
-          .catch((error) => {
-            console.error(`Error creating new stocktake:`, error);
-            const message =
-              error.response?.data?.message ||
-              "Neizdevās izveidot inventarizāciju";
-            push.error(message);
-          })
-          .finally(() => {
-            this.loading = false;
-          });
+        this.newStocktake();
+      } else if (item.action === "update_locations") {
+        const result = await Swal.fire({
+          title: "Vai esi pārliecināts?",
+          text: `Tiks mainītas visu saskaitīto produktu novietnes`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Jā, mainīt",
+          cancelButtonText: "Atcelt",
+        });
+
+        if (result.isConfirmed) {
+          this.updateLocations();
+        }
+      } else if (item.action === "deactivate_stocktake") {
+        const result = await Swal.fire({
+          title: "Vai esi pārliecināts?",
+          text: `Preču skaitīšana un atlikumu labošana vairs nebūs iespējama`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Jā, slēgt inventarizāciju",
+          cancelButtonText: "Atcelt",
+        });
+
+        if (result.isConfirmed) {
+          this.deactivateStocktake();
+        }
       }
     },
   },
