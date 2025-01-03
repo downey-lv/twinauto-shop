@@ -303,7 +303,7 @@ export default defineComponent({
       getProducts();
 
       // Focus input field
-      await this.focusInput();
+      await focusInput();
     };
 
     watch(
