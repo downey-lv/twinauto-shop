@@ -62,15 +62,17 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column label="" width="100" sortable>
+        <el-table-column label="" width="100" sortable class-name="text-center">
           <template #default="scope">
-            <img
-              v-if="scope.row.imageUrl"
-              :onmouseover="`showImage('${scope.row.imageUrl}')`"
-              onmouseleave="showImage()"
-              :src="scope.row.imageUrl"
-              style="max-width: 100px"
-            />
+            <div class="bg-white" style="width: 100px; height: 100px">
+              <img
+                v-if="scope.row.imageUrl"
+                :onmouseover="`showImage('${scope.row.imageUrl}')`"
+                onmouseleave="showImage()"
+                :src="scope.row.imageUrl"
+                style="max-width: 100px; max-height: 100px"
+              />
+            </div>
           </template>
         </el-table-column>
         <el-table-column property="productidstr" label="ID" sortable />
