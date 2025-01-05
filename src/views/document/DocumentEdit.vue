@@ -629,16 +629,6 @@ export default defineComponent({
       return callback();
     };
 
-    const validateComment = (rule, value, callback, product) => {
-      const productid = product.productid;
-
-      if (value === "" && parseInt(productid) === 1) {
-        callback(new Error("Jānorāda komentārs"));
-      } else {
-        callback();
-      }
-    };
-
     // Define form rules
     const documentRules = {
       ordertypeid: [
@@ -746,12 +736,6 @@ export default defineComponent({
           {
             required: true,
             message: "",
-            trigger: "change",
-          },
-        ],
-        comment: [
-          {
-            validator: productValidator(validateComment, product),
             trigger: "change",
           },
         ],

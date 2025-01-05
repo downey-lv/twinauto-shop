@@ -299,7 +299,7 @@
               <button
                 class="btn btn-icon btn-sm btn-active-primary"
                 @click="viewProduct(scope.row.index)"
-                :onmouseover="`showImage('${scope.row.data.images?.[0]}')`"
+                :onmouseover="`showImage('${scope.row.data?.images?.[0]}')`"
                 onmouseleave="showImage()"
               >
                 <i class="fa-solid fa-eye"></i>
@@ -354,7 +354,7 @@
         >
           <template #default="scope">
             <el-tooltip
-              :content="scope.row.data.priceDetails"
+              :content="scope.row.data?.priceDetails"
               placement="left"
               raw-content
             >
@@ -551,12 +551,18 @@ export default defineComponent({
           products?.forEach((product) => {
             useProductWatcher(product);
 
+            // Add index
+            product.index = products.indexOf(product);
+
+            // Skip already processed 00001 products
+            if (parseInt(product.productid) === 1 && product.data) {
+              return;
+            }
+
+            // Fetch product data
             ApiService.get("product/find", `id/${product.productid}`).then(
               (response) => {
                 product.data = response.data[0];
-
-                // Add index
-                product.index = products.indexOf(product);
 
                 // Choose buy price
                 product.documentBuyPrice = Number(

@@ -101,11 +101,10 @@ export class ProductService {
 
         return;
       } else {
-        product.comment = match.name;
         product.productid = "00001";
         product.productcode = match.code;
         product.producer = match.producer;
-        product.productname = "Neiepirkta prece";
+        product.productname = match.name;
         product.matches = [];
       }
     } else {
