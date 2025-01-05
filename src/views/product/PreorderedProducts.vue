@@ -10,6 +10,7 @@
 
   <div class="card mb-5" v-loading="loading">
     <div class="card-body">
+      <p class="text-muted">Divreiz uzklikšķini, lai labotu</p>
       <el-table
         :data="products"
         style="width: 100%"
