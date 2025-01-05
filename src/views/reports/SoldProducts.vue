@@ -23,7 +23,7 @@
               <span>{{ scope.row.productcode }}</span>
               <button
                 class="btn btn-icon btn-sm btn-active-primary"
-                @click="viewProduct(scope.row.idx)"
+                @click="viewProduct(scope.row.productid)"
                 :onmouseover="`showImage('${scope.row.data.images?.[0]}')`"
                 onmouseleave="showImage()"
               >
@@ -66,7 +66,6 @@ import {
   defineComponent,
   nextTick,
   onBeforeUnmount,
-  onMounted,
   ref,
   watch,
 } from "vue";
@@ -117,19 +116,7 @@ export default defineComponent({
         recipient: filterRecipient.value,
       })
         .then((response) => {
-          let data = response.data;
-
-          // Add index as key
-          products.value = data.map((obj, index) => ({ idx: index, ...obj }));
-
-          // Load product data
-          products.value.forEach((product) => {
-            ApiService.get("product/find", `id/${product.productid}`).then(
-              (response) => {
-                product.data = response.data[0];
-              }
-            );
-          });
+          products.value = response.data;
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
@@ -189,10 +176,12 @@ export default defineComponent({
     };
   },
   methods: {
-    viewProduct(idx) {
-      const productStore = useProductStore();
-      const data = this.products[idx].data;
-      if (data) productStore.setProduct([data]);
+    viewProduct(product_id) {
+      ApiService.get(`/product/find/id/${product_id}`).then((response) => {
+        const data = response.data[0];
+        const productStore = useProductStore();
+        if (data) productStore.setProduct([data]);
+      });
     },
     openDocument(row) {
       console.log(row);
