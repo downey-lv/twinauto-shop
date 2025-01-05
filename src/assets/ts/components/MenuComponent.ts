@@ -930,9 +930,14 @@ class MenuComponent {
 
   // Hide all dropdowns and skip one if provided
   public static hideDropdowns = (skip: HTMLElement | undefined) => {
-    const items = document.querySelectorAll<HTMLElement>(
+    const dropdowns = document.querySelectorAll<HTMLElement>(
       ".show.menu-dropdown[data-kt-menu-trigger]"
     );
+    // Added as fix for menu sub dropdown issues
+    const sub_dropdowns = document.querySelectorAll<HTMLElement>(
+      ".show.menu-sub-dropdown"
+    );
+    const items = Array.from(dropdowns).concat(Array.from(sub_dropdowns));
 
     if (items && items.length > 0) {
       for (let i = 0, len = items.length; i < len; i++) {
