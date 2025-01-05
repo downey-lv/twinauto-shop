@@ -36,9 +36,19 @@ const MainMenuConfig: Array<MenuItem> = [
     faIcon: "boxes-packing",
   },
   {
-    heading: "Pārdotais",
-    route: "/sold/",
+    sectionTitle: "Kustība",
+    route: "/report",
     faIcon: "timeline",
+    pages: [
+      {
+        heading: "Pārdotais",
+        route: "/report/sold/",
+      },
+      {
+        heading: "Pasūtītais",
+        route: "/report/ordered/",
+      },
+    ],
   },
   {
     heading: "Grozi",

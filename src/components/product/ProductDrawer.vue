@@ -243,12 +243,33 @@
                     </ul>
                   </div>
 
-                  <a
-                    href="#"
-                    @click.prevent="addtoCart()"
-                    class="btn btn-sm btn-primary me-3"
-                    >Pārdot</a
-                  >
+                  <div class="btn-group me-1">
+                    <a
+                      href="#"
+                      @click.prevent="addtoCart()"
+                      class="btn btn-sm btn-primary"
+                      >Pārdot</a
+                    >
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          @click.prevent="addPreorder()"
+                          ><i class="fa-solid fa-cart-shopping fa-fw me-2"></i>
+                          Pasūtīts</a
+                        >
+                      </li>
+                    </ul>
+                  </div>
                 </div>
                 <!--end::Actions-->
               </div>
@@ -412,6 +433,11 @@
             <li class="nav-item" v-if="p.prices && p.prices.length > 0">
               <a class="nav-link" data-bs-toggle="tab" href="#tab_prices"
                 >Cenas</a
+              >
+            </li>
+            <li class="nav-item" v-if="p.productid != `` && preorders.length > 0">
+              <a class="nav-link" data-bs-toggle="tab" href="#tab_preorders"
+                >Pasūtījumi</a
               >
             </li>
             <li class="nav-item" v-if="p.productid != ``">
@@ -595,87 +621,7 @@
                   !p.shop && !p.tecdoc && !(p.vide?.cross?.length > 0),
               }"
             >
-              <div class="row mb-3 fw-bold">
-                <label class="col-lg-2">Piegādātājs</label>
-                <label class="col-lg-4">Kods</label>
-                <label class="col-lg-3"
-                  >Piegāde
-                  <i
-                    class="fa-solid fa-circle-info text-info ms-1"
-                    title="<span class='text-success'>Piegāde šodien</span><br/><span class='text-warning'>Piegāde rīt</span>"
-                    v-tooltip-html
-                  ></i
-                ></label>
-                <label class="col-lg-1">Atl.</label>
-                <label class="col-lg-2">Cena</label>
-              </div>
-              <div
-                class="row mb-3"
-                v-for="(item, index) in suppliers"
-                :key="index"
-              >
-                <label class="col-lg-2">{{ item.supplier_name }}</label>
-                <label class="col-lg-4">
-                  {{ item.code_supplier }}
-                  <a
-                    :href="item.search_url"
-                    target="_blank"
-                    v-if="item.search_url"
-                  >
-                    <KTIcon icon-name="magnifier" icon-class="fs-5 text-info" />
-                  </a>
-                  <Copy
-                    :value="item.code_supplier"
-                    font-size="6"
-                    trim-spaces
-                    button-class="ms-1"
-                  />
-                </label>
-                <label
-                  class="col-lg-3"
-                  :class="
-                    item.delivery_days === 0
-                      ? `text-success`
-                      : item.delivery_days === 1
-                      ? `text-warning`
-                      : ``
-                  "
-                  :title="item.delivery_warehouse"
-                  v-tooltip
-                >
-                  {{ item.delivery_info ?? "" }}
-                </label>
-                <label
-                  class="col-lg-1"
-                  :class="item.supplier_rest == 0 ? `text-danger` : ``"
-                  ><template v-if="item.rest_overflow">> </template
-                  >{{ item.supplier_rest }}</label
-                >
-                <label
-                  class="col-lg-2"
-                  :title="item.volume_pricing_string || item.order_date || ''"
-                  v-tooltip-html
-                >
-                  {{ item.supplier_price }} €
-                  <i
-                    v-if="item.volume_pricing_string"
-                    class="fa-solid fa-badge-percent text-warning"
-                  ></i>
-                  <span
-                    v-if="item.deposit_price > 0"
-                    :title="item.deposit_details"
-                    v-tooltip
-                  >
-                    <br /><i
-                      class="fa-solid fa-money-bill-transfer text-info"
-                    ></i>
-                    {{ item.deposit_price }} €
-                  </span>
-                  <span v-if="item.min_order"
-                    ><br />Min. {{ item.min_order }} gab.</span
-                  >
-                </label>
-              </div>
+              <ProductSuppliers :suppliers="suppliers" />
             </div>
             <div class="tab-pane fade p-3" id="tab_prices" role="tabpanel">
               <div
@@ -721,14 +667,36 @@
                 </label>
               </div>
             </div>
+            <div class="tab-pane fade" id="tab_preorders" role="tabpanel">
+              <DataTable
+                id="preorders"
+                :columns="dt.preorders.columns"
+                :data="preorders"
+                :options="dtOptions"
+                @select="openPreorder"
+                @deselect="openPreorder"
+                class="table table-hover table-row-bordered table-sm gy-5 align-middle fs-8"
+              >
+                <thead>
+                  <tr class="fw-bolder text-dark p-4">
+                    <th
+                      v-for="(header, index) in dt.preorders.headers"
+                      :key="index"
+                    >
+                      {{ header }}
+                    </th>
+                  </tr>
+                </thead>
+              </DataTable>
+            </div>
             <div class="tab-pane fade" id="tab_history" role="tabpanel">
               <DataTable
                 id="history"
                 :columns="dt.history.columns"
                 :data="historyData"
                 :options="dtOptions"
-                @select="onSelect"
-                @deselect="onSelect"
+                @select="openDocument"
+                @deselect="openDocument"
                 class="table table-hover table-row-bordered table-sm gy-5 align-middle fs-8"
               >
                 <thead>
@@ -766,6 +734,13 @@
   />
   <LinkageModal v-if="p?.tecdoc" ref="linkageModalRef" :data="p.tecdoc" />
   <CartAddModal v-if="p?.productid" ref="cartAddModalRef" :product="p" />
+  <PreorderModal
+    ref="preorderModalRef"
+    :product="p"
+    :product-suppliers="suppliers"
+    :preorder="selectedPreorder"
+    @refresh="loadPreorders(p?.productid)"
+  />
 </template>
 
 <style scoped>
@@ -817,9 +792,14 @@ import LinkageModal from "@/components/product/ProductLinkages.vue";
 import CartAddModal from "@/components/cart/CartAddModal.vue";
 import { getOption, getOptionLabel } from "@/core/services/OptionService";
 import EditableField from "./EditableField.vue";
+import type { PreorderedProduct } from "@/types/PreorderedProducts";
+import PreorderModal from "@/components/product/PreorderModal.vue";
+import ProductSuppliers from "@/components/product/ProductSuppliers.vue";
 
 export default defineComponent({
   components: {
+    ProductSuppliers,
+    PreorderModal,
     LogModal,
     Notice,
     Copy,
@@ -839,6 +819,8 @@ export default defineComponent({
     const suppliers = ref<Supplier[]>();
     const historyData = ref();
     const replacements = ref<PartListEntry[]>([]);
+    const preorders = ref<PreorderedProduct[]>([]);
+    const selectedPreorder = ref<PreorderedProduct | null>(null);
 
     const updateValues = (p) => {
       // Force to render tabs again
@@ -889,6 +871,7 @@ export default defineComponent({
           p.shop.productgroupid = String(p.shop.productgroupid);
 
         loadHistoryData(p.productid);
+        loadPreorders(p.productid);
       }
 
       stats.value = newStats;
@@ -1017,6 +1000,25 @@ export default defineComponent({
         });
     }
 
+    // Load preorders
+    function loadPreorders(id) {
+      if (!id) return;
+
+      loading.value = true;
+      ApiService.get("preorder", "", {
+        product_id: id,
+      })
+        .then((response) => {
+          preorders.value = response.data;
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+    }
+
     // Define datatable
     let dtOptions = getDtOptions();
     dtOptions["select"] = true;
@@ -1035,6 +1037,16 @@ export default defineComponent({
         orderid: "",
         directionOrder: "",
       },
+      preorders: {
+        supplier_name: "Piegādātājs",
+        customer_name: "Klients",
+        quantity: "Daudzums",
+        price: "Cena",
+        comment: "Komentārs",
+        user_name: "Lietotājs",
+        created_date: "Pievienots",
+        preorder_id: "",
+      },
     };
 
     const columnOptions = {
@@ -1047,6 +1059,19 @@ export default defineComponent({
           visible: false,
         },
         directionOrder: {
+          visible: false,
+        },
+      },
+      preorders: {
+        quantity: {
+          render: function (data, type, row) {
+            const icon = row.delivered
+              ? "fa-circle-check text-success"
+              : "fa-hourglass-start text-warning";
+            return `${data} <i class="fa-duotone fa-solid ms-2 ${icon}"></i>`;
+          },
+        },
+        preorder_id: {
           visible: false,
         },
       },
@@ -1070,6 +1095,9 @@ export default defineComponent({
       dt,
       historyData,
       replacements,
+      preorders,
+      selectedPreorder,
+      loadPreorders,
     };
   },
   computed: {
@@ -1113,7 +1141,7 @@ export default defineComponent({
         this.toggleButtonState(el, false);
       }
     },
-    onSelect(e, dt, type, indexes) {
+    openDocument(e, dt, type, indexes) {
       const rowData = handleSelect(dt, indexes);
       const { grouping, orderid, return_id } = rowData[0];
       if (!orderid || !grouping) return;
@@ -1164,6 +1192,16 @@ export default defineComponent({
     addtoCart() {
       // return false;
       (this.$refs.cartAddModalRef as any).show();
+    },
+    openPreorder(e, dt, type, indexes) {
+      const rowData = handleSelect(dt, indexes);
+      this.addPreorder(rowData[0]);
+    },
+    addPreorder(preorder_data = null) {
+      this.selectedPreorder = preorder_data;
+      this.$nextTick(() => {
+        (this.$refs.preorderModalRef as any).show();
+      });
     },
     updateFormattedValue(newFormattedValue, item, key = "value") {
       item[key] = newFormattedValue;

@@ -77,11 +77,20 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/sold/:type?",
+        path: "/report/sold/:type?",
         name: "report-sold-products",
         component: () => import("@/views/reports/SoldProducts.vue"),
         meta: {
-          pageTitle: "Labot preci",
+          pageTitle: "Pārdotā prece",
+          breadcrumbs: [],
+        },
+      },
+      {
+        path: "/report/ordered/",
+        name: "report-ordered-products",
+        component: () => import("@/views/product/PreorderedProducts.vue"),
+        meta: {
+          pageTitle: "Pasūtītā prece",
           breadcrumbs: [],
         },
       },

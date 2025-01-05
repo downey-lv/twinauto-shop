@@ -3,6 +3,15 @@
     <div class="card-body ps-9 p-5">
       <div class="row">
         <div class="col-lg-8 row">
+          <div class="col-lg-3 mb-2 mg-lg-0" v-if="showTextFilter">
+            <el-input
+              class="me-2 w-100"
+              v-model="filterText"
+              placeholder="Meklēt"
+              size="large"
+              @keyup="updateParent"
+            />
+          </div>
           <div class="col-lg-3 mb-2 mg-lg-0" v-if="showDateFilter">
             <el-date-picker
               class="me-2 w-100"
@@ -96,6 +105,33 @@
               @change="updateParent"
             />
           </div>
+          <div class="col-lg-3 mb-2 mg-lg-0" v-if="showClientFilter">
+            <SelectComponentVirtualized
+              v-loading="loadingClients"
+              class="me-2"
+              element-class="mb-0"
+              placeholder="Klients"
+              :options="clients"
+              v-model="filterClient"
+              size="large"
+              @change="updateParent"
+              clearable
+            />
+          </div>
+          <template v-if="showOrderedProductFilter">
+            <div class="col-lg-3 mb-2 mg-lg-0 d-flex align-items-center">
+              <el-form-item label="Piegādāts" style="margin-bottom: 0">
+                <el-radio-group
+                  v-model="filterDelivered"
+                  @change="updateParent"
+                >
+                  <el-radio-button label="Visi" value="" />
+                  <el-radio-button label="Jā" :value="true" />
+                  <el-radio-button label="Nē" :value="false" />
+                </el-radio-group>
+              </el-form-item>
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -105,14 +141,16 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
+import SelectComponentVirtualized from "@/components/core/form/SelectComponentVirtualized.vue";
 import ApiService from "@/core/services/ApiService";
 import { useAuthStore } from "@/stores/auth";
 import { getOption } from "@/core/services/OptionService";
 import { DateTime } from "luxon";
+import type { Company } from "@/types/Document";
 
 export default defineComponent({
   name: "document-header",
-  components: { SelectComponent },
+  components: { SelectComponent, SelectComponentVirtualized },
   emits: ["updateFilters"],
   props: {
     showUserFilter: {
@@ -136,6 +174,18 @@ export default defineComponent({
       default: true,
     },
     showRangeFilter: {
+      type: Boolean,
+      default: false,
+    },
+    showClientFilter: {
+      type: Boolean,
+      default: false,
+    },
+    showOrderedProductFilter: {
+      type: Boolean,
+      default: false,
+    },
+    showTextFilter: {
       type: Boolean,
       default: false,
     },
@@ -185,6 +235,18 @@ export default defineComponent({
         data["issued"] = filterIssued.value;
         if (filterPaid.value === null) delete data["paid"];
         if (filterIssued.value === null) delete data["issued"];
+      }
+
+      if (props.showClientFilter) {
+        data["client"] = filterClient.value;
+      }
+
+      if (props.showOrderedProductFilter) {
+        data["delivered"] = filterDelivered.value;
+      }
+
+      if (props.showTextFilter) {
+        data["text"] = filterText.value;
       }
 
       emit("updateFilters", data);
@@ -295,6 +357,30 @@ export default defineComponent({
     const filterPaid = ref(null);
     const filterIssued = ref(null);
 
+    // Client selection
+    const loadingClients = ref(false);
+    const filterClient = ref("");
+    const clients = ref<Company[]>([]);
+    const fetchClients = async () => {
+      loadingClients.value = true;
+      await ApiService.get("company/")
+        .then((response) => {
+          clients.value = response.data;
+        })
+        .catch((error) => {
+          console.error(`Error fetching clients`, error);
+        })
+        .finally(() => {
+          loadingClients.value = false;
+        });
+    };
+
+    // Ordered selection
+    const filterDelivered = ref(null);
+
+    // Free text search
+    const filterText = ref("");
+
     // Default values
     const setDefaults = () => {
       const authStore = useAuthStore();
@@ -311,11 +397,15 @@ export default defineComponent({
       filterPaid.value = null;
       filterIssued.value = null;
       filterRange.value = "";
+      filterClient.value = "";
+      filterDelivered.value = null;
+      filterText.value = "";
     };
 
     onMounted(async () => {
       await fetchUsers();
       await fetchRecipients();
+      await fetchClients();
       setDefaults();
       updateParent();
     });
@@ -328,14 +418,19 @@ export default defineComponent({
       filterPaid,
       filterIssued,
       filterRange,
+      filterClient,
+      filterDelivered,
+      filterText,
       disabledDate,
       shortcuts,
       rangeShortcuts,
       users,
+      clients,
       paymentRecipients,
       paymentTypes,
       loadingUsers,
       loadingRecipients,
+      loadingClients,
       updateParent,
     };
   },

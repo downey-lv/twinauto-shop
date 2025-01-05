@@ -323,7 +323,29 @@
           label="Daudzums"
           sortable
           width="130"
-        />
+        >
+          <template #default="scope">
+            {{ scope.row.quantity }}
+            <template
+              v-if="
+                $route.params.type !== `in` && scope.row.preorderStatus !== null
+              "
+            >
+              <i
+                v-if="scope.row.preorderStatus"
+                class="fa-duotone fa-solid fa-fw fa-circle-check text-success"
+                title="Piegādāts"
+                v-tooltip
+              ></i>
+              <i
+                v-else
+                class="fa-duotone fa-solid fa-fw fa-hourglass-start text-warning"
+                title="Pasūtīts"
+                v-tooltip
+              ></i>
+            </template>
+          </template>
+        </el-table-column>
         <el-table-column
           property="priceVAT"
           label="Cena ar PVN"
@@ -498,6 +520,15 @@ export default defineComponent({
       calculateTotalVAT(totalPriceVAT.value, totalPrice.value)
     );
 
+    // Tooltips for table
+    const initializeTooltips = () => {
+      nextTick(() => {
+        document.querySelectorAll(".tooltip-item").forEach((el) => {
+          new Tooltip(el, { html: true });
+        });
+      });
+    };
+
     // Document load
     const fetchDocument = async () => {
       loading.value = true;
@@ -549,6 +580,7 @@ export default defineComponent({
           push.error("Neizdevās ielādēt dokumentu");
         })
         .finally(() => {
+          initializeTooltips();
           loading.value = false;
         });
     };
