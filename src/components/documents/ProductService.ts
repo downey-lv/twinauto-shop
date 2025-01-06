@@ -25,17 +25,17 @@ export class ProductService {
     this.route = route;
     this.router = router;
     this.returnDocument = returnDocument;
-    this.cancelToken = null;
+    this.cancelToken = {};
   }
 
   searchProduct(type, idx, extendedHistory = false, enableCancel = false) {
     // Cancel the previous request if it exists
-    if (enableCancel && this.cancelToken) {
-      this.cancelToken.cancel("Canceled due to new request");
+    if (enableCancel && this.cancelToken[idx]) {
+      this.cancelToken[idx].cancel("Canceled due to new request");
     }
 
     // Create a new cancel token for this request
-    this.cancelToken = axios.CancelToken.source();
+    this.cancelToken[idx] = axios.CancelToken.source();
 
     const product = this.document.value.products[idx];
     if (!product) return;
@@ -59,7 +59,7 @@ export class ProductService {
 
     this.stateRefs.loadingProduct.value[idx] = true;
     ApiService.get("product/find", `${type}/${query}`, queryParams, {
-      cancelToken: this.cancelToken.token,
+      cancelToken: this.cancelToken[idx].token,
     })
       .then((response) => {
         const overwriteData = this.activeIdx === idx;

@@ -1213,7 +1213,7 @@ export default defineComponent({
       totalPriceVAT,
       totalVAT,
       ...stateRefs,
-      debouncedSearch: null as any,
+      debouncedSearch: {} as any,
       rules,
       tourSteps,
       tourOptions,
@@ -1249,13 +1249,13 @@ export default defineComponent({
   },
   methods: {
     debounceSearch(type, idx) {
-      if (!this.debouncedSearch) {
-        this.debouncedSearch = debounce(
+      if (!this.debouncedSearch[idx]) {
+        this.debouncedSearch[idx] = debounce(
           this.searchProduct,
           Number(getOption("search_speed"))
         );
       }
-      this.debouncedSearch(type, idx);
+      this.debouncedSearch[idx](type, idx);
     },
     setPrice(idx, price) {
       this.document.products[idx].priceVAT = price;
