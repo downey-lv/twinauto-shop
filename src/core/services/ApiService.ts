@@ -3,6 +3,7 @@ import type { AxiosResponse } from "axios";
 import axios from "axios";
 import VueAxios from "vue-axios";
 import JwtService from "@/core/services/JwtService";
+import { push } from "@/main";
 
 /**
  * @description service to call HTTP request via Axios
@@ -127,6 +128,23 @@ class ApiService {
     params: any = {}
   ): Promise<AxiosResponse> {
     return ApiService.vueInstance.axios.delete(resource, { data: params });
+  }
+
+  public static pdf(resource, slug = "", queryParams = {}) {
+    ApiService.get(resource, slug, queryParams, { responseType: "blob" })
+      .then((response) => {
+        // Create PDF
+        const file = new Blob([response.data], { type: "application/pdf" });
+        // Create URL
+        const fileURL = URL.createObjectURL(file);
+        // Open URL
+        window.open(fileURL);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        push.error("Neizdevās izdrukāt");
+      })
+      .finally(() => {});
   }
 }
 

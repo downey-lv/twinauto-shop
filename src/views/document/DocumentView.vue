@@ -636,25 +636,10 @@ export default defineComponent({
       return index + 1;
     },
     async printDocument() {
-      await ApiService.get(
+      await ApiService.pdf(
         "document/print",
-        String(this.$route.params.documentId),
-        {},
-        { responseType: "blob" }
-      )
-        .then((response) => {
-          // Create PDF
-          const file = new Blob([response.data], { type: "application/pdf" });
-          // Create URL
-          const fileURL = URL.createObjectURL(file);
-          // Open URL
-          window.open(fileURL);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-          push.error("Neizdevās izdrukāt");
-        })
-        .finally(() => {});
+        String(this.$route.params.documentId)
+      );
     },
     lockDocument(isLocked: boolean) {
       removeTooltip();

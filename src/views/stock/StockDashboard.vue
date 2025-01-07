@@ -53,6 +53,12 @@ export default defineComponent({
             },
           },
           {
+            title: "Drukāt lapu",
+            subtitle: "",
+            icon: "file-lines",
+            action: "print_stocktake",
+          },
+          {
             title: "Saskaitītās novietnes",
             subtitle: "",
             icon: "shelves",
@@ -166,6 +172,9 @@ export default defineComponent({
           this.loading = false;
         });
     },
+    async printStocktake() {
+      await ApiService.pdf("stocktake/print");
+    },
     async handleClick(item) {
       if (item.action === "new_stocktake") {
         this.newStocktake();
@@ -195,6 +204,8 @@ export default defineComponent({
         if (result.isConfirmed) {
           this.deactivateStocktake();
         }
+      } else if (item.action === "print_stocktake") {
+        await this.printStocktake();
       }
     },
   },
