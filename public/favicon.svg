@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.dev/svgjs" width="500" height="500"><svg version="1.1" id="SvgjsSvg1015" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#1E1E2D;}
+	.st1{fill:#AB1E22;}
+</style>
+<path class="st0" d="M430,500H70c-38.5,0-70-31.5-70-70V70C0,31.5,31.5,0,70,0h360c38.5,0,70,31.5,70,70v360
+	C500,468.5,468.5,500,430,500z"></path>
+<g>
+	<path class="st1" d="M111.6,257.7c4.4,4.5,34.1,32.2,59,61.7c37.3,44.1,53.4,85.3,53.4,85.3h36.7c0,0,17.8-47.9,86.9-147
+		c69-99.1,140.9-135.3,143.7-141.4c2.8-6.1-48.4,14.6-114.1,70.7c-45.7,39-129.7,159.8-129.7,159.8s-28.6-30.6-55.5-52
+		c-34.7-27.6-63.6-40.4-72-42.1C111.6,251,107.2,253.2,111.6,257.7L111.6,257.7z"></path>
+	<path class="st1" d="M10.4,247.4c4.8,4.8,36.4,34.4,63.1,66c39.9,47.2,57.2,91.3,57.2,91.3h52.1c0,0,20.3-52.5,90.2-150.3
+		c62.2-87,139.2-143.7,143.6-158.3c2.1-6.9-75.9,35.3-137,104.8c-67.1,76.4-124,161.5-124,161.5s-35.3-47.7-64.1-70.6
+		c-37.1-29.5-63.4-47.9-72.3-49.7C10.4,240.2,5.7,242.6,10.4,247.4L10.4,247.4z"></path>
+</g>
+</svg><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
+@media (prefers-color-scheme: dark) { :root { filter: none; } }
+</style></svg>
