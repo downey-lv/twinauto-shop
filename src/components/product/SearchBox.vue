@@ -4,13 +4,6 @@
       <div class="row g-5 g-xl-8">
         <div class="col-md-2">
           <div class="input-group">
-            <button
-              class="btn btn-outline-secondary d-xl-none"
-              type="button"
-              @click="openScanner('id')"
-            >
-              <i class="fa-solid fa-camera"></i>
-            </button>
             <div class="form-floating">
               <Field
                 type="text"
@@ -55,9 +48,9 @@
             <button
               class="btn btn-outline-secondary d-xl-none"
               type="button"
-              @click="openScanner('code')"
+              @click="openScanner()"
             >
-              <i class="fa-solid fa-camera"></i>
+              <i class="fa-solid fa-barcode-scan"></i>
             </button>
             <div class="form-floating">
               <Field
@@ -98,7 +91,7 @@
           </div>
         </div>
 
-        <div class="col-md-1 d-flex align-items-center justify-content-center">
+        <div class="col-md-1 d-none d-xl-flex align-items-center justify-content-center">
           <div
             class="form-check form-switch form-check-custom form-check-solid"
           >
@@ -108,7 +101,9 @@
               v-model="searchData.oe"
               @change="search('code')"
             />
-            <label class="form-check-label"> OE analogi </label>
+            <label class="form-check-label">
+              OE analogi
+            </label>
           </div>
         </div>
 
@@ -133,7 +128,9 @@
 
                   <!-- Dropdown with suggestions -->
                   <ul
-                    v-if="suggestions.text?.length && suggestionsActive == 'text'"
+                    v-if="
+                      suggestions.text?.length && suggestionsActive == 'text'
+                    "
                     class="suggestions-list"
                   >
                     <li
@@ -225,7 +222,6 @@ export default defineComponent({
 
     const barcodeScanned = ref("");
     const barcodeModalState = ref(false);
-    const barcodeType = ref("");
 
     const suggestionsActive = ref("");
     const suggestions = ref(
@@ -313,7 +309,6 @@ export default defineComponent({
       suggestionsActive,
       barcodeScanned,
       barcodeModalState,
-      barcodeType,
     };
   },
   mounted() {
@@ -321,16 +316,20 @@ export default defineComponent({
   },
   watch: {
     barcodeScanned(value) {
-      if (value && this.barcodeType) {
-        this.searchData[this.barcodeType] = value;
-        this.search(this.barcodeType);
+      if (value) {
+        let barcodeType = "code";
+        if (value.length <= 5) {
+          barcodeType = "id";
+        }
+
+        this.searchData[barcodeType] = value;
+        this.search(barcodeType);
         this.barcodeScanned = "";
       }
     },
   },
   methods: {
-    openScanner(type) {
-      this.barcodeType = type;
+    openScanner() {
       this.barcodeModalState = true;
     },
     search(field: string) {
