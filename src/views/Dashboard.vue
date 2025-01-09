@@ -16,8 +16,9 @@
     </div>
     <div class="col-xl-8">
       <ActiveIssues v-if="issuesAllowed" />
+      <ActiveRepairs v-if="repairsAllowed && isServicePreferred" />
       <OnlineOrders v-if="ordersAllowed" />
-      <ActiveRepairs v-if="repairsAllowed" />
+      <ActiveRepairs v-if="repairsAllowed && !isServicePreferred" />
     </div>
   </div>
 </template>
@@ -32,6 +33,7 @@ import { useAuthStore } from "@/stores/auth";
 import { push } from "@/main";
 import ActiveRepairs from "@/components/data/ActiveRepairs.vue";
 import ActiveIssues from "@/components/product/ActiveIssues.vue";
+import { getOption } from "@/core/services/OptionService";
 
 export default defineComponent({
   name: "dashboard-main",
@@ -50,11 +52,14 @@ export default defineComponent({
     const repairsAllowed = auth.user?.permissions?.includes("active_repairs");
     const issuesAllowed = auth.user?.permissions?.includes("product_issues");
 
+    const isServicePreferred = getOption("default_document_type") == "service";
+
     return {
       revenueAllowed,
       ordersAllowed,
       repairsAllowed,
       issuesAllowed,
+      isServicePreferred,
     };
   },
 });

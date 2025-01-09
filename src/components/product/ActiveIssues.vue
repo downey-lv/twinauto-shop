@@ -1,6 +1,6 @@
 <template>
   <!--begin::List Widget 4-->
-  <div class="card mb-5">
+  <div class="card mb-5" v-if="data && data.length > 0">
     <!--begin::Header-->
     <div class="card-header border-0 pt-5">
       <h3 class="card-title align-items-start flex-column">
