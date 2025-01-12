@@ -1125,6 +1125,10 @@ export default defineComponent({
             // Add cart id to document
             document.value.cartId = response.data.cart_id;
 
+            // Set companyid
+            if (response.data.recipient_id)
+              document.value.companyid = String(response.data.recipient_id);
+
             // Notify user
             push.info(`Pievienots grozs: ${response.data.title}`);
           })

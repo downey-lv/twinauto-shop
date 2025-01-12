@@ -38,7 +38,7 @@
           <!--begin::Modal body-->
           <div class="modal-body py-10 px-lg-10">
             <div class="mb-5">
-              <CartView :cart-id="cartId" />
+              <CartView :cart-id="cartId" @update-recipient="updateRecipient" />
             </div>
             <el-form-item>
               <el-radio-group v-model="formData.existingDocument">
@@ -100,15 +100,20 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    recipientId: {
+      type: String,
+      required: false,
+    },
   },
-  setup() {
+  setup(props) {
     const formRef = ref<null | HTMLFormElement>(null);
     const cartSellModalRef = ref();
     const loading = ref<boolean>(false);
+    const selectedRecipient = ref<string | null>(null);
 
     const blankForm = {
       existingDocument: false,
-      companyId: null,
+      companyId: null as string | null,
       documentId: null,
     };
     const formData = ref({ ...blankForm });
@@ -125,6 +130,7 @@ export default defineComponent({
         initModal();
       }
       formData.value = { ...blankForm };
+      formData.value.companyId = selectedRecipient.value;
       loadCompanies();
       modal.show();
     };
@@ -182,8 +188,27 @@ export default defineComponent({
       }
     );
 
+    function updateRecipient(recipientId) {
+      let value = null;
+      if (recipientId) {
+        value = recipientId.toString();
+      }
+
+      selectedRecipient.value = value;
+      formData.value.companyId = value;
+    }
+
+    const rWatcher = watch(
+      () => props.recipientId,
+      (newVal) => {
+        updateRecipient(newVal);
+      },
+      { immediate: true }
+    );
+
     onBeforeUnmount(() => {
       cWatcher();
+      rWatcher();
     });
 
     const rules = ref({
@@ -214,6 +239,8 @@ export default defineComponent({
       cartSellModalRef,
       show,
       hide,
+      selectedRecipient,
+      updateRecipient,
     };
   },
 

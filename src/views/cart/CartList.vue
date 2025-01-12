@@ -20,13 +20,13 @@
             <el-button
               type="info"
               size="small"
-              @click="viewCart(scope.row.cart_id)"
+              @click="viewCart(scope.row.cart_id, scope.row.recipient_id)"
               >Atvērt</el-button
             >
             <el-button
               type="success"
               size="small"
-              @click="sellCart(scope.row.cart_id)"
+              @click="sellCart(scope.row.cart_id, scope.row.recipient_id)"
               >Pārdot</el-button
             >
             <el-popconfirm
@@ -50,9 +50,13 @@
     ref="cartViewModalRef"
     :cart-id="cartId"
     @delete="removeCart(cartId)"
-    @sell="sellCart(cartId)"
+    @sell="sellCart(cartId, recipientId)"
   />
-  <CartSellModal ref="cartSellModalRef" :cart-id="cartId" />
+  <CartSellModal
+    ref="cartSellModalRef"
+    :cart-id="cartId"
+    :recipient-id="recipientId"
+  />
 </template>
 
 <script lang="ts">
@@ -74,6 +78,7 @@ export default defineComponent({
   setup() {
     const loading = ref<boolean>(false);
     const cartId = ref<number>(0);
+    const recipientId = ref<string>("");
     const carts = ref<Cart[]>([]);
     const cartUsers = ref<any>([]);
     function loadCarts() {
@@ -103,6 +108,7 @@ export default defineComponent({
       loadCarts,
       cartUsers,
       cartId,
+      recipientId,
     };
   },
   async mounted() {
@@ -119,12 +125,14 @@ export default defineComponent({
           push.error("Neizdevās izdzēst");
         });
     },
-    viewCart(cartId) {
+    viewCart(cartId, recipientId) {
       this.cartId = cartId;
+      this.recipientId = recipientId;
       (this.$refs.cartViewModalRef as any).show();
     },
-    sellCart(cartId) {
+    sellCart(cartId, recipientId) {
       this.cartId = cartId;
+      this.recipientId = recipientId;
       (this.$refs.cartSellModalRef as any).show();
     },
     filterUsers(value: string, row) {

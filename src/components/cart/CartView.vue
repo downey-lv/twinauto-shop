@@ -52,7 +52,8 @@ export default defineComponent({
       default: false,
     },
   },
-  setup(props) {
+  emits: ["update-recipient"],
+  setup(props, { emit }) {
     const formRef = ref<null | HTMLFormElement>(null);
     const cartViewModalRef = ref();
     const loading = ref<boolean>(false);
@@ -77,6 +78,9 @@ export default defineComponent({
       ApiService.get(`cart/${props.cartId}`)
         .then((response) => {
           cartData.value = response.data;
+
+          // Emit cart recipient
+          emit("update-recipient", response.data.recipient_id);
 
           // Calculate total
           const total = cartData.value.products?.reduce(
