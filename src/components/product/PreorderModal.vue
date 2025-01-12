@@ -209,6 +209,9 @@ export default defineComponent({
       comment: "",
       user_name: "",
       created_date: "",
+      code: "",
+      producer: "",
+      tecdocId: 0,
     };
     const formData = ref({ ...blankForm });
 
@@ -244,7 +247,7 @@ export default defineComponent({
         const p = props.preorder;
         formData.value = {
           preorder_id: p.preorder_id,
-          product_id: p.product_id,
+          product_id: p.productid,
           supplier_id: p.supplier_id ? String(p.supplier_id) : null,
           customer_id: p.customer_id ? String(p.customer_id) : null,
           quantity: Number(p.quantity),
@@ -257,6 +260,9 @@ export default defineComponent({
       } else if (props.product) {
         formData.value.product_id = Number(props.product.productid);
         formData.value.price = Number(props.product.priceSell);
+        formData.value.code = props.product.codeAlphanum;
+        formData.value.tecdocId = props.product.tecdocId;
+        formData.value.producer = props.product.producer;
         activeCollapse.value = ["1"];
       }
     }

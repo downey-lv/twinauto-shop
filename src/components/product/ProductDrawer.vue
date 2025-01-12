@@ -39,7 +39,7 @@
       <!--end::Header-->
 
       <!--begin::Body-->
-      <div class="card-body" id="product_drawer__body" v-loading="loading">
+      <div class="card-body" id="product_drawer__body" v-loading="loading.length > 0">
         <!--begin::Content-->
         <div
           id="product_drawer__scroll"
@@ -271,6 +271,14 @@
                     </ul>
                   </div>
                 </div>
+                <div class="d-flex my-4" v-else>
+                  <a
+                    href="#"
+                    @click.prevent="addPreorder()"
+                    class="btn btn-sm btn-primary"
+                  >Pasūtīts</a
+                  >
+                </div>
                 <!--end::Actions-->
               </div>
               <!--end::Title-->
@@ -435,7 +443,7 @@
                 >Cenas</a
               >
             </li>
-            <li class="nav-item" v-if="p.productid != `` && preorders.length > 0">
+            <li class="nav-item" v-if="preorders.length > 0">
               <a class="nav-link" data-bs-toggle="tab" href="#tab_preorders"
                 >Pasūtījumi</a
               >
@@ -689,8 +697,9 @@
                 </thead>
               </DataTable>
             </div>
-            <div class="tab-pane fade" id="tab_history" role="tabpanel">
+            <div class="tab-pane fade" id="tab_history" role="tabpanel" v-if="p.productid != ''">
               <DataTable
+                v-if="historyData"
                 id="history"
                 :columns="dt.history.columns"
                 :data="historyData"
@@ -813,7 +822,7 @@ export default defineComponent({
     const productStore = useProductStore();
     const p = ref<Product | null>(productStore.productData);
     const tabsKey = ref(0);
-    const loading = ref(false);
+    const loading = ref<any[]>([]);
     const stats = ref();
     const title = ref();
     const suppliers = ref<Supplier[]>();
@@ -872,6 +881,8 @@ export default defineComponent({
 
         loadHistoryData(p.productid);
         loadPreorders(p.productid);
+      } else {
+        loadPreorders(null, p.codeAlphanum, p.tecdocId);
       }
 
       stats.value = newStats;
@@ -932,12 +943,12 @@ export default defineComponent({
           console.error("Error fetching data:", error);
         })
         .finally(() => {
-          // loading.value = false;
+          // loading.value.pop();
         });
     }
 
     function reloadProduct(data) {
-      loading.value = true;
+      loading.value.push(1);
       ApiService.get(`tecdoc/article`, `${data.tecdocId}/${data.codeAlphanum}`)
         .then((response) => {
           const d = response.data[0];
@@ -955,12 +966,12 @@ export default defineComponent({
           console.error("Error fetching data:", error);
         })
         .finally(() => {
-          loading.value = false;
+          loading.value.pop();
         });
     }
 
     function loadSupplierData(suppliersData, code) {
-      loading.value = true;
+      loading.value.push(1);
       ApiService.get(`api/suppliers`, code)
         .then((response) => {
           const api_suppliers = response.data;
@@ -972,7 +983,7 @@ export default defineComponent({
           console.error("Error fetching data:", error);
         })
         .finally(() => {
-          loading.value = false;
+          loading.value.pop();
         });
     }
 
@@ -987,7 +998,7 @@ export default defineComponent({
 
     // Load history data
     function loadHistoryData(id) {
-      loading.value = true;
+      loading.value.push(1);
       ApiService.get(`product`, `history/${id}`)
         .then((response) => {
           historyData.value = response.data;
@@ -996,17 +1007,17 @@ export default defineComponent({
           console.error("Error fetching data:", error);
         })
         .finally(() => {
-          loading.value = false;
+          loading.value.pop();
         });
     }
 
     // Load preorders
-    function loadPreorders(id) {
-      if (!id) return;
-
-      loading.value = true;
+    function loadPreorders(id, code_alphanum = null, tecdocId = null) {
+      loading.value.push(1);
       ApiService.get("preorder", "", {
         product_id: id,
+        code: code_alphanum,
+        tecdoc_id: tecdocId,
       })
         .then((response) => {
           preorders.value = response.data;
@@ -1015,7 +1026,7 @@ export default defineComponent({
           console.error("Error fetching data:", error);
         })
         .finally(() => {
-          loading.value = false;
+          loading.value.pop();
         });
     }
 

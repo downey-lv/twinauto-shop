@@ -1,6 +1,6 @@
 export interface PreorderedProduct {
   preorder_id: number;
-  product_id: number;
+  productid: number;
   quantity: number;
   price: number;
   supplier_id?: number;
@@ -28,4 +28,7 @@ export interface newPreorderedProduct {
   comment: string;
   user_name?: string;
   created_date?: string;
+  code?: string;
+  producer?: string;
+  tecdocId?: number;
 }

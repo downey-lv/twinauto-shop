@@ -14,7 +14,7 @@
       <button
         class="btn btn-sm btn-info mb-2"
         @click="openCartModal"
-        :disabled="checkedPreorders.length === 0"
+        :disabled="!enableCartButton"
       >
         Uz grozu
       </button>
@@ -33,7 +33,7 @@
               <span>{{ scope.row.productcode }}</span>
               <button
                 class="btn btn-icon btn-sm btn-active-primary"
-                @click="viewProduct(scope.row.product_id)"
+                @click="viewProduct(scope.row.productid, scope.row.product_data)"
               >
                 <i class="fa-solid fa-eye"></i>
               </button>
@@ -106,6 +106,7 @@ export default defineComponent({
   },
   setup() {
     const checkedPreorders = ref<PreorderedProduct[]>([]);
+    const enableCartButton = ref(false);
 
     // Modal
     const selectedPreorder = ref<PreorderedProduct | null>(null);
@@ -178,15 +179,21 @@ export default defineComponent({
       products,
       selectedPreorder,
       checkedPreorders,
+      enableCartButton,
     };
   },
   methods: {
-    viewProduct(product_id) {
-      ApiService.get(`/product/find/id/${product_id}`).then((response) => {
-        const data = response.data[0];
-        const productStore = useProductStore();
-        if (data) productStore.setProduct([data]);
-      });
+    viewProduct(product_id, product_data) {
+      const productStore = useProductStore();
+
+      if (product_id) {
+        ApiService.get(`/product/find/id/${product_id}`).then((response) => {
+          const data = response.data[0];
+          if (data) productStore.setProduct([data]);
+        });
+      } else {
+        if (product_data) productStore.setProduct([product_data]);
+      }
     },
     openPreorderModal(preorder: PreorderedProduct) {
       this.selectedPreorder = preorder;
@@ -196,6 +203,21 @@ export default defineComponent({
     },
     handleSelectionChange(val) {
       this.checkedPreorders = val;
+
+      // Check if cart button should be enabled
+      let enable_cart = false;
+      if (val.length > 0) {
+        enable_cart = true;
+
+        // Check if all products have product_id
+        val.forEach((item) => {
+          if (!item.productid) {
+            enable_cart = false;
+            return;
+          }
+        });
+      }
+      this.enableCartButton = enable_cart;
     },
     openCartModal() {
       this.$nextTick(() => {
