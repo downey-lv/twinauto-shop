@@ -130,12 +130,20 @@
             </el-form-item>
 
             <el-form-item>
-              <el-button
+              <el-popconfirm
                 v-if="formData.preorder_id"
-                type="danger"
-                @click="deletePreorder()"
-                >Dzēst</el-button
+                confirm-button-text="Dzēst"
+                cancel-button-text="Atcelt"
+                confirm-button-type="danger"
+                :title="`Izdzēst pasūtījumu?`"
+                :width="300"
+                @confirm="deletePreorder()"
               >
+                <template #reference>
+                  <el-button type="danger">Dzēst</el-button>
+                </template>
+              </el-popconfirm>
+
               <el-button type="primary" @click="submit()">
                 <span v-if="formData.preorder_id">Saglabāt</span>
                 <span v-else>Pievienot</span>
@@ -166,7 +174,6 @@ import type {
 import SelectComponentVirtualized from "@/components/core/form/SelectComponentVirtualized.vue";
 import type { Company } from "@/types/Document";
 import ProductSuppliers from "@/components/product/ProductSuppliers.vue";
-import Swal from "sweetalert2";
 
 export default defineComponent({
   name: "preorder-modal",
@@ -322,31 +329,20 @@ export default defineComponent({
         }
       });
     },
-    async deletePreorder() {
-      const result = await Swal.fire({
-        title: "Vai esi pārliecināts?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "var(--el-color-danger)",
-        confirmButtonText: "Dzēst",
-        cancelButtonText: "Atcelt",
-      });
-
-      if (result.isConfirmed) {
-        this.loading = true;
-        ApiService.delete(`preorder/${this.formData.preorder_id}`)
-          .then(() => {
-            push.success("Dzēsts");
-            this.$emit("refresh");
-            this.hide();
-          })
-          .catch(() => {
-            push.error("Neizdevās dzēst");
-          })
-          .finally(() => {
-            this.loading = false;
-          });
-      }
+    deletePreorder() {
+      this.loading = true;
+      ApiService.delete(`preorder/${this.formData.preorder_id}`)
+        .then(() => {
+          push.success("Dzēsts");
+          this.$emit("refresh");
+          this.hide();
+        })
+        .catch(() => {
+          push.error("Neizdevās dzēst");
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
     setPrice(price) {
       this.formData.price = Number(price);
