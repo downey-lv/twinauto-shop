@@ -173,6 +173,7 @@ export default defineComponent({
       type: "",
       recipient: "",
       orderid: "",
+      giftcard: "",
     };
     const formData = ref({ ...blankForm });
 
@@ -414,7 +415,7 @@ export default defineComponent({
             this.formData.amount = data.amount;
 
             // Validate input
-            this.formRef.validateField("giftcard");
+            if (this.formRef) this.formRef.validateField("giftcard");
           }
         })
         .catch(() => {
