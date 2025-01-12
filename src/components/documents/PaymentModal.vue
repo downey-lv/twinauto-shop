@@ -99,6 +99,20 @@
                     class="w-75"
                   />
                 </el-form-item>
+                <template v-if="formData.type == '7'">
+                  <el-form-item prop="giftcard" label="Kods">
+                    <el-input
+                      v-model="formData.giftcard"
+                      class="w-75"
+                      @keyup="validateGiftcard"
+                    />
+                    <div
+                      v-if="giftCardStatus"
+                      class="fs-7 fw-semibold text-muted w-75"
+                      v-html="giftCardStatus"
+                    ></div>
+                  </el-form-item>
+                </template>
                 <el-form-item prop="amount" label="Darba vieta">
                   <SelectComponent
                     :options="paymentRecipients"
@@ -151,6 +165,8 @@ export default defineComponent({
     const loading = ref<boolean>(false);
     const paymentTypes = ref<any>([]);
     const paymentRecipients = ref<any>([]);
+    const giftCardStatus = ref<string>("");
+    const giftCardValid = ref<boolean>(false);
 
     const blankForm = {
       amount: "",
@@ -196,6 +212,8 @@ export default defineComponent({
     function loadData() {
       formData.value = { ...blankForm };
       formData.value.recipient = getOption("default_payment_recipient");
+      giftCardStatus.value = "";
+      giftCardValid.value = false;
 
       // Load payments
       ApiService.get("payment", props.pData.orderid)
@@ -283,10 +301,26 @@ export default defineComponent({
       }
     };
 
+    const giftCardValidator = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(""));
+      } else {
+        if (!giftCardValid.value)
+          callback(new Error(""));
+        else callback();
+      }
+    };
+
     const rules = ref({
       type: [
         {
           validator: typeValidator,
+          trigger: "change",
+        },
+      ],
+      giftcard: [
+        {
+          validator: giftCardValidator,
           trigger: "change",
         },
       ],
@@ -312,6 +346,8 @@ export default defineComponent({
       paymentTypes,
       paymentRecipients,
       allowEdit,
+      giftCardStatus,
+      giftCardValid,
     };
   },
 
@@ -352,6 +388,37 @@ export default defineComponent({
         })
         .catch(() => {
           push.error("Neizdevās dzēst");
+        });
+    },
+    validateGiftcard() {
+      const code = this.formData.giftcard;
+
+      if (!code) {
+        this.giftCardStatus = "";
+        return;
+      }
+
+      ApiService.get("payment/giftcard", code)
+        .then((response) => {
+          const data = response.data;
+
+          // Set message
+          const message_class = data.valid ? "text-success" : "text-danger";
+          this.giftCardStatus = `<span class="${message_class}">${data.message}</span>`;
+
+          // Set valid
+          this.giftCardValid = data.valid;
+
+          if (data.valid) {
+            // Set amount
+            this.formData.amount = data.amount;
+
+            // Validate input
+            this.formRef.validateField("giftcard");
+          }
+        })
+        .catch(() => {
+          push.error("Neizdevās pārbaudīt kodu");
         });
     },
   },
