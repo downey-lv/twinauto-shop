@@ -10,13 +10,22 @@
 
   <div class="card mb-5" v-loading="loading">
     <div class="card-body">
-      <p class="text-muted">Divreiz uzklikšķini, lai labotu</p>
+      <p class="text-muted">Divreiz uzklikšķini uz rindas, lai labotu</p>
+      <button
+        class="btn btn-sm btn-info mb-2"
+        @click="openCartModal"
+        :disabled="checkedPreorders.length === 0"
+      >
+        Uz grozu
+      </button>
       <el-table
         :data="products"
         style="width: 100%"
         :default-sort="{ prop: 'preorder_id', order: 'descending' }"
         @row-dblclick="openPreorderModal"
+        @selection-change="handleSelectionChange"
       >
+        <el-table-column type="selection" width="55" />
         <el-table-column property="productidstr" label="ID" width="80" />
         <el-table-column property="productcode" label="Kods">
           <template #default="scope">
@@ -34,7 +43,9 @@
         <el-table-column property="producer" label="Ražotājs" />
         <el-table-column property="productname" label="Nosaukums" width="350">
           <template #default="scope">
-            <span v-html="scope.row.productname.replace(/\n/g, '<br/>')"></span>
+            <span
+              v-html="(scope.row.productname ?? '').replace(/\n/g, '<br/>')"
+            ></span>
           </template>
         </el-table-column>
         <el-table-column property="quantity" label="Daudz." width="80" />
@@ -69,6 +80,11 @@
     :preorder="selectedPreorder"
     @refresh="loadProducts()"
   />
+  <CartPreorderModal
+    ref="cardPreorderModalRef"
+    :products="checkedPreorders"
+    @refresh="loadProducts()"
+  ></CartPreorderModal>
 </template>
 
 <script lang="ts">
@@ -80,13 +96,17 @@ import { push } from "@/main";
 import { Tooltip } from "bootstrap";
 import type { PreorderedProduct } from "@/types/PreorderedProducts";
 import PreorderModal from "@/components/product/PreorderModal.vue";
+import CartPreorderModal from "@/components/cart/CartPreorderModal.vue";
 
 export default defineComponent({
   components: {
+    CartPreorderModal,
     PreorderModal,
     DailyFilter,
   },
   setup() {
+    const checkedPreorders = ref<PreorderedProduct[]>([]);
+
     // Modal
     const selectedPreorder = ref<PreorderedProduct | null>(null);
 
@@ -157,6 +177,7 @@ export default defineComponent({
       loading,
       products,
       selectedPreorder,
+      checkedPreorders,
     };
   },
   methods: {
@@ -168,10 +189,17 @@ export default defineComponent({
       });
     },
     openPreorderModal(preorder: PreorderedProduct) {
-      console.log("openPreorderModal", preorder);
       this.selectedPreorder = preorder;
       this.$nextTick(() => {
         (this.$refs.preorderModalRef as any).show();
+      });
+    },
+    handleSelectionChange(val) {
+      this.checkedPreorders = val;
+    },
+    openCartModal() {
+      this.$nextTick(() => {
+        (this.$refs.cardPreorderModalRef as any).show();
       });
     },
   },

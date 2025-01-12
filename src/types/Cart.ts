@@ -1,3 +1,5 @@
+import type { PreorderedProduct } from "@/types/PreorderedProducts";
+
 export interface newCartItem {
   selectedCart: string;
   amount: number | null;
@@ -20,4 +22,9 @@ export interface CartDocument {
   orderdate: string;
   comment: string;
   grouping: string;
+}
+
+export interface preorderCart {
+  selectedCart: string;
+  preorders: PreorderedProduct[];
 }
