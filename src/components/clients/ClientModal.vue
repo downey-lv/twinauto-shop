@@ -131,6 +131,7 @@
                     label-width="200px"
                   >
                     <el-input-number
+                      :disabled="!creditAllowed"
                       v-model="formData.credit"
                       :controls="false"
                     />
@@ -161,6 +162,7 @@ import { push } from "@/main";
 import { Modal } from "bootstrap";
 import type { FormInstance } from "element-plus";
 import type { Client } from "@/types/Client";
+import { useAuthStore } from "@/stores/auth";
 
 export default defineComponent({
   name: "payment-modal",
@@ -310,6 +312,10 @@ export default defineComponent({
       vatComment.value = "<span class='text-warning'>Nav pārbaudīts</span>";
     }
 
+    // Set permissions
+    const auth = useAuthStore();
+    const creditAllowed = auth.user?.permissions?.includes("credit");
+
     return {
       rules,
       formRef,
@@ -322,6 +328,7 @@ export default defineComponent({
       countries,
       vatComment,
       invalidateVAT,
+      creditAllowed,
     };
   },
 
