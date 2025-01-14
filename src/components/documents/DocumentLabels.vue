@@ -127,14 +127,14 @@ export default defineComponent({
       products.value = cloneDeep(props.pData) as DocumentProduct[];
 
       // Check if rest is lower than quantity
-      products.value.forEach((product) => {
-        if (
-          product.data &&
-          Number(product.data.rest ?? 0) < Number(product.quantity)
-        ) {
-          product.quantity = Math.max(Number(product.data.rest), 0);
-        }
-      });
+      // products.value.forEach((product) => {
+      //   if (
+      //     product.data &&
+      //     Number(product.data.rest ?? 0) < Number(product.quantity)
+      //   ) {
+      //     product.quantity = Math.max(Number(product.data.rest), 0);
+      //   }
+      // });
     };
 
     return {
