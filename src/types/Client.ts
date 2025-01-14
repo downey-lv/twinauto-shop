@@ -14,7 +14,22 @@ export interface Client {
   vat_excluded: boolean;
   is_supplier: boolean;
   credit?: number | null;
-  balance?: number;
   comment: string;
   email: string;
+  status?: ClientStatus;
+}
+
+interface ClientDebts {
+  label: string;
+  days: number;
+  amount: number;
+}
+
+export interface ClientStatus {
+  balance?: number;
+  blocked_reasons: string[];
+  blocked: boolean;
+  credit_left: number;
+  credit_used: number;
+  debts: ClientDebts[];
 }

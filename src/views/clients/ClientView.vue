@@ -106,19 +106,60 @@
     <div class="col-lg-2 pb-5">
       <div class="card h-100">
         <div class="card-body" v-loading="loading">
-          <div class="row" v-if="client.balance">
-            <div class="col-5 fw-bold">Parāds</div>
-            <div class="col">{{ client.balance }} €</div>
-          </div>
-          <div class="row" v-if="client.credit">
-            <div class="col-5 fw-bold">Kredītlimits</div>
-            <div
-              class="col"
-              :class="(client.balance ?? 0) > client.credit ? `text-danger` : ``"
-            >
-              {{ client.credit }} €
+          <div class="row" v-if="client.status">
+            <div class="col-5 fw-bold">Statuss</div>
+            <div class="col">
+              <ClientStatusTag
+                v-if="client.status"
+                :blocked-reasons="client.status.blocked_reasons"
+                :credit-left="client.status.credit_left"
+                :blocked="client.status.blocked"
+              />
             </div>
           </div>
+
+          <div class="row fs-2" v-if="client.status?.balance && client.credit">
+            <div class="col-5 fw-bold">Parāds</div>
+            <div
+              class="col"
+              :class="
+                (client.status.balance ?? 0) > client.credit
+                  ? `text-danger`
+                  : ``
+              "
+            >
+              {{ client.status.balance }} €
+            </div>
+          </div>
+
+          <div class="row" v-if="client.credit">
+            <div class="col-5 fw-bold">Kredītlimits</div>
+            <div class="col">{{ client.credit }} €</div>
+          </div>
+
+          <template
+            v-if="client.status?.debts && client.status.debts.length > 0"
+          >
+            <div class="separator separator-dashed my-6"></div>
+            <template v-for="(debt, index) in client.status.debts" :key="index">
+              <div class="row">
+                <div class="col-5 fw-bold">{{ debt.label }}</div>
+                <div class="col">
+                  <span
+                    :class="
+                      debt.days > 30
+                        ? `text-danger`
+                        : debt.days > 14
+                        ? `text-warning`
+                        : ``
+                    "
+                    >{{ debt.amount.toFixed(2) }} €</span
+                  >
+                  ({{ debt.days }} dienas)
+                </div>
+              </div>
+            </template>
+          </template>
         </div>
       </div>
     </div>
@@ -139,9 +180,10 @@ import DocumentTable from "@/components/documents/DocumentTable.vue";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
 import ClientModal from "@/components/clients/ClientModal.vue";
+import ClientStatusTag from "@/components/clients/ClientStatusTag.vue";
 
 export default defineComponent({
-  components: { DocumentTable, ClientModal },
+  components: { ClientStatusTag, DocumentTable, ClientModal },
   setup: function () {
     const loading = ref<boolean>(false);
 
@@ -166,7 +208,6 @@ export default defineComponent({
       vat_excluded: false,
       is_supplier: false,
       credit: null,
-      balance: 0,
     };
     const client = ref({ ...blankClient });
 

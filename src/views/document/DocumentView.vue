@@ -197,6 +197,7 @@
             <div class="col">
               {{ documentData.companyname }}
               <router-link
+                class="ms-2"
                 v-if="documentData.companyid"
                 :to="{
                   name: 'client-view',
@@ -207,8 +208,18 @@
               >
                 <i class="fa-solid fa-eye"></i>
               </router-link>
+              <span class="ms-2">
+                <ClientStatusTag
+                  v-if="client_status"
+                  :blocked-reasons="client_status.blocked_reasons"
+                  :credit-left="client_status.credit_left"
+                  :blocked="client_status.blocked"
+                  :document-type="$route.params.type"
+                />
+              </span>
             </div>
           </div>
+
           <div class="row">
             <div class="col-5 fw-bold">Dokumenta numurs</div>
             <div class="col">{{ documentData.waybillno }}</div>
@@ -437,6 +448,8 @@ import ImageHover from "@/components/product/ImageHover.vue";
 import { Tooltip } from "bootstrap";
 import LogModal from "@/components/data/LogModal.vue";
 import { useViewHistoryStore } from "@/stores/viewHistory";
+import ClientStatusTag from "@/components/clients/ClientStatusTag.vue";
+import type { ClientStatus } from "@/types/Client";
 
 const breadcrumbStore = useBreadcrumbStore();
 
@@ -446,7 +459,13 @@ export default defineComponent({
       return DateTime;
     },
   },
-  components: { LogModal, ImageHover, PaymentModal, DocumentLabelsModal },
+  components: {
+    ClientStatusTag,
+    LogModal,
+    ImageHover,
+    PaymentModal,
+    DocumentLabelsModal,
+  },
   setup() {
     const loading = ref<boolean>(false);
     const route = useRoute();
@@ -466,6 +485,8 @@ export default defineComponent({
       deletedItems: [],
     };
     const documentData = ref({ ...blankDocument });
+
+    const client_status = ref<null | ClientStatus>(null);
 
     // Define price calculators
     const vatDecimal = computed(() =>
@@ -580,6 +601,11 @@ export default defineComponent({
               }
             );
           });
+
+          // Load client data
+          ApiService.get("company", data.companyid).then((response) => {
+            client_status.value = response.data[0].status;
+          });
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
@@ -614,6 +640,7 @@ export default defineComponent({
       totalVAT,
       fetchDocument,
       lastBreadcrumb,
+      client_status,
     };
   },
   async mounted() {

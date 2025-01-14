@@ -88,11 +88,23 @@
                   <SelectComponentVirtualized
                     :options="companies"
                     v-model="document.companyid"
-                    @change="updatePayterm()"
+                    @change="companyChanged()"
                     prop="companyid"
                   >
+                    <template #empty>
+                      <div>
+                        Nav rezultātu<br />
+                        <a href="#" @click.prevent="newClient">Jauns klients</a>
+                      </div>
+                    </template>
                     <template #comment>
-                      <a href="#" @click.prevent="newClient()">Jauns</a>
+                      <ClientStatusTag
+                        v-if="client_status"
+                        :blocked-reasons="client_status.blocked_reasons"
+                        :credit-left="client_status.credit_left"
+                        :blocked="client_status.blocked"
+                        :document-type="$route.params.type"
+                      />
                     </template>
                   </SelectComponentVirtualized>
                 </div>
@@ -149,10 +161,7 @@
                     </el-radio-group>
                   </el-form-item>
                 </div>
-                <div
-                  class="fv-row"
-                  v-if="$route.params.type === 'in'"
-                >
+                <div class="fv-row" v-if="$route.params.type === 'in'">
                   <label class="fs-6">Piegādes izdevumi, bez PVN</label>
                   <el-form-item>
                     <el-input-number
@@ -163,7 +172,8 @@
                       class="w-100"
                     />
                     <div class="fs-7 fw-semibold text-muted">
-                      Pievieno tikai tad, kad ir ievadīta visa pavadzīme. Pēc saglabāšanas pārbaudi kopsummu
+                      Pievieno tikai tad, kad ir ievadīta visa pavadzīme. Pēc
+                      saglabāšanas pārbaudi kopsummu
                     </div>
                   </el-form-item>
                 </div>
@@ -522,9 +532,12 @@ import { DateTime } from "luxon";
 import { getOption } from "@/core/services/OptionService";
 import ClientModal from "@/components/clients/ClientModal.vue";
 import { useDocumentStore } from "@/stores/activeDocuments";
+import ClientStatusTag from "@/components/clients/ClientStatusTag.vue";
+import type { ClientStatus } from "@/types/Client";
 
 export default defineComponent({
   components: {
+    ClientStatusTag,
     ClientModal,
     DocumentHeader,
     SelectComponentVirtualized,
@@ -835,6 +848,7 @@ export default defineComponent({
         setRules();
         setDailyDocument();
         preSelectType();
+        // checkClient();
       },
       { immediate: true }
     );
@@ -1089,6 +1103,9 @@ export default defineComponent({
               icon: "warning",
             });
           }
+
+          // Check client
+          checkClient();
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
@@ -1153,6 +1170,27 @@ export default defineComponent({
       { deep: true }
     );
     watcherHandles.push(iWatcher);
+
+    const companyChanged = () => {
+      updatePayterm();
+      checkClient();
+    };
+
+    // Check client
+    const client_status = ref<null | ClientStatus>(null);
+    const checkClient = () => {
+      const company_id = document.value.companyid;
+      client_status.value = null;
+      if (company_id) {
+        ApiService.get("company", company_id)
+          .then((response) => {
+            client_status.value = response.data[0].status;
+          })
+          .catch(() => {
+            push.error("Neizdevās ielādēt klienta statusu");
+          });
+      }
+    };
 
     // Update payterm
     const updatePayterm = (termValue = null as any) => {
@@ -1237,6 +1275,8 @@ export default defineComponent({
       dailyDocument,
       newDocument,
       timestampNew,
+      companyChanged,
+      client_status,
     };
   },
   async mounted() {

@@ -14,8 +14,13 @@
       :allow-create="allowCreate"
       :options="formattedOptions"
     >
-      <template #default="{ item }">
-        {{ item.label }}&lrm;
+      <template #default="{ item }"> {{ item.label }}&lrm; </template>
+
+      <template #empty>
+        <slot name="empty">
+          <!-- Default No-Match Message -->
+          <div style="color: gray">Nav rezultātu</div>
+        </slot>
       </template>
     </el-select-v2>
     <div class="fs-7 fw-semibold text-muted">
@@ -97,6 +102,10 @@ export default defineComponent({
     grouped: {
       type: Boolean,
       default: false,
+    },
+    noMatchText: {
+      type: String,
+      default: "Nav rezultātu",
     },
   },
   emits: ["update:modelValue", "change"],
