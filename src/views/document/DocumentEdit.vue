@@ -643,6 +643,8 @@ export default defineComponent({
           validator: (rule, value, callback) => {
             if (value === "") {
               callback(new Error(""));
+            } else if (route.params.type !== "daily" && value === "6570") {
+              callback(new Error("Izvēlies klientu"));
             } else {
               callback();
             }
