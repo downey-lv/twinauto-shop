@@ -9,6 +9,7 @@ export interface PreorderedProduct {
   user_id: number;
   created_date: string;
   delivered: boolean;
+  delivered_date: string;
   productidstr: string;
   productcode: string;
   producer: string;

@@ -33,7 +33,9 @@
               <span>{{ scope.row.productcode }}</span>
               <button
                 class="btn btn-icon btn-sm btn-active-primary"
-                @click="viewProduct(scope.row.productid, scope.row.product_data)"
+                @click="
+                  viewProduct(scope.row.productid, scope.row.product_data)
+                "
               >
                 <i class="fa-solid fa-eye"></i>
               </button>
@@ -69,6 +71,18 @@
               title="Gaida"
               v-tooltip
             ></i>
+          </template>
+        </el-table-column>
+        <el-table-column
+          property="delivered_date"
+          label="Piegādāts"
+          width="130"
+          sortable
+        >
+          <template #default="scope">
+            <span :class="{ 'text-danger': scope.row.warning }">{{
+              scope.row.delivered_date
+            }}</span>
           </template>
         </el-table-column>
       </el-table>
