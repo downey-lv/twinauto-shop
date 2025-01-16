@@ -161,7 +161,11 @@
   </div>
 
   <ImageHover />
-  <DocumentLabelsModal ref="modalLabels" :pData="selectedProducts" />
+  <DocumentLabelsModal
+    ref="modalLabels"
+    :pData="selectedProducts"
+    stock-based
+  />
 </template>
 
 <script lang="ts">

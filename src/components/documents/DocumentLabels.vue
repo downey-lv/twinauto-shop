@@ -90,6 +90,10 @@ export default defineComponent({
       type: Object,
       required: true,
     },
+    stockBased: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props) {
     const formRef = ref<null | HTMLFormElement>(null);
@@ -126,15 +130,12 @@ export default defineComponent({
     const loadData = () => {
       products.value = cloneDeep(props.pData) as DocumentProduct[];
 
-      // Check if rest is lower than quantity
-      // products.value.forEach((product) => {
-      //   if (
-      //     product.data &&
-      //     Number(product.data.rest ?? 0) < Number(product.quantity)
-      //   ) {
-      //     product.quantity = Math.max(Number(product.data.rest), 0);
-      //   }
-      // });
+      // Delete products with 0 rest
+      if (props.stockBased) {
+        products.value = products.value.filter((product) => {
+          return Number(product.data?.rest ?? 0) > 0;
+        });
+      }
     };
 
     return {
