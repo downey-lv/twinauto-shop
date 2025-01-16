@@ -1,12 +1,12 @@
 <template>
   <div
-    class="modal fade"
+    class="modal modal-xl fade"
     id="document_labels"
     ref="documentLabelsModalRef"
     tabindex="-1"
     aria-hidden="true"
   >
-    <div class="modal-dialog modal-dialog-centered mw-650px">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h2 class="fw-bold">Drukāt uzlīmes</h2>
@@ -23,19 +23,23 @@
 
         <div class="modal-body py-10 px-lg-17">
           <div class="row border-bottom mb-2 pb-1 fw-bold">
-            <div class="col">Kods</div>
-            <div class="col">Ražotājs</div>
-            <div class="col">Skaits</div>
+            <div class="col-2">Kods</div>
+            <div class="col-2">Ražotājs</div>
+            <div class="col">Nosaukums</div>
+            <div class="col-2">Skaits</div>
           </div>
           <template v-for="(product, idx) in products" :key="idx">
             <div class="row mb-1 justify-content-center align-items-center">
-              <div class="col align-self-center">
+              <div class="col-2 align-self-center">
                 {{ product.productcode }}
               </div>
-              <div class="col align-self-center">
+              <div class="col-2 align-self-center">
                 <span style="height: 32px">{{ product.producer }}</span>
               </div>
-              <div class="col">
+              <div class="col align-self-center">
+                {{ product.productname }}
+              </div>
+              <div class="col-2">
                 <el-input-number v-model="product.quantity" :min="0" />
               </div>
             </div>
@@ -130,10 +134,16 @@ export default defineComponent({
     const loadData = () => {
       products.value = cloneDeep(props.pData) as DocumentProduct[];
 
-      // Delete products with 0 rest
+      // Stock based processing
       if (props.stockBased) {
+        // Delete products with 0 rest
         products.value = products.value.filter((product) => {
           return Number(product.data?.rest ?? 0) > 0;
+        });
+
+        // Sort by producer
+        products.value.sort((a, b) => {
+          return a.producer.localeCompare(b.producer);
         });
       }
     };
