@@ -39,7 +39,7 @@
           drag
           :show-file-list="false"
           :http-request="uploadFile()"
-          :accept="companies[selectedCompany].csv ? '.csv' : '.xml'"
+          :accept="companies[selectedCompany].fileType"
         >
           <el-icon class="el-icon--upload"><upload-filled /></el-icon>
           <div class="el-upload__text">
