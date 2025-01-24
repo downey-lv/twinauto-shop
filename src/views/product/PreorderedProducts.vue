@@ -57,10 +57,22 @@
         <el-table-column property="comment" label="Komentārs" />
         <el-table-column property="created_date" label="Pievienots" />
         <el-table-column property="user_name" label="Lietotājs" width="130" />
-        <el-table-column property="delivered" label="" width="50">
+        <el-table-column
+          property="delivered"
+          label=""
+          width="50"
+          sortable
+          :sort-by="iconSorting"
+        >
           <template #default="scope">
             <i
-              v-if="scope.row.delivered"
+              v-if="scope.row.probably_sold"
+              class="fa-duotone fa-solid fa-fw fa-cash-register text-danger"
+              title="Iespējams jau pārdots"
+              v-tooltip
+            ></i>
+            <i
+              v-else-if="scope.row.delivered"
               class="fa-duotone fa-solid fa-fw fa-circle-check text-success"
               title="Piegādāts"
               v-tooltip
@@ -237,6 +249,9 @@ export default defineComponent({
       this.$nextTick(() => {
         (this.$refs.cardPreorderModalRef as any).show();
       });
+    },
+    iconSorting(row) {
+      return row.probably_sold ? 2 : row.delivered ? 1 : 0;
     },
   },
 });

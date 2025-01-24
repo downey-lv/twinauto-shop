@@ -17,6 +17,7 @@ export interface PreorderedProduct {
   supplier_name?: string;
   customer_name?: string;
   user_name: string;
+  probably_sold: Boolean;
 }
 
 export interface newPreorderedProduct {
