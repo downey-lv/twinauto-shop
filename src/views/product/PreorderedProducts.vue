@@ -21,7 +21,7 @@
       <el-table
         :data="products"
         style="width: 100%"
-        :default-sort="{ prop: 'preorder_id', order: 'descending' }"
+        :default-sort="{ prop: 'created_date', order: 'descending' }"
         @row-dblclick="openPreorderModal"
         @selection-change="handleSelectionChange"
       >
@@ -55,7 +55,7 @@
         <el-table-column property="supplier_name" label="Piegādātājs" />
         <el-table-column property="customer_name" label="Saņēmējs" />
         <el-table-column property="comment" label="Komentārs" />
-        <el-table-column property="created_date" label="Pievienots" />
+        <el-table-column property="created_date" label="Pievienots" sortable />
         <el-table-column property="user_name" label="Lietotājs" width="130" />
         <el-table-column
           property="delivered"
