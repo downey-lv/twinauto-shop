@@ -342,7 +342,7 @@ export default defineComponent({
         product.priceSell = product.saleprice;
 
         // Add name for labels
-        const name = product.productname.split("\r\n");
+        const name = product.productname.split("\n");
         product.productTitle = name[0];
         product.productSubtitle = name[1] ?? "";
 
