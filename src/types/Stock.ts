@@ -5,4 +5,5 @@ export interface StockEntry {
   productname: string;
   productcode: string;
   producer: string;
+  saleprice?: number;
 }

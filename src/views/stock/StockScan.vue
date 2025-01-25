@@ -78,6 +78,20 @@
   </div>
 
   <div class="card mb-5" v-if="current_location" v-loading="loadingProducts">
+    <div class="card-header border-0 pt-5">
+      <h3 class="card-title">Produkti</h3>
+      <div class="card-toolbar">
+        <button
+          type="button"
+          class="btn btn-sm btn-light btn-icon"
+          title="Drukāt uzlīmes"
+          v-tooltip
+          @click="printLabels"
+        >
+          <i class="fa-solid fa-note-sticky"></i>
+        </button>
+      </div>
+    </div>
     <div class="card-body p-2">
       <el-table :data="products" style="width: 100%">
         <el-table-column type="expand">
@@ -191,6 +205,7 @@
     v-model="barcodeScanned"
     v-model:open-modal="barcodeModalState"
   />
+  <DocumentLabelsModal ref="modalLabels" :pData="productsLabel" />
 </template>
 
 <script lang="ts">
@@ -205,19 +220,28 @@ import { useRoute } from "vue-router";
 import Notice from "@/components/core/Notice.vue";
 import EditEntryModal from "@/components/stock/EditEntryModal.vue";
 import CameraScanner from "@/components/stock/CameraScanner.vue";
+import DocumentLabelsModal from "@/components/documents/DocumentLabels.vue";
+import type { StockEntry } from "@/types/Stock";
 export default defineComponent({
   computed: {
     DateTime() {
       return DateTime;
     },
   },
-  components: { EditEntryModal, Notice, Field, CameraScanner },
+  components: {
+    DocumentLabelsModal,
+    EditEntryModal,
+    Notice,
+    Field,
+    CameraScanner,
+  },
   setup() {
     const route = useRoute();
 
     const loadingProducts = ref(false);
     const loadingLocations = ref(false);
-    const products = ref([]);
+    const products = ref<StockEntry[]>([]);
+    const productsLabel = ref<any[]>([]);
     const current_barcode = ref("");
     const current_location = ref("");
     const current_location_selected = ref("");
@@ -324,6 +348,7 @@ export default defineComponent({
       locations,
       locations_select,
       products,
+      productsLabel,
       getProducts,
       location_change,
       editId,
@@ -526,6 +551,28 @@ export default defineComponent({
     },
     onDecode(result) {
       console.log(result);
+    },
+    printLabels() {
+      // Format data for labels
+      this.productsLabel = [...this.products] as any[];
+      this.productsLabel.forEach((product) => {
+        // Add price
+        product.priceSell = product.saleprice;
+
+        // Add name for labels
+        const name = product.productname.split("\n");
+        product.productTitle = name[0];
+        product.productSubtitle = name[1] ?? "";
+
+        // Add everything to data
+        product.data = product;
+        product.data.shop = product;
+      });
+
+      this.$nextTick(() => {
+        // Show modal
+        (this.$refs.modalLabels as any).show();
+      });
     },
   },
 });
