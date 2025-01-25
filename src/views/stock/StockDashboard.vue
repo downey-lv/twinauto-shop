@@ -14,11 +14,11 @@
             :class="`fa-${item.icon}`"
           ></i>
 
-          <div class="fw-bold fs-2 mb-2 mt-5 text-inverse-primary">
+          <div class="fw-bold fs-2 mb-2 mt-5">
             {{ item.title }}
           </div>
 
-          <div class="fw-semobold fs-7 text-inverse-primary">
+          <div class="fw-semobold fs-7">
             {{ item.subtitle }}
           </div>
         </div>
