@@ -32,6 +32,8 @@ export interface DocumentProduct {
   buy_price?: number;
   documentBuyPrice?: number;
   index?: number;
+  productTitle?: string;
+  productSubtitle?: string;
 }
 
 export interface Document {

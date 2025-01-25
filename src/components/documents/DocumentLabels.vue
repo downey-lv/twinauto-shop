@@ -37,7 +37,8 @@
                 <span style="height: 32px">{{ product.producer }}</span>
               </div>
               <div class="col align-self-center">
-                {{ product.productname }}
+                {{ product.productTitle }}<br />
+                {{ product.productSubtitle }}
               </div>
               <div class="col-2">
                 <el-input-number v-model="product.quantity" :min="0" />
