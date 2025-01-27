@@ -78,6 +78,39 @@
               </div>
             </div>
           </div>
+          <div
+            class="col-lg-4"
+            v-if="document.internal === 'false' && document.return_type !== '1'"
+            v-loading="loadingVIN"
+          >
+            <div class="fv-row">
+              <el-form-item :error="vinError">
+                <label class="fs-6">Automašīna</label>
+                <el-input
+                  v-model="selectedVIN"
+                  @keyup.enter.prevent="findVIN()"
+                  placeholder="VIN vai reģistrācijas numurs"
+                  enterkeyhint="search"
+                  ref="VIN"
+                ></el-input>
+              </el-form-item>
+            </div>
+            <template v-if="document.vehicle_information && Object.keys(document.vehicle_information).length > 0">
+              <template
+                v-for="(value, key) in document.vehicle_information"
+                :key="key"
+              >
+                <div class="row">
+                  <div class="col">{{ key }}</div>
+                  <div class="col">{{ value }}</div>
+                </div>
+              </template>
+              <div class="row">
+                <div class="col"></div>
+                <div class="col text-danger" @click="clearVehicle">Nodzēst auto</div>
+              </div>
+            </template>
+          </div>
         </div>
       </div>
     </div>
@@ -328,12 +361,19 @@ export default defineComponent({
     SelectComponent,
     Notice,
   },
+  data() {
+    return {
+      vinError: "",
+    };
+  },
   setup() {
     const loading = ref<boolean>(false);
+    const loadingVIN = ref<boolean>(false);
     const route = useRoute();
     const router = useRouter();
     const formRef = ref<FormInstance>();
     const watcherHandles: WatchStopHandle[] = [];
+    const selectedVIN = ref<string>("");
 
     // Initialize dropdowns
     const types = ref<ReturnType[]>([]);
@@ -361,6 +401,7 @@ export default defineComponent({
       internal: "",
       products: [],
       return_comment: "",
+      vehicle_information: {},
     };
 
     const document = ref({ ...blankDocument });
@@ -601,6 +642,7 @@ export default defineComponent({
 
     return {
       loading,
+      loadingVIN,
       types,
       document,
       blankProduct,
@@ -614,6 +656,7 @@ export default defineComponent({
       documentMatches,
       formRef,
       matchedProducts,
+      selectedVIN,
     };
   },
   async mounted() {
@@ -765,6 +808,37 @@ export default defineComponent({
           return false;
         }
       });
+    },
+    findVIN() {
+      this.vinError = "";
+      const vin = this.selectedVIN;
+
+      if (!vin) {
+        this.vinError = "Lauks nevar būt tukšs";
+        return;
+      }
+
+      this.loadingVIN = true;
+      this.document.vehicle_information = {};
+
+      ApiService.get(`tecdoc/vin`, vin)
+        .then((response) => {
+          const data = response.data;
+          if ("csdd" in data) this.document.vehicle_information = data.csdd;
+          else this.vinError = "Nav atrasts";
+        })
+        .catch((error) => {
+          if (error.response?.data?.error)
+            this.vinError = error.response.data.error;
+          else this.vinError = "Neizdevās ielādēt";
+          console.error("Error fetching data:", error);
+        })
+        .finally(() => {
+          this.loadingVIN = false;
+        });
+    },
+    clearVehicle() {
+      this.document.vehicle_information = {};
     },
   },
 });

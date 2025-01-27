@@ -19,6 +19,14 @@
               <button class="btn btn-sm btn-light-danger me-2">Dzēst</button>
             </template>
           </el-popconfirm>
+          <button
+            v-if="!returnDoc.internal && returnDoc.return_type !== 1"
+            type="button"
+            class="btn btn-sm btn-light me-2"
+            @click="printReturn()"
+          >
+            <i class="fa-solid fa-fw fa-print"></i> Drukāt pieteikumu
+          </button>
           <router-link
             class="btn btn-sm btn-light-info me-2"
             type="button"
@@ -34,18 +42,33 @@
           </router-link>
         </div>
       </div>
-      <div class="card-body pt-3 pb-5 d-flex flex-column">
-        <span class="p-2">Datums: {{ returnDoc.date }}</span>
-        <span class="p-2" v-if="returnDoc.companyname"
-          >Klients: {{ returnDoc.companyname }}</span
-        >
-        <span class="p-2"
-          >Statuss:
-          <span :class="'ms-2 badge badge-' + returnDoc.status.bg">{{
-            returnDoc.status.name
-          }}</span></span
-        >
-        <span class="p-2">Komentārs: {{ returnDoc.return_comment }}</span>
+      <div class="card-body pt-3 pb-5">
+        <div class="row">
+          <div class="col d-flex flex-column">
+            <span class="p-2">Datums: {{ returnDoc.date }}</span>
+            <span class="p-2" v-if="returnDoc.companyname"
+              >Klients: {{ returnDoc.companyname }}</span
+            >
+            <span class="p-2"
+              >Statuss:
+              <span :class="'ms-2 badge badge-' + returnDoc.status.bg">{{
+                returnDoc.status.name
+              }}</span></span
+            >
+            <span class="p-2">Komentārs: {{ returnDoc.return_comment }}</span>
+          </div>
+          <div class="col" v-if="returnDoc.vehicle_information">
+            <template
+              v-for="(value, key) in returnDoc.vehicle_information"
+              :key="key"
+            >
+              <div class="row">
+                <div class="col">{{ key }}</div>
+                <div class="col">{{ value }}</div>
+              </div>
+            </template>
+          </div>
+        </div>
       </div>
     </div>
     <DocumentView v-if="documentId" />
@@ -138,6 +161,7 @@ export default defineComponent({
         name: "",
         bg: "",
       },
+      internal: false,
     } as ReturnView);
 
     const fetchReturn = async () => {
@@ -189,6 +213,9 @@ export default defineComponent({
         .catch(() => {
           push.error("Neizdevās izdzēst atgriešanu");
         });
+    },
+    async printReturn() {
+      await ApiService.pdf("return/print", String(this.$route.params.returnId));
     },
   },
 });

@@ -7,6 +7,9 @@ export interface ReturnDocument {
   internal: string;
   return_comment: string;
   products: ReturnProduct[];
+  vehicle_information: {
+    [key: string]: string;
+  };
 }
 
 export interface ReturnProduct extends DocumentProduct {
@@ -41,4 +44,9 @@ export interface ReturnView {
     bg: string;
   };
   supplierDocumentType?: string;
+  internal: boolean;
+  return_type: number;
+  vehicle_information: null | {
+    [key: string]: string;
+  };
 }
