@@ -27,7 +27,12 @@
         </div>
         <!--end::Modal header-->
         <!--begin::Form-->
-        <el-form @submit.prevent="submit()" :model="formData" ref="formRef" v-if="formData">
+        <el-form
+          @submit.prevent="submit()"
+          :model="formData"
+          ref="formRef"
+          v-if="formData"
+        >
           <!--begin::Modal body-->
           <div class="modal-body py-10 px-lg-17">
             <div class="fv-row mb-7">
@@ -65,13 +70,20 @@
               Aizvērt
             </button>
 
-            <button
-              type="button"
-              class="btn btn-light-danger"
-              @click="deleteItem()"
+            <el-popconfirm
+              confirm-button-text="Dzēst"
+              cancel-button-text="Atcelt"
+              confirm-button-type="danger"
+              :title="`Izdzēst ierakstu?`"
+              :width="300"
+              @confirm="deleteItem()"
             >
-              Dzēst
-            </button>
+              <template #reference>
+                <button type="button" class="btn btn-light-danger">
+                  Dzēst
+                </button>
+              </template>
+            </el-popconfirm>
 
             <!--begin::Button-->
             <button
