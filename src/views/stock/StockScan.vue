@@ -40,7 +40,7 @@
     </div>
     <div class="card-body">
       <div class="row">
-        <div class="col-xl-2">
+        <div class="col-xl-2 col-lg-8">
           <div class="input-group">
             <button
               class="btn btn-outline-secondary d-xl-none"
@@ -72,6 +72,15 @@
               <i class="fa-solid fa-plus"></i>
             </button>
           </div>
+        </div>
+        <div class="col-xl-2 col-lg-4">
+          <el-form-item label="Ievadīt arī daudzumu">
+            <el-switch
+              v-model="openModal"
+              active-text="Jā"
+              inactive-text="Nē"
+            />
+          </el-form-item>
         </div>
       </div>
     </div>
@@ -250,6 +259,8 @@ export default defineComponent({
     const locations_select = ref();
     const editId = ref(null);
 
+    const openModal = ref(false);
+
     const barcodeScanned = ref("");
     const barcodeModalState = ref(false);
 
@@ -330,6 +341,7 @@ export default defineComponent({
       await focusInput();
     };
 
+    // Watch for route changes and load data
     watch(
       () => route.params.scanId,
       (newVal) => {
@@ -337,8 +349,28 @@ export default defineComponent({
       }
     );
 
+    // Load data on mount
     onMounted(() => {
       fetchData(route.params.scanId);
+    });
+
+    // Watch for openModal change and store in browser
+    watch(
+      () => openModal.value,
+      (newVal) => {
+        if (newVal) {
+          localStorage.setItem("openModal", "true");
+        } else {
+          localStorage.removeItem("openModal");
+        }
+      }
+    );
+
+    // Set openModal on mount
+    onMounted(() => {
+      if (localStorage.getItem("openModal")) {
+        openModal.value = true;
+      }
     });
 
     return {
@@ -357,6 +389,7 @@ export default defineComponent({
       barcodeScanned,
       barcodeModalState,
       focusInput,
+      openModal,
     };
   },
   watch: {
@@ -423,14 +456,20 @@ export default defineComponent({
       ApiService.post(`stocktake/products/${scanId}`, {
         productId: product.productid,
       })
-        .then(() => {
+        .then((result) => {
+          // Refresh product list
           this.getProducts();
 
-          // Show notification
-          this.toast(
-            `${product.producer} ${product.productcode}`,
-            product.productname.split("\n")[0]
-          );
+          // Open edit modal
+          if (this.openModal) {
+            this.editEntry(result.data.entry_id);
+          } else {
+            // Show notification
+            this.toast(
+              `${product.producer} ${product.productcode}`,
+              product.productname.split("\n")[0]
+            );
+          }
         })
         .catch((error) => {
           console.error(`Error saving product to DB:`, error);
@@ -468,7 +507,9 @@ export default defineComponent({
           this.storeProduct(product);
 
           // Focus input field
-          this.focusInput();
+          if (!this.openModal) {
+            this.focusInput();
+          }
         })
         .catch((error) => {
           console.error(
