@@ -67,6 +67,14 @@ export default defineComponent({
             },
           },
           {
+            title: "Atlikumu pārbaude",
+            subtitle: "",
+            icon: "rectangles-mixed",
+            route: {
+              name: "stock-control",
+            },
+          },
+          {
             title: "Mainīt produktu novietnes",
             subtitle: "",
             icon: "location-crosshairs",

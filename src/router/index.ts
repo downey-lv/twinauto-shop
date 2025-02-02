@@ -257,6 +257,15 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/stock/control",
+        name: "stock-control",
+        component: () => import("@/views/stock/StockControl.vue"),
+        meta: {
+          pageTitle: "Atlikumu pārbaude",
+          breadcrumbs: [],
+        },
+      },
+      {
         path: "/stock/",
         name: "stock-dashboard",
         component: () => import("@/views/stock/StockDashboard.vue"),
