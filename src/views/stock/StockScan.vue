@@ -316,6 +316,9 @@ export default defineComponent({
         })
         .finally(() => {
           loadingProducts.value = false;
+
+          // Focus input field
+          focusInput();
         });
     };
 
