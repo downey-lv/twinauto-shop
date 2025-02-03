@@ -1,19 +1,47 @@
 <template>
   <div v-loading="loading">
     <div class="card mb-5">
-      <div class="card-header border-0 pt-5 pb-5">
-        <h3 class="card-title">
-          <!--suppress VueMissingComponentImportInspection -->
-          <el-select-v2
-            v-model="currentLocation"
-            :options="locations"
-            placeholder="Novietne"
-            size="large"
-            style="width: 100%; min-width: 240px"
-            filterable
-            clearable
-          />
-        </h3>
+      <div class="border-0 p-5">
+        <div class="row">
+          <div class="col">
+            <!--suppress VueMissingComponentImportInspection -->
+            <el-select-v2
+              v-model="currentLocation"
+              :options="locations"
+              placeholder="Novietne"
+              size="large"
+              style="width: 100%; min-width: 240px"
+              filterable
+              clearable
+            />
+          </div>
+          <div class="col">
+            <div class="input-group">
+              <div class="form-floating">
+                <Field
+                  type="text"
+                  class="form-control form-control-solid"
+                  name="product_id"
+                  v-model="productId"
+                  @keyup.enter="loadData()"
+                  placeholder="ID"
+                  autocomplete="off"
+                  enterkeyhint="done"
+                  inputmode="numeric"
+                  id="product_id"
+                />
+                <label>ID</label>
+              </div>
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                @click="loadData()"
+              >
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <template v-if="currentControl">
@@ -113,8 +141,8 @@
                 </div>
                 <div class="card-footer">
                   <div class="row">
-                    <label class="col-4 fw-light">Jaunais atlikums</label>
-                    <div class="col-4">
+                    <label class="col-md-4 fw-light">Jaunais atlikums</label>
+                    <div class="col-md-4">
                       <el-input-number
                         v-model="quantities[item.product_id]"
                         :step="1"
@@ -122,7 +150,7 @@
                         class="w-100"
                       />
                     </div>
-                    <div class="col-4">
+                    <div class="col-md-4">
                       <el-popconfirm
                         confirm-button-text="Saglabāt"
                         cancel-button-text="Atcelt"
@@ -153,13 +181,16 @@ import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
 import type { ControlProduct, StockControl } from "@/types/Stock";
 import { useProductStore } from "@/stores/product";
+import { Field } from "vee-validate";
 
 export default defineComponent({
+  components: { Field },
   setup() {
     const control = ref<StockControl[]>([]);
     const locations = ref<any[]>([]);
     const loading = ref(false);
 
+    const productId = ref("");
     const currentLocation = ref<number>();
     const currentControl = computed(() => {
       if (!control.value || !currentLocation.value) {
@@ -187,7 +218,7 @@ export default defineComponent({
     // Load control
     const loadData = () => {
       loading.value = true;
-      ApiService.get(`/stocktake/control`)
+      ApiService.get(`/stocktake/control`, "", { productId: productId.value })
         .then((response) => {
           control.value = response.data;
 
@@ -210,7 +241,9 @@ export default defineComponent({
           locations.value.sort((a, b) => a.label.localeCompare(b.label));
 
           // Reset current location if it does not exist
-          if (!currentLocationExists) {
+          if (productId.value) {
+            currentLocation.value = control.value[0]?.location.locationid;
+          } else if (!currentLocationExists) {
             currentLocation.value = undefined;
           }
 
@@ -236,6 +269,7 @@ export default defineComponent({
     return {
       currentControl,
       currentLocation,
+      productId,
       locations,
       quantities,
       loading,
