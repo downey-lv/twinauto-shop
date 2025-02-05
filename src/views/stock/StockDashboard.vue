@@ -81,6 +81,12 @@ export default defineComponent({
             action: "update_locations",
           },
           {
+            title: "Saglabāt atlikumus",
+            subtitle: "",
+            icon: "retweet",
+            action: "update_rest",
+          },
+          {
             title: "Pārtraukt inventarizāciju",
             subtitle: "",
             icon: "hand",
@@ -137,6 +143,24 @@ export default defineComponent({
           const message =
             error.response?.data?.message ||
             "Neizdevās atjaunot produktu novietnes";
+          push.error(message);
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    updateRest() {
+      this.loading = true;
+      // Update stocktake locations
+      ApiService.post(`/stocktake/order`, {})
+        .then(() => {
+          push.success("Produktu atlikumi saglabāti");
+        })
+        .catch((error) => {
+          console.error(`Error updating stocktake locations:`, error);
+          const message =
+            error.response?.data?.message ||
+            "Neizdevās saglabāt produktu atlikumus";
           push.error(message);
         })
         .finally(() => {
@@ -214,6 +238,19 @@ export default defineComponent({
         }
       } else if (item.action === "print_stocktake") {
         await this.printStocktake();
+      } else if (item.action === "update_rest") {
+        const result = await Swal.fire({
+          title: "Vai esi pārliecināts?",
+          text: `Preču atlikumi tiks mainīti uz pārbaudītajiem`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Jā, saglabāt",
+          cancelButtonText: "Atcelt",
+        });
+
+        if (result.isConfirmed) {
+          this.updateRest();
+        }
       }
     },
   },
