@@ -16,6 +16,7 @@
                 placeholder="ID"
                 autocomplete="off"
                 enterkeyhint="search"
+                inputmode="numeric"
               />
               <label>ID</label>
 
