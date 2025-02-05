@@ -638,7 +638,7 @@
                   !p.shop && !p.tecdoc && !(p.vide?.cross?.length > 0),
               }"
             >
-              <ProductSuppliers :suppliers="suppliers" />
+              <ProductSuppliers v-if="suppliers" :suppliers="suppliers" />
             </div>
             <div class="tab-pane fade p-3" id="tab_prices" role="tabpanel">
               <div

@@ -29,7 +29,6 @@
         <!--begin::Form-->
         <el-form
           @submit.prevent="submit()"
-          model=""
           :rules="rules"
           ref="formRef"
         >
@@ -169,7 +168,7 @@ export default defineComponent({
     const giftCardValid = ref<boolean>(false);
 
     const blankForm = {
-      amount: "",
+      amount: null,
       type: "",
       recipient: "",
       orderid: "",

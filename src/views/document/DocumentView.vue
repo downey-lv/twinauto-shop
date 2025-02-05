@@ -372,6 +372,11 @@
               {{ scope.row.priceVAT.toFixed(2) }} €
             </el-tooltip>
             <el-tooltip
+              v-if="
+                !$route.params.returnId &&
+                $route.params.type !== `in` &&
+                scope.row.priceVAT < (scope.row.data?.priceOnline?.[1] ?? 0)
+              "
               :content="
                 scope.row.priceVAT < (scope.row.documentBuyPrice ?? 0)
                   ? `Zem iepirkuma`
@@ -379,11 +384,6 @@
               "
             >
               <i
-                v-if="
-                  !$route.params.returnId &&
-                  $route.params.type !== `in` &&
-                  scope.row.priceVAT < (scope.row.data?.priceOnline?.[1] ?? 0)
-                "
                 class="fa-solid fa-triangle-exclamation ms-3"
                 :class="
                   scope.row.priceVAT < (scope.row.documentBuyPrice ?? 0)
@@ -580,26 +580,26 @@ export default defineComponent({
               return;
             }
 
-            // Fetch product data
-            ApiService.get("product/find", `id/${product.productid}`).then(
-              (response) => {
-                product.data = response.data[0];
-
-                // Choose buy price
-                product.documentBuyPrice = Number(
-                  product.buy_price || product.data?.priceBuy
-                );
-
-                // Add to priceDetails
-                if (
-                  product.data &&
-                  product.documentBuyPrice !== Number(product.data.priceBuy)
-                )
-                  product.data.priceDetails =
-                    `Dokumenta iepirkums: ${product.documentBuyPrice} €<br/>` +
-                    product.data.priceDetails;
-              }
-            );
+            // // Fetch product data
+            // ApiService.get("product/find", `id/${product.productid}`).then(
+            //   (response) => {
+            //     product.data = response.data[0];
+            //
+            //     // Choose buy price
+            //     product.documentBuyPrice = Number(
+            //       product.buy_price || product.data?.priceBuy
+            //     );
+            //
+            //     // Add to priceDetails
+            //     if (
+            //       product.data &&
+            //       product.documentBuyPrice !== Number(product.data.priceBuy)
+            //     )
+            //       product.data.priceDetails =
+            //         `Dokumenta iepirkums: ${product.documentBuyPrice} €<br/>` +
+            //         product.data.priceDetails;
+            //   }
+            // );
           });
 
           // Load client data
