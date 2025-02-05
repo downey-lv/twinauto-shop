@@ -39,7 +39,11 @@
       <!--end::Header-->
 
       <!--begin::Body-->
-      <div class="card-body" id="product_drawer__body" v-loading="loading.length > 0">
+      <div
+        class="card-body"
+        id="product_drawer__body"
+        v-loading="loading.length > 0"
+      >
         <!--begin::Content-->
         <div
           id="product_drawer__scroll"
@@ -276,7 +280,7 @@
                     href="#"
                     @click.prevent="addPreorder()"
                     class="btn btn-sm btn-primary"
-                  >Pasūtīts</a
+                    >Pasūtīts</a
                   >
                 </div>
                 <!--end::Actions-->
@@ -340,7 +344,12 @@
                           :multiple-limit="2"
                           @update:formattedValue="
                             (newFormattedValue) =>
-                              updateFormattedValue(newFormattedValue, item)
+                              updateFormattedValue(
+                                newFormattedValue,
+                                item,
+                                `value`,
+                                item.shopKey
+                              )
                           "
                         ></editable-field>
                         <div class="fs-2 fw-bold" v-else>
@@ -697,7 +706,12 @@
                 </thead>
               </DataTable>
             </div>
-            <div class="tab-pane fade" id="tab_history" role="tabpanel" v-if="p.productid != ''">
+            <div
+              class="tab-pane fade"
+              id="tab_history"
+              role="tabpanel"
+              v-if="p.productid != ''"
+            >
               <DataTable
                 v-if="historyData"
                 id="history"
@@ -842,6 +856,7 @@ export default defineComponent({
         editField?: string;
         editType?: string;
         rawValue?: string;
+        shopKey?: string;
       };
 
       let newStats: Stat[] = [];
@@ -874,6 +889,7 @@ export default defineComponent({
             editField: "location",
             editType: "select",
             rawValue: p.shop.location_list,
+            shopKey: "locations",
           });
 
         if (p.shop.productgroupid)
@@ -1214,8 +1230,15 @@ export default defineComponent({
         (this.$refs.preorderModalRef as any).show();
       });
     },
-    updateFormattedValue(newFormattedValue, item, key = "value") {
+    updateFormattedValue(
+      newFormattedValue,
+      item,
+      key = "value",
+      shopKey: keyof Product["shop"] | null = null // Restrict to known keys
+    ) {
       item[key] = newFormattedValue;
+      if (shopKey && this.p?.shop)
+        this.p.shop[shopKey as string] = newFormattedValue;
     },
   },
 });

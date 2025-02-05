@@ -138,7 +138,7 @@ export default defineComponent({
             // Set display value to selected options
             displayValue.value = selected
               .map((option) => option.label)
-              .join(", ");
+              .join(" / ");
 
             // Emit changes
             emit("update:formattedValue", displayValue.value);
