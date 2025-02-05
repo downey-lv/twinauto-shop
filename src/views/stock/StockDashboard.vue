@@ -87,6 +87,17 @@ export default defineComponent({
             action: "update_rest",
           },
           {
+            title: "Inventarizācijas rezultāts",
+            subtitle: "",
+            icon: "square-poll-horizontal",
+            route: {
+              name: "stock-result",
+              params: {
+                stocktakeId: activeStocktake,
+              },
+            },
+          },
+          {
             title: "Pārtraukt inventarizāciju",
             subtitle: "",
             icon: "hand",
