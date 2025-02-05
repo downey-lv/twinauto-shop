@@ -128,7 +128,7 @@
                   : ``
               "
             >
-              {{ client.status.balance }} €
+              {{ client.status.balance.toFixed(2) }} €
             </div>
           </div>
 
