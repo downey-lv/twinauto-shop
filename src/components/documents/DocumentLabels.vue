@@ -37,8 +37,15 @@
                 <span style="height: 32px">{{ product.producer }}</span>
               </div>
               <div class="col align-self-center">
-                {{ product.productTitle }}<br />
-                {{ product.productSubtitle }}
+                <template v-if="product.productTitle">
+                  {{ product.productTitle }}<br />
+                  {{ product.productSubtitle }}
+                </template>
+                <span
+                  v-else
+                  v-html="product.productname.replace(/\n/g, `<br/>`)"
+                >
+                </span>
               </div>
               <div class="col-2">
                 <el-input-number v-model="product.quantity" :min="0" />
