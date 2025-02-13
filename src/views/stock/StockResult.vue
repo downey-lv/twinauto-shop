@@ -60,7 +60,7 @@
           sortable
         >
           <template #default="scope">
-            <span v-html="scope.row.productname.replace(/\n/g, '<br/>')"></span>
+            <span v-html="scope.row.productname?.replace(/\n/g, '<br/>')"></span>
           </template>
         </el-table-column>
         <el-table-column
