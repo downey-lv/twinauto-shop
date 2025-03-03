@@ -113,6 +113,19 @@
                     <Copy :value="p.code" trim-spaces />
                     <Search :value="p.code" />
                   </div>
+                  <div
+                    class="d-flex flex-wrap fs-6 mb-4 pe-2"
+                    v-if="p.vide?.code_supersession"
+                  >
+                    <span class="fs-2 fw-bold me-1"
+                      ><i class="fa-solid fa-triangle-exclamation text-danger fs-2 me-2"></i><span class="text-danger">Koda maiņa uz:</span>
+                      {{ p.vide.code_supersession }}</span
+                    >
+                    <Search
+                      :value="String(p.vide.code_supersession)"
+                      font-size="2"
+                    />
+                  </div>
                   <!--end::Name-->
 
                   <!--begin::Info-->

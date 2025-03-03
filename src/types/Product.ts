@@ -97,6 +97,7 @@ export interface Vide {
   sell_price_3: number;
   sell_price_shop: number;
   sell_price_service: number;
+  code_supersession: string;
   cross: Cross[];
   suppliers: Supplier[];
 }
