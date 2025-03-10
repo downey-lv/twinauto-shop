@@ -266,6 +266,15 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/stock/result",
+        name: "stock-result-list",
+        component: () => import("@/views/stock/StockResultList.vue"),
+        meta: {
+          pageTitle: "Inventarizāciju rezultāti",
+          breadcrumbs: [],
+        },
+      },
+      {
         path: "/stock/result/:stocktakeId",
         name: "stock-result",
         component: () => import("@/views/stock/StockResult.vue"),

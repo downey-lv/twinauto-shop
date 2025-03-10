@@ -112,6 +112,14 @@ export default defineComponent({
             icon: "list",
             action: "new_stocktake",
           },
+          {
+            title: "Inventarizāciju rezultāti",
+            subtitle: "",
+            icon: "square-poll-horizontal",
+            route: {
+              name: "stock-result-list",
+            },
+          },
         ];
       }
     };
