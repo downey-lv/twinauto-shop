@@ -11,6 +11,13 @@
         >
           <i class="fa-solid fa-car-wrench"></i> Atvērt remontu
         </a>
+        <button
+          v-if="hasRepackage"
+          class="btn btn-sm btn-primary me-2"
+          @click="repackageDocument()"
+        >
+          <i class="fa-solid fa-box-open"></i> Izkomplektēt
+        </button>
         <template v-else>
           <div class="btn-group me-2" role="group">
             <a
@@ -337,6 +344,14 @@
         >
           <template #default="scope">
             {{ scope.row.quantity }}
+            <i
+              v-if="
+                $route.params.type == `in` && scope.row.data?.shop?.repackage_to
+              "
+              class="fa-duotone fa-solid fa-fw fa-box-open text-info"
+              title="Jāizkomplektē"
+              v-tooltip
+            ></i>
             <template
               v-if="
                 $route.params.type !== `in` && scope.row.preorderStatus !== null
@@ -405,6 +420,12 @@
   </div>
 
   <DocumentLabelsModal ref="modalLabels" :pData="documentData.products" />
+  <DocumentRepackageModal
+    ref="modalRepackage"
+    :pData="documentData.products"
+    :document-id="$route.params.documentId"
+    @refresh="fetchDocument()"
+  />
   <PaymentModal
     ref="modalPayment"
     :pData="documentData"
@@ -450,6 +471,7 @@ import LogModal from "@/components/data/LogModal.vue";
 import { useViewHistoryStore } from "@/stores/viewHistory";
 import ClientStatusTag from "@/components/clients/ClientStatusTag.vue";
 import type { ClientStatus } from "@/types/Client";
+import DocumentRepackageModal from "@/components/documents/DocumentRepackage.vue";
 
 const breadcrumbStore = useBreadcrumbStore();
 
@@ -460,6 +482,7 @@ export default defineComponent({
     },
   },
   components: {
+    DocumentRepackageModal,
     ClientStatusTag,
     LogModal,
     ImageHover,
@@ -617,6 +640,13 @@ export default defineComponent({
         });
     };
 
+    // Check if any items have repackage_to
+    const hasRepackage = computed(() =>
+      documentData.value.products.some(
+        (product) => product.data?.shop?.repackage_to
+      )
+    );
+
     // Watch for changes in id
     const idWatcher = watch(
       () => route.params.documentId,
@@ -641,6 +671,7 @@ export default defineComponent({
       fetchDocument,
       lastBreadcrumb,
       client_status,
+      hasRepackage,
     };
   },
   async mounted() {
@@ -655,6 +686,9 @@ export default defineComponent({
     },
     printLabels() {
       (this.$refs.modalLabels as any).show();
+    },
+    repackageDocument() {
+      (this.$refs.modalRepackage as any).show();
     },
     showPayments() {
       (this.$refs.modalPayment as any).show();

@@ -60,6 +60,8 @@ export interface Shop {
   stale: boolean;
   repackage_from?: string;
   repackage_to?: string;
+  repackage_amount?: number;
+  repackage_to_amount?: number;
 }
 
 export interface PartListEntry {

@@ -93,6 +93,22 @@
                 </div>
               </el-form-item>
             </div>
+
+            <div
+              class="col-lg-6"
+              v-if="product.repackage_from || $route.query.repackage"
+            >
+              <div class="fv-row mb-2">
+                <label class="fs-6 mb-2 required">Daudzums iepakojumā (izkomplektēšanai)</label>
+                <el-form-item prop="repackage_amount">
+                  <el-input-number
+                    v-model="product.repackage_amount"
+                    :min="1"
+                    :step="1"
+                  ></el-input-number>
+                </el-form-item>
+              </div>
+            </div>
           </div>
         </div>
         <!-- Product settings -->
@@ -554,6 +570,10 @@ export default defineComponent({
     const locationSuggestions = ref([]);
     const formRef = ref<FormInstance>();
 
+    const copyValues = ref({
+      productname: "",
+    });
+
     const blankGroup = {
       type: `group`,
       settingData: {
@@ -593,6 +613,8 @@ export default defineComponent({
       important: false,
       td_code: "",
       td_producer: "",
+      repackage_from: null,
+      repackage_amount: 0,
     };
     const product = ref({ ...defaultProduct });
     let originalProduct;
@@ -688,11 +710,21 @@ export default defineComponent({
               "images",
               "imagesweb",
               "image_ids",
+              "repackage_from",
             ];
 
             reset_fields.forEach((key) => {
               data[key] = defaultProduct[key] || null;
             });
+
+            // Adjust for repackaging
+            if (route.query.repackage) {
+              data.repackage_from = id as string;
+              data.productcode = `AP${data.productcode}`;
+              data.producerid = "1191";
+
+              copyValues.value.productname = data.productname;
+            }
           }
 
           // Set tecdoc warning
@@ -761,10 +793,23 @@ export default defineComponent({
           trigger: "change",
         },
       ],
-      productname: [
+      repackage_amount: [
         {
           required: true,
-          message: "Jānorāda nosaukums",
+          message: "Jānorāda daudzums",
+        },
+      ],
+      productname: [
+        {
+          validator: (rule, value, callback) => {
+            if (!value) {
+              callback(new Error("Jānorāda nosaukums"));
+            } else if (copyValues.value.productname === value) {
+              callback(new Error("Jānomaina nosaukums"));
+            } else {
+              callback();
+            }
+          },
           trigger: "change",
         },
       ],

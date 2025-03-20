@@ -142,6 +142,17 @@ export default defineComponent({
     const loadData = () => {
       products.value = cloneDeep(props.pData) as DocumentProduct[];
 
+      // Merge products with the same ID
+      products.value = products.value.reduce((acc, product) => {
+        const existing = acc.find((p) => p.productid === product.productid);
+        if (existing) {
+          existing.quantity += product.quantity;
+        } else {
+          acc.push(product);
+        }
+        return acc;
+      }, [] as DocumentProduct[]);
+
       // Stock based processing
       if (props.stockBased) {
         // Delete products with 0 rest

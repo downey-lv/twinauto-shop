@@ -252,6 +252,20 @@
                       <span class="visually-hidden">Toggle Dropdown</span>
                     </button>
                     <ul class="dropdown-menu">
+                      <li v-if="!p.shop?.repackage_from">
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          @click.prevent="
+                            $router.push({
+                              name: `product-edit`,
+                              params: { id: 'new' },
+                              query: { copy: p.productid, repackage: 1 },
+                            })
+                          "
+                          ><i class="fa-solid fa-box-open fa-fw me-2"></i> Izkomplektēt</a
+                        >
+                      </li>
                       <li>
                         <a
                           class="dropdown-item"
