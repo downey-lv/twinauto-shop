@@ -58,6 +58,8 @@ export interface Shop {
   productnameFormatted: string;
   details: Detail[];
   stale: boolean;
+  repackage_from?: string;
+  repackage_to?: string;
 }
 
 export interface PartListEntry {

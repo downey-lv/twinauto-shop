@@ -118,12 +118,41 @@
                     v-if="p.vide?.code_supersession"
                   >
                     <span class="fs-2 fw-bold me-1"
-                      ><i class="fa-solid fa-triangle-exclamation text-danger fs-2 me-2"></i><span class="text-danger">Koda maiņa uz:</span>
+                      ><i
+                        class="fa-solid fa-triangle-exclamation text-danger fs-2 me-2"
+                      ></i
+                      ><span class="text-danger">Koda maiņa uz:</span>
                       {{ p.vide.code_supersession }}</span
                     >
                     <Search
                       :value="String(p.vide.code_supersession)"
                       font-size="2"
+                    />
+                  </div>
+                  <div
+                    class="d-flex flex-wrap mb-4 pe-2"
+                    v-if="p.shop?.repackage_from"
+                  >
+                    <span class="fw-bold me-1"
+                      >Izkomplektēts no: {{ p.shop.repackage_from }}</span
+                    >
+                    <Search
+                      :value="String(p.shop.repackage_from)"
+                      font-size="2"
+                      type="id"
+                    />
+                  </div>
+                  <div
+                    class="d-flex flex-wrap mb-4 pe-2"
+                    v-if="p.shop?.repackage_to"
+                  >
+                    <span class="fw-bold me-1"
+                    >Izkomplektēts uz: {{ p.shop.repackage_to }}</span
+                    >
+                    <Search
+                      :value="String(p.shop.repackage_to)"
+                      font-size="2"
+                      type="id"
                     />
                   </div>
                   <!--end::Name-->
