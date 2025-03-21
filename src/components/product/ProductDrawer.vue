@@ -252,7 +252,7 @@
                       <span class="visually-hidden">Toggle Dropdown</span>
                     </button>
                     <ul class="dropdown-menu">
-                      <li v-if="!p.shop?.repackage_from">
+                      <li v-if="!p.shop?.repackage_from && !p.shop?.repackage_to">
                         <a
                           class="dropdown-item"
                           href="#"
