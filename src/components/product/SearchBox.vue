@@ -90,80 +90,83 @@
               <i class="fa-solid fa-magnifying-glass"></i>
             </button>
           </div>
-        </div>
 
-        <div class="col-md-1 d-none d-xl-flex align-items-center justify-content-center">
-          <div
-            class="form-check form-switch form-check-custom form-check-solid"
-          >
-            <input
-              class="form-check-input h-20px w-30px"
-              type="checkbox"
-              v-model="searchData.oe"
-              @change="search('code')"
-            />
-            <label class="form-check-label">
-              OE analogi
-            </label>
+          <div class="d-flex mt-2">
+            <div
+              class="form-check form-switch form-check-custom form-check-solid me-5"
+            >
+              <input
+                class="form-check-input h-20px w-30px"
+                type="checkbox"
+                v-model="searchData.oe"
+                @change="search('code')"
+              />
+              <label class="form-check-label"> OE analogi </label>
+            </div>
+            <div
+              class="form-check form-switch form-check-custom form-check-solid me-5"
+            >
+              <input
+                class="form-check-input h-20px w-30px"
+                type="checkbox"
+                v-model="searchData.useLinks"
+                @change="search('code')"
+              />
+              <label class="form-check-label"> Netiešie analogi </label>
+            </div>
           </div>
         </div>
 
-        <div class="col-md-3">
-          <div class="row">
-            <div class="col-9">
-              <div class="input-group">
-                <div class="form-floating">
-                  <Field
-                    type="text"
-                    class="form-control form-control-solid"
-                    name="code"
-                    v-model="searchData.text"
-                    @keyup.enter="search('text')"
-                    @focus="suggestionsActive = 'text'"
-                    @blur="suggestionsActive = ''"
-                    placeholder="Teksts"
-                    autocomplete="off"
-                    enterkeyhint="search"
-                  />
-                  <label>Teksts</label>
+        <div class="col-md-4">
+          <div class="input-group">
+            <div class="form-floating">
+              <Field
+                type="text"
+                class="form-control form-control-solid"
+                name="code"
+                v-model="searchData.text"
+                @keyup.enter="search('text')"
+                @focus="suggestionsActive = 'text'"
+                @blur="suggestionsActive = ''"
+                placeholder="Teksts"
+                autocomplete="off"
+                enterkeyhint="search"
+              />
+              <label>Teksts</label>
 
-                  <!-- Dropdown with suggestions -->
-                  <ul
-                    v-if="
-                      suggestions.text?.length && suggestionsActive == 'text'
-                    "
-                    class="suggestions-list"
-                  >
-                    <li
-                      v-for="(suggestion, index) in suggestions.text"
-                      :key="index"
-                      @mousedown="selectSuggestion('text', suggestion)"
-                    >
-                      {{ suggestion }}
-                    </li>
-                  </ul>
-                </div>
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  @click="search('text')"
-                >
-                  <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-              </div>
-            </div>
-            <div class="col-3 d-flex align-items-center justify-content-center">
-              <div
-                class="form-check form-switch form-check-custom form-check-solid"
+              <!-- Dropdown with suggestions -->
+              <ul
+                v-if="suggestions.text?.length && suggestionsActive == 'text'"
+                class="suggestions-list"
               >
-                <input
-                  class="form-check-input h-20px w-30px"
-                  type="checkbox"
-                  v-model="searchData.partialText"
-                  @change="search('text')"
-                />
-                <label class="form-check-label"> Daļējs teksts </label>
-              </div>
+                <li
+                  v-for="(suggestion, index) in suggestions.text"
+                  :key="index"
+                  @mousedown="selectSuggestion('text', suggestion)"
+                >
+                  {{ suggestion }}
+                </li>
+              </ul>
+            </div>
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              @click="search('text')"
+            >
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </div>
+          <div class="d-flex mt-2">
+            <div
+              class="form-check form-switch form-check-custom form-check-solid me-5"
+            >
+              <input
+                class="form-check-input h-20px w-30px"
+                type="checkbox"
+                v-model="searchData.partialText"
+                @change="search('text')"
+              />
+              <label class="form-check-label"> Daļējs teksts </label>
             </div>
           </div>
         </div>
@@ -237,6 +240,7 @@ export default defineComponent({
       oe: false,
       groups: null,
       partialText: false,
+      useLinks: false,
     });
 
     const setParams = () => {
@@ -249,7 +253,9 @@ export default defineComponent({
             params.type && params.type.toString() === key
               ? params.query?.toString() || ""
               : "";
-        } else if (["analogues", "oe", "partialText"].includes(key)) {
+        } else if (
+          ["analogues", "oe", "partialText", "useLinks"].includes(key)
+        ) {
           searchData[key] = Boolean(query[key]);
         } else if (["groups"].includes(key)) {
           const groupsFromQuery = query[key];
@@ -349,6 +355,7 @@ export default defineComponent({
         if (field === "code") {
           if (this.searchData.analogues) query["analogues"] = 1;
           if (this.searchData.oe) query["oe"] = 1;
+          if (this.searchData.useLinks) query["useLinks"] = 1;
         } else if (field === "text") {
           if (this.searchData.partialText) query["partialText"] = 1;
         }
