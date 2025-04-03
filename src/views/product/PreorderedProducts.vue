@@ -55,7 +55,16 @@
         <el-table-column property="supplier_name" label="Piegādātājs" />
         <el-table-column property="customer_name" label="Saņēmējs" />
         <el-table-column property="comment" label="Komentārs" />
-        <el-table-column property="created_date" label="Pievienots" sortable />
+        <el-table-column
+          property="created_date"
+          label="Pievienots"
+          sortable
+          :sort-method="sortByDate"
+        >
+          <template #default="{ row }">
+            {{ row.created_date_string }}
+          </template>
+        </el-table-column>
         <el-table-column property="user_name" label="Lietotājs" width="130" />
         <el-table-column
           property="delivered"
@@ -123,6 +132,7 @@ import { Tooltip } from "bootstrap";
 import type { PreorderedProduct } from "@/types/PreorderedProducts";
 import PreorderModal from "@/components/product/PreorderModal.vue";
 import CartPreorderModal from "@/components/cart/CartPreorderModal.vue";
+import { DateTime } from "luxon";
 
 export default defineComponent({
   components: {
@@ -158,7 +168,16 @@ export default defineComponent({
         text: filterText.value,
       })
         .then((response) => {
-          products.value = response.data;
+          const data = response.data;
+
+          // Add formatted date
+          data.forEach((item) => {
+            item.created_date_string = DateTime.fromISO(item.created_date).toLocaleString(
+              DateTime.DATETIME_MED, { locale: 'lv' }
+            );
+          });
+
+          products.value = data;
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
@@ -252,6 +271,11 @@ export default defineComponent({
     },
     iconSorting(row) {
       return row.probably_sold ? 2 : row.delivered ? 1 : 0;
+    },
+    sortByDate(a, b) {
+      const dateA = DateTime.fromISO(a.date);
+      const dateB = DateTime.fromISO(b.date);
+      return dateA.toMillis() - dateB.toMillis();
     },
   },
 });
