@@ -26,6 +26,7 @@
         <KTIcon icon-name="magnifier" icon-class="fs-5 text-info" />
       </a>
       <Copy
+        v-if="item.code_supplier"
         :value="item.code_supplier"
         font-size="6"
         trim-spaces
@@ -44,7 +45,7 @@
       :title="item.delivery_warehouse"
       v-tooltip
     >
-      {{ item.delivery_info ?? "" }}
+      {{ item.order_date ?? item.delivery_info ?? "" }}
     </label>
     <label
       class="col-lg-1"
@@ -57,7 +58,7 @@
       :title="item.volume_pricing_string || item.order_date || ''"
       v-tooltip-html
     >
-      {{ item.supplier_price }} €
+      {{ item.supplier_price }} <template v-if="item.supplier_price">€</template>
       <i
         v-if="item.volume_pricing_string"
         class="fa-solid fa-badge-percent text-warning"
