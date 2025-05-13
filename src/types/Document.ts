@@ -34,6 +34,7 @@ export interface DocumentProduct {
   index?: number;
   productTitle?: string;
   productSubtitle?: string;
+  eshopQuantity?: number;
 }
 
 export interface Document {

@@ -419,7 +419,7 @@
     </div>
   </div>
 
-  <DocumentLabelsModal ref="modalLabels" :pData="documentData.products" />
+  <DocumentLabelsModal ref="modalLabels" :pData="documentData.products" :supplier-id="documentData.companyid" />
   <DocumentRepackageModal
     ref="modalRepackage"
     :pData="documentData.products"

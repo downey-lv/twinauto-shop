@@ -21,7 +21,17 @@
           <!--end::Close-->
         </div>
 
-        <div class="modal-body py-10 px-lg-17">
+        <div class="modal-body py-10 px-lg-17" v-loading="loading">
+          <div class="align-items-end mb-5">
+            <button
+              class="btn btn-info btn-sm"
+              type="button"
+              @click="checkOrders()"
+            >
+              Pārbaudīt internetu
+            </button>
+          </div>
+
           <div class="row border-bottom mb-2 pb-1 fw-bold">
             <div class="col-2">Kods</div>
             <div class="col-2">Ražotājs</div>
@@ -36,16 +46,23 @@
               <div class="col-2 align-self-center">
                 <span style="height: 32px">{{ product.producer }}</span>
               </div>
-              <div class="col align-self-center">
-                <template v-if="product.productTitle">
-                  {{ product.productTitle }}<br />
-                  {{ product.productSubtitle }}
-                </template>
-                <span
-                  v-else
-                  v-html="product.productname.replace(/\n/g, `<br/>`)"
-                >
-                </span>
+              <div class="col align-self-center row">
+                <div class="col fs-8">
+                  <template v-if="product.productTitle">
+                    {{ product.productTitle }}<br />
+                    {{ product.productSubtitle }}
+                  </template>
+                  <span
+                    v-else
+                    v-html="product.productname.replace(/\n/g, `<br/>`)"
+                  >
+                  </span>
+                </div>
+                <div class="col-2 text-end" v-if="product.eshopQuantity && product.eshopQuantity > 0">
+                  <span class="badge badge-info">
+                    {{ product.eshopQuantity }}
+                  </span>
+                </div>
               </div>
               <div class="col-2">
                 <el-input-number v-model="product.quantity" :min="0" />
@@ -94,6 +111,7 @@ import { Modal } from "bootstrap";
 import { labelService } from "@/core/services/LabelService";
 import { cloneDeep } from "lodash";
 import type { DocumentProduct } from "@/types/Document";
+import ApiService from "@/core/services/ApiService";
 
 export default defineComponent({
   name: "document-labels-modal",
@@ -105,6 +123,10 @@ export default defineComponent({
     stockBased: {
       type: Boolean,
       default: false,
+    },
+    supplierId: {
+      type: Number,
+      default: 0,
     },
   },
   setup(props) {
@@ -153,6 +175,11 @@ export default defineComponent({
         return acc;
       }, [] as DocumentProduct[]);
 
+      // Add eshopQuantity to each product
+      products.value.forEach((product) => {
+        product.eshopQuantity = 0;
+      });
+
       // Stock based processing
       if (props.stockBased) {
         // Delete products with 0 rest
@@ -192,11 +219,62 @@ export default defineComponent({
           hideCode: hideCode,
         };
 
+        // Format e-shop quantity
+        let eshopQuantityUsed = false;
+        this.products.forEach((product) => {
+          // Skip if no shop data
+          if (!product.data?.shop) return;
+
+          const eshopQuantity = product.eshopQuantity || 0;
+
+          // Check if eshopQuantity is greater than 0
+          if (eshopQuantity > 0) {
+            eshopQuantityUsed = true;
+
+            const formatted_code = `* ${product.data.shop.productcode}`;
+
+            // If eshop quantity is greater or equal to quantity, prepend star to code
+            if (eshopQuantity >= product.quantity) {
+              product.data.shop.productcode = formatted_code;
+            } else {
+              // Else clone product
+              const newProduct = cloneDeep(product);
+
+              // Check if product has shop data
+              if (!newProduct.data?.shop) return;
+
+              // Format code
+              newProduct.data.shop.productcode = formatted_code;
+
+              // Adjust quantities
+              newProduct.quantity = eshopQuantity;
+              product.quantity = product.quantity - eshopQuantity;
+
+              // Push new product to array
+              this.products.push(newProduct);
+            }
+          }
+        });
+
+        // If eshopQuantityUsed sort by productcode
+        if (eshopQuantityUsed) {
+          this.products.sort((a, b) => {
+            // Skip if no shop data
+            if (!a.data?.shop || !b.data?.shop) return 0;
+
+            return a.data.shop.productcode.localeCompare(b.data.shop.productcode);
+          });
+        }
+
         // Set label data
         let products = [] as any[];
         this.products.forEach((product) => {
+          // Skip if no shop data
+          if (!product.data?.shop) return;
+
+          // Add product to array based on quantity
           for (let i = 0; i < product.quantity; i++) {
-            if (product.data?.shop) products.push(product.data);
+            products.push(product.data);
           }
         });
 
@@ -213,6 +291,51 @@ export default defineComponent({
       } finally {
         el.innerHTML = value;
       }
+    },
+
+    async checkOrders() {
+      // Check if supplierId is set
+      if (!this.supplierId) {
+        push.error("Nav informācija par piegādātāju");
+        return;
+      }
+
+      // Send API request
+      this.loading = true;
+      ApiService.get(`/api/eshop/supplier/${this.supplierId}`)
+        .then((response) => {
+          // Loop through products and set eshopQuantity
+          this.products.forEach((product) => {
+            // Find product by ID
+            let eshopProduct = response.data.find(
+              (p) => parseInt(p.id) === parseInt(product.productid)
+            );
+
+            console.log(eshopProduct);
+
+            // Find by code_alphanum and tecdoc_id
+            if (!eshopProduct) {
+              eshopProduct = response.data.find(
+                (p) =>
+                  String(p.code_alphanum) ===
+                    String(product.data?.codeAlphanum) &&
+                  Number(p.tecdoc_id) === product.data?.tecdocId
+              );
+            }
+
+            // If product is found, set eshopQuantity
+            if (eshopProduct) {
+              product.eshopQuantity += eshopProduct.quantity;
+            }
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          push.error("Neizdevās pārbaudīt internetu");
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
   },
 });
