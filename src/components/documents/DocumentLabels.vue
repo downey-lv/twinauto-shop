@@ -22,16 +22,6 @@
         </div>
 
         <div class="modal-body py-10 px-lg-17" v-loading="loading">
-          <div class="align-items-end mb-5">
-            <button
-              class="btn btn-info btn-sm"
-              type="button"
-              @click="checkOrders()"
-            >
-              Pārbaudīt internetu
-            </button>
-          </div>
-
           <div class="row border-bottom mb-2 pb-1 fw-bold">
             <div class="col-2">Kods</div>
             <div class="col-2">Ražotājs</div>
@@ -151,6 +141,7 @@ export default defineComponent({
       }
       loadData();
       modal.show();
+      checkOrders();
     };
 
     // Hide modal
@@ -194,6 +185,49 @@ export default defineComponent({
       }
     };
 
+    const checkOrders = () => {
+      // Check if supplierId is set
+      if (!props.supplierId) {
+        push.error("Nav informācija par piegādātāju");
+        return;
+      }
+
+      // Send API request
+      loading.value = true;
+      ApiService.get(`/api/eshop/supplier/${props.supplierId}`)
+        .then((response) => {
+          // Loop through products and set eshopQuantity
+          products.value.forEach((product) => {
+            // Find product by ID
+            let eshopProduct = response.data.find(
+              (p) => parseInt(p.id) === parseInt(product.productid)
+            );
+
+            // Find by code_alphanum and tecdoc_id
+            if (!eshopProduct) {
+              eshopProduct = response.data.find(
+                (p) =>
+                  String(p.code_alphanum) ===
+                  String(product.data?.codeAlphanum) &&
+                  Number(p.tecdoc_id) === product.data?.tecdocId
+              );
+            }
+
+            // If product is found, set eshopQuantity
+            if (eshopProduct) {
+              product.eshopQuantity += eshopProduct.quantity;
+            }
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          push.error("Neizdevās pārbaudīt internetu");
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+    };
+
     return {
       products,
       formRef,
@@ -203,6 +237,7 @@ export default defineComponent({
       hide,
       showCode,
       showPrice,
+      checkOrders,
     };
   },
 
@@ -291,51 +326,6 @@ export default defineComponent({
       } finally {
         el.innerHTML = value;
       }
-    },
-
-    async checkOrders() {
-      // Check if supplierId is set
-      if (!this.supplierId) {
-        push.error("Nav informācija par piegādātāju");
-        return;
-      }
-
-      // Send API request
-      this.loading = true;
-      ApiService.get(`/api/eshop/supplier/${this.supplierId}`)
-        .then((response) => {
-          // Loop through products and set eshopQuantity
-          this.products.forEach((product) => {
-            // Find product by ID
-            let eshopProduct = response.data.find(
-              (p) => parseInt(p.id) === parseInt(product.productid)
-            );
-
-            console.log(eshopProduct);
-
-            // Find by code_alphanum and tecdoc_id
-            if (!eshopProduct) {
-              eshopProduct = response.data.find(
-                (p) =>
-                  String(p.code_alphanum) ===
-                    String(product.data?.codeAlphanum) &&
-                  Number(p.tecdoc_id) === product.data?.tecdocId
-              );
-            }
-
-            // If product is found, set eshopQuantity
-            if (eshopProduct) {
-              product.eshopQuantity += eshopProduct.quantity;
-            }
-          });
-        })
-        .catch((error) => {
-          console.error(error);
-          push.error("Neizdevās pārbaudīt internetu");
-        })
-        .finally(() => {
-          this.loading = false;
-        });
     },
   },
 });
