@@ -1229,11 +1229,11 @@ export default defineComponent({
       router
     );
     const searchProduct = (type, idx, enableCancel = true) =>
-      productService.searchProduct(type, idx, false, enableCancel);
+      productService.searchProduct(type, idx, false, enableCancel, document.value.companyid);
     const addMatch = (product, matches) =>
-      productService.addMatch(product, matches);
+      productService.addMatch(product, matches, false, document.value.companyid);
     const selectMatch = (product, match) =>
-      productService.selectMatch(product, match);
+      productService.selectMatch(product, match, false, document.value.companyid);
 
     const changeMatch = (product, increase = true) =>
       productService.changeMatch(product, increase);

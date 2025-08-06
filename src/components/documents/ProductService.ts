@@ -28,7 +28,7 @@ export class ProductService {
     this.cancelToken = {};
   }
 
-  searchProduct(type, idx, extendedHistory = false, enableCancel = false) {
+  searchProduct(type, idx, extendedHistory = false, enableCancel = false, companyId: string | null = null) {
     // Cancel the previous request if it exists
     if (enableCancel && this.cancelToken[idx]) {
       this.cancelToken[idx].cancel("Canceled due to new request");
@@ -63,7 +63,7 @@ export class ProductService {
     })
       .then((response) => {
         const overwriteData = this.activeIdx === idx;
-        this.addMatch(product, response.data, overwriteData);
+        this.addMatch(product, response.data, overwriteData, companyId);
         this.activeIdx = idx;
       })
       .catch((error) => {
@@ -78,7 +78,7 @@ export class ProductService {
       });
   }
 
-  selectMatch(product, match, overwriteData = false) {
+  selectMatch(product, match, overwriteData = false, companyId: string | null = null) {
     // Add full data
     product.data = match;
     product.valid = true;
@@ -152,7 +152,11 @@ export class ProductService {
             break;
           case "out":
           case "daily":
-            price = match.priceSell;
+            if (companyId && match.priceCustomer?.[companyId]) {
+              priceGross = match.priceCustomer[companyId];
+            } else {
+              price = match.priceSell;
+            }
             break;
           case "service":
             price = match.priceService;
@@ -174,10 +178,10 @@ export class ProductService {
     if (this.formRef.value) this.formRef.value.validate();
   }
 
-  addMatch(product, matches, overwriteData = false) {
+  addMatch(product, matches, overwriteData = false, companyId: string | null = null) {
     if (matches.length == 1 && matches[0].productid) {
       const match = matches[0];
-      this.selectMatch(product, match, overwriteData);
+      this.selectMatch(product, match, overwriteData, companyId);
     } else {
       // Set product as invalid
       product.valid = false;
