@@ -720,8 +720,10 @@ export default defineComponent({
             // Adjust for repackaging
             if (route.query.repackage) {
               data.repackage_from = id as string;
-              data.productcode = `AP${data.productcode}`;
-              data.producerid = "1191";
+              if (data.producerid === "1012") {
+                data.productcode = `AP${data.productcode}`;
+                data.producerid = "1191";
+              }
 
               copyValues.value.productname = data.productname;
             }
