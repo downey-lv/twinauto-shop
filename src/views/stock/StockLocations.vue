@@ -22,7 +22,7 @@
                 scope.row.product_count == 0 &&
                 scope.row.products_in_location > 0
               "
-              class="fa-sharp-duotone fa-solid fa-circle-exclamation text-danger"
+              class="fa-duotone fa-solid fa-circle-exclamation text-danger"
             ></i>
           </template>
         </el-table-column>

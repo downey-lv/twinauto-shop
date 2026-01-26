@@ -224,10 +224,17 @@ export default defineComponent({
 
           let currentLocationExists = false;
           // Extract locations from each value
+          let groupedLocations: [any[], any[]] = [[], []];
+
           locations.value = [];
           control.value.forEach((entry) => {
             const productCount = entry.products.length;
-            locations.value.push({
+
+            // Create group if needed
+            if (!groupedLocations[entry.is_counted])
+              groupedLocations[entry.is_counted] = [];
+
+            groupedLocations[entry.is_counted].push({
               value: entry.location.locationid,
               label: `${entry.location.locationname} (${productCount})`,
             });
@@ -237,8 +244,25 @@ export default defineComponent({
             }
           });
 
-          // Sort locations
-          locations.value.sort((a, b) => a.label.localeCompare(b.label));
+          // Sort and group locations
+          if (groupedLocations[1].length > 0) {
+            groupedLocations[1].sort((a, b) => a.label.localeCompare(b.label));
+
+            locations.value.push({
+              value: "Novietne saskaitīta",
+              label: "Novietne saskaitīta",
+              options: groupedLocations[1],
+            });
+          }
+          if (groupedLocations[0].length > 0) {
+            groupedLocations[0].sort((a, b) => a.label.localeCompare(b.label));
+
+            locations.value.push({
+              value: "Novietne nav skaitīta",
+              label: "Novietne nav skaitīta",
+              options: groupedLocations[0],
+            });
+          }
 
           // Reset current location if it does not exist
           if (productId.value) {

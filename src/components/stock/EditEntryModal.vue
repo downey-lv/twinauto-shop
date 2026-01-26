@@ -54,6 +54,7 @@
               <label class="fs-6 fw-semibold mb-2">Daudzums</label>
               <el-form-item prop="quantity">
                 <el-input-number
+                  id="quantity_input"
                   v-model="formData.quantity"
                   :step="1"
                   :min="1"
@@ -110,7 +111,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, nextTick, ref, watch } from "vue";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
@@ -137,6 +138,19 @@ export default defineComponent({
     const initModal = () => {
       const modalElement = editEntryModalRef.value;
       modal = new Modal(modalElement);
+
+      modalElement?.addEventListener("shown.bs.modal", () => {
+        focusInput();
+      });
+    };
+
+    const focusInput = async () => {
+      await nextTick();
+      const input_field = document.getElementById("quantity_input");
+      if (input_field) {
+        input_field.focus();
+        (input_field as HTMLInputElement).select();
+      }
     };
 
     // Show modal
@@ -146,6 +160,7 @@ export default defineComponent({
         initModal();
       }
       modal.show();
+      focusInput();
     };
 
     // Hide modal

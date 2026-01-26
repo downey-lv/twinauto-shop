@@ -218,14 +218,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, onMounted, ref, watch } from "vue";
+import {
+  defineComponent,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import { Field } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
 import { useProductStore } from "@/stores/product";
 import { DateTime } from "luxon";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import Notice from "@/components/core/Notice.vue";
 import EditEntryModal from "@/components/stock/EditEntryModal.vue";
 import CameraScanner from "@/components/stock/CameraScanner.vue";
@@ -246,6 +253,7 @@ export default defineComponent({
   },
   setup() {
     const route = useRoute();
+    const router = useRouter();
 
     const loadingProducts = ref(false);
     const loadingLocations = ref(false);
@@ -298,6 +306,20 @@ export default defineComponent({
         if (input_field) input_field.focus();
       }
     };
+
+    // Force navigation to /stock on back button
+    const onPopState = () => {
+      router.push("/stock");
+    };
+
+    onMounted(() => {
+      history.pushState(null, "", location.href); // trap back
+      window.addEventListener("popstate", onPopState);
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener("popstate", onPopState);
+    });
 
     // Load products
     const getProducts = () => {
@@ -485,7 +507,7 @@ export default defineComponent({
         search_type = "id";
       }
 
-      ApiService.get(`/product/find/${search_type}/${barcode}`)
+      ApiService.get(`/product/find/${search_type}/${barcode}?exact=1`)
         .then((response) => {
           const data = response.data;
 

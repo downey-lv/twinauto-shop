@@ -10,7 +10,7 @@
         <!--begin::Body-->
         <div class="card-body">
           <i
-            class="fa-sharp-duotone fa-solid fs-3x mx-n1"
+            class="fa-duotone fa-solid fs-3x mx-n1"
             :class="`fa-${item.icon}`"
           ></i>
 

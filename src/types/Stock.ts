@@ -11,6 +11,7 @@ export interface StockEntry {
 export interface StockControl {
   location: LocationData;
   products: ControlProduct[];
+  is_counted: number;
 }
 
 export interface ControlProduct {
