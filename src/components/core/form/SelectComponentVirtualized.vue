@@ -29,10 +29,12 @@
   </el-form-item>
 </template>
 
+<!-- Ellipsis at the start for long options in dropdown -->
 <style>
 .el-select-dropdown__item {
   direction: rtl;
   text-overflow: ellipsis;
+  text-align: left;
 }
 </style>
 
