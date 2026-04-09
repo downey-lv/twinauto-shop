@@ -183,6 +183,7 @@ export interface Product {
   tecdoc: Tecdoc;
   vide: Vide;
   productid: string;
+  masterId: string;
   code: string;
   codeAlphanum: string;
   rest: string;

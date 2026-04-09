@@ -137,6 +137,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const productStore = useProductStore();
     const loading = ref<boolean>(false);
     const parts = ref();
     const countWarning = ref(false);

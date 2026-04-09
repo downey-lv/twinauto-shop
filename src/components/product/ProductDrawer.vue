@@ -146,8 +146,8 @@
                     class="d-flex flex-wrap mb-4 pe-2"
                     v-if="p.shop?.repackage_to"
                   >
-                    <span class="fw-bold me-1"
-                    >Izkomplektēts uz: {{ p.shop.repackage_to }}</span
+                    <span class="fw-bold me-1">
+                      Izkomplektēts uz: {{ p.shop.repackage_to }}</span
                     >
                     <Search
                       :value="String(p.shop.repackage_to)"
@@ -252,7 +252,9 @@
                       <span class="visually-hidden">Toggle Dropdown</span>
                     </button>
                     <ul class="dropdown-menu">
-                      <li v-if="!p.shop?.repackage_from && !p.shop?.repackage_to">
+                      <li
+                        v-if="!p.shop?.repackage_from && !p.shop?.repackage_to"
+                      >
                         <a
                           class="dropdown-item"
                           href="#"
@@ -263,7 +265,8 @@
                               query: { copy: p.productid, repackage: 1 },
                             })
                           "
-                          ><i class="fa-solid fa-box-open fa-fw me-2"></i> Izkomplektēt</a
+                          ><i class="fa-solid fa-box-open fa-fw me-2"></i>
+                          Izkomplektēt</a
                         >
                       </li>
                       <li>
@@ -335,9 +338,16 @@
                   <a
                     href="#"
                     @click.prevent="addPreorder()"
-                    class="btn btn-sm btn-primary"
+                    class="btn btn-sm btn-primary me-2"
                     >Pasūtīts</a
                   >
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light"
+                    @click="openRemapModal()"
+                  >
+                    Pārsaitīt
+                  </button>
                 </div>
                 <!--end::Actions-->
               </div>
@@ -820,6 +830,11 @@
     :preorder="selectedPreorder"
     @refresh="loadPreorders(p?.productid)"
   />
+  <ProductRemapModal
+    ref="productRemapModalRef"
+    :product="p"
+    @remapped="handleRemapSuccess"
+  />
 </template>
 
 <style scoped>
@@ -874,9 +889,12 @@ import EditableField from "./EditableField.vue";
 import type { PreorderedProduct } from "@/types/PreorderedProducts";
 import PreorderModal from "@/components/product/PreorderModal.vue";
 import ProductSuppliers from "@/components/product/ProductSuppliers.vue";
+import ProductRemapModal from "@/components/product/ProductRemapModal.vue";
+import { DrawerComponent } from "@/assets/ts/components";
 
 export default defineComponent({
   components: {
+    ProductRemapModal,
     ProductSuppliers,
     PreorderModal,
     LogModal,
@@ -1181,6 +1199,7 @@ export default defineComponent({
       preorders,
       selectedPreorder,
       loadPreorders,
+      productStore,
     };
   },
   computed: {
@@ -1284,6 +1303,22 @@ export default defineComponent({
       this.selectedPreorder = preorder_data;
       this.$nextTick(() => {
         (this.$refs.preorderModalRef as any).show();
+      });
+    },
+    openRemapModal() {
+      (this.$refs.productRemapModalRef as any).show();
+    },
+    handleRemapSuccess(targetProduct) {
+      const drawer = DrawerComponent.getInstance("product_drawer");
+      if (drawer) drawer.hide();
+
+      const targetProductId =
+        targetProduct?.productid || targetProduct?.shop?.productid;
+      if (!targetProductId) return;
+
+      ApiService.get(`/product/find/id/${targetProductId}`).then((response) => {
+        const data = response.data[0];
+        if (data) this.productStore.setProduct([data]);
       });
     },
     updateFormattedValue(
