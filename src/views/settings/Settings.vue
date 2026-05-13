@@ -45,11 +45,17 @@
                 >
                 <i
                   v-if="!data.data.upload_to_web"
-                  class="fa-kit fa-solid-globe-slash ms-2 text-warning"
-                  title="Grupa un apakšgrupas netiek rādītas web"
+                  class="fa-solid fa-align-slash ms-2 text-warning"
+                  title="Grupa un apakšgrupas netiek rādītas e-veikalā kokā"
                   v-tooltip
-                ></i
-              ></span>
+                ></i>
+                <i
+                  v-if="data.data.block_products_in_web"
+                  class="fa-solid fa-do-not-enter ms-2 text-danger"
+                  title="Produkti netiek lādēti e-veikalā"
+                  v-tooltip
+                ></i>
+              </span>
               <span>
                 <router-link
                   v-if="data.data.products > 0"
@@ -344,6 +350,8 @@ export default defineComponent({
           image: "",
           parentid: "",
           upload_to_web: true,
+          enabled_in_web: true,
+          block_products_in_web: false,
         };
       }
 

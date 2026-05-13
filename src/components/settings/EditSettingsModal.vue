@@ -124,7 +124,7 @@
 
               <div class="d-flex flex-stack mb-8">
                 <div class="me-5">
-                  <label class="fs-6">Rādīt e-veikalā</label>
+                  <label class="fs-6">Rādīt e-veikala kokā</label>
 
                   <div class="fs-7 fw-semobold text-gray-400">
                     Paslēpj šo un visas apakšgrupas e-veikala kokā
@@ -138,6 +138,27 @@
                     type="checkbox"
                     value="1"
                     v-model="formData.upload_to_web"
+                  />
+                </label>
+                <!--end::Switch-->
+              </div>
+
+              <div class="d-flex flex-stack mb-8">
+                <div class="me-5">
+                  <label class="fs-6">Nelādēt produktus e-veikalā</label>
+
+                  <div class="fs-7 fw-semobold text-gray-400">
+                    Kategorijas produkti e-veikalā nebūs atrodami
+                  </div>
+                </div>
+                <label
+                  class="form-check form-switch form-check-custom form-check-solid"
+                >
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    value="1"
+                    v-model="formData.block_products_in_web"
                   />
                 </label>
                 <!--end::Switch-->
