@@ -56,7 +56,30 @@
                     </el-radio-group>
                   </el-form-item>
                   <el-form-item prop="companyname" label="Nosaukums">
-                    <el-input v-model="formData.companyname" />
+                    <el-autocomplete
+                      class="w-100"
+                      v-model="formData.companyname"
+                      :fetch-suggestions="searchCompanies"
+                      value-key="companyname"
+                      :trigger-on-focus="false"
+                      :teleported="false"
+                      popper-class="client-company-autocomplete"
+                      clearable
+                      @select="selectCompanySuggestion"
+                      placeholder="Sāc rakstīt, lai meklētu uzņēmumus"
+                    >
+                      <template #default="{ item }">
+                        <div class="client-company-suggestion">
+                          <div class="fw-semibold">
+                            {{ item.companyname }}
+                          </div>
+                          <div class="fs-8">{{ item.reg_code }}</div>
+                          <div class="fs-8 text-muted">
+                            {{ item.addressLine }}
+                          </div>
+                        </div>
+                      </template>
+                    </el-autocomplete>
                   </el-form-item>
                   <el-form-item prop="nmrno" label="Reģ. nr">
                     <el-input v-model="formData.nmrno" />
@@ -164,6 +187,17 @@ import type { FormInstance } from "element-plus";
 import type { Client } from "@/types/Client";
 import { useAuthStore } from "@/stores/auth";
 
+interface CompanySearchResult {
+  legal_form?: string;
+  name?: string;
+  city?: string;
+  address?: string;
+  reg_code?: string;
+  vat_number?: string;
+  companyname?: string;
+  addressLine?: string;
+}
+
 export default defineComponent({
   name: "payment-modal",
   components: { SelectComponent },
@@ -183,6 +217,7 @@ export default defineComponent({
     const clientEditModalRef = ref();
     const loading = ref<boolean>(false);
     const vatComment = ref<string>("");
+    const companySearchRequestId = ref<number>(0);
 
     const blankForm: Client = {
       companyid: "",
@@ -329,10 +364,58 @@ export default defineComponent({
       vatComment,
       invalidateVAT,
       creditAllowed,
+      companySearchRequestId,
     };
   },
 
   methods: {
+    formatCompanySearchResult(company: CompanySearchResult) {
+      return {
+        ...company,
+        companyname: [company.name, company.legal_form]
+          .filter(Boolean)
+          .join(" "),
+        addressLine: [company.address, company.city].filter(Boolean).join(", "),
+      };
+    },
+    searchCompanies(
+      queryString: string,
+      cb: (results: CompanySearchResult[]) => void
+    ) {
+      const name = queryString.trim();
+      const requestId = this.companySearchRequestId + 1;
+      this.companySearchRequestId = requestId;
+
+      if (name.length < 2) {
+        cb([]);
+        return;
+      }
+
+      ApiService.get("api/company", "search", { name })
+        .then((response) => {
+          if (requestId !== this.companySearchRequestId) {
+            return;
+          }
+
+          const results = Array.isArray(response.data) ? response.data : [];
+          cb(results.map(this.formatCompanySearchResult));
+        })
+        .catch((error) => {
+          if (requestId !== this.companySearchRequestId) {
+            return;
+          }
+
+          console.error(`Error fetching company search data:`, error);
+          cb([]);
+        });
+    },
+    selectCompanySuggestion(company: CompanySearchResult) {
+      this.formData.companyname = company.companyname || "";
+      this.formData.address = company.addressLine || "";
+      this.formData.nmrno = company.reg_code || "";
+      this.formData.pvnno = company.vat_number || "";
+      this.invalidateVAT();
+    },
     submit() {
       (this.$refs.formRef as FormInstance).validate((valid: boolean) => {
         if (valid) {
@@ -408,3 +491,16 @@ export default defineComponent({
   },
 });
 </script>
+
+<style>
+.client-company-autocomplete .el-autocomplete-suggestion li {
+  cursor: pointer;
+  height: auto;
+  line-height: normal;
+  padding: 6px 12px;
+}
+
+.client-company-suggestion {
+  line-height: 1.35;
+}
+</style>
