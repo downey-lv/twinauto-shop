@@ -129,15 +129,31 @@
           >
             <i class="fa-solid fa-mobile-signal-out"></i>
           </button>
-          <button
-            type="button"
-            class="btn btn-sm btn-light"
-            title="Drukāt dokumentu"
-            v-tooltip
-            @click="printDocument"
-          >
-            <i class="fa-solid fa-fw fa-print"></i>
-          </button>
+          <div class="btn-group">
+            <button
+              type="button"
+              class="btn btn-sm btn-light dropdown-toggle"
+              title="Drukāt dokumentu"
+              v-tooltip
+              data-bs-toggle="dropdown"
+            >
+              <i class="fa-solid fa-fw fa-print"></i>
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item cursor-pointer" @click="printDocument"
+                  >Pavaddokuments</a
+                >
+              </li>
+              <li>
+                <a
+                  class="dropdown-item cursor-pointer"
+                  @click="printPackingList"
+                  >Iepakošanas saraksts</a
+                >
+              </li>
+            </ul>
+          </div>
           <button
             type="button"
             class="btn btn-sm btn-light"
@@ -699,6 +715,12 @@ export default defineComponent({
     async printDocument() {
       await ApiService.pdf(
         "document/print",
+        String(this.$route.params.documentId)
+      );
+    },
+    async printPackingList() {
+      await ApiService.pdf(
+        "document/print/packing",
         String(this.$route.params.documentId)
       );
     },
