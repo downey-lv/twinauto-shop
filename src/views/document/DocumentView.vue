@@ -12,7 +12,7 @@
           <i class="fa-solid fa-car-wrench"></i> Atvērt remontu
         </a>
         <button
-          v-if="hasRepackage"
+          v-if="hasRepackage && documentData.grouping === 'in'"
           class="btn btn-sm btn-primary me-2"
           @click="repackageDocument()"
         >
