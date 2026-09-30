@@ -6,6 +6,7 @@ import {
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { getOption } from "@/core/services/OptionService";
+import { consumeProtocolLaunch } from "@/core/services/AutoshopProtocol";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -105,6 +106,12 @@ const routes: Array<RouteRecordRaw> = [
           breadcrumbStore: "document",
         },
         children: [
+          {
+            path: "open/:documentId",
+            name: "document-open",
+            component: () => import("@/views/document/DocumentOpen.vue"),
+            meta: { pageTitle: "Atvērt dokumentu" },
+          },
           {
             path: "list/:type",
             name: "document-list",
@@ -337,6 +344,10 @@ const routes: Array<RouteRecordRaw> = [
   },
 ];
 
+// Hash history captures the current URL during construction. Resolve protocol
+// launches here, before that capture (main.ts runs after its imports evaluate).
+consumeProtocolLaunch();
+
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
@@ -360,7 +371,7 @@ router.beforeEach((to, from, next) => {
     if (authStore.isAuthenticated) {
       next();
     } else {
-      next({ name: "sign-in" });
+      next({ name: "sign-in", query: { redirect: to.fullPath } });
     }
   } else {
     next();

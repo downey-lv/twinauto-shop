@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 import { Tooltip } from "bootstrap";
 import App from "./App.vue";
+import { registerProtocolLaunchConsumer, registerAutoshopProtocol } from "@/core/services/AutoshopProtocol";
 
 //imports for app initialization
 import ApiService from "@/core/services/ApiService";
@@ -89,3 +90,5 @@ app.directive("tooltip-html", makeTooltip({ html: true }));
 // Place it at THE END of the app.use() chain, just right before app.mount()
 export const push = createNotivue(app);
 app.mount("#app");
+registerProtocolLaunchConsumer(router);
+registerAutoshopProtocol();

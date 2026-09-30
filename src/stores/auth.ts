@@ -47,7 +47,12 @@ export const useAuthStore = defineStore("auth", () => {
     user.value = {} as User;
     errors.value = [];
     JwtService.destroyToken();
-    if (error) router.push({ name: "sign-in" });
+    if (error && router.currentRoute.value.name !== "sign-in") {
+      router.push({
+        name: "sign-in",
+        query: { redirect: router.currentRoute.value.fullPath },
+      });
+    }
   }
 
   function login(credentials: User) {

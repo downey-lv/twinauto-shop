@@ -17,5 +17,11 @@
   ],
   "theme_color": "#1e1e2d",
   "background_color": "#1e1e2d",
-  "display": "standalone"
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
+  "protocol_handlers": [
+    { "protocol": "web+autoshop", "url": "/?autoshop=%s" }
+  ],
+  "launch_handler": { "client_mode": "navigate-existing" }
 }

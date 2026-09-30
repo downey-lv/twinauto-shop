@@ -139,7 +139,12 @@ export default defineComponent({
       const error = Object.values(store.errors);
 
       if (error.length === 0) {
-        router.push({ name: "dashboard" });
+        const redirect = router.currentRoute.value.query.redirect;
+        router.push(
+          typeof redirect === "string" && redirect.startsWith("/") && !redirect.startsWith("//")
+            ? redirect
+            : { name: "dashboard" }
+        );
       } else {
         Swal.fire({
           text: error[0] as string,
