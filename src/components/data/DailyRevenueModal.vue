@@ -38,7 +38,7 @@
               <template #default="scope">
                 <a
                   v-if="scope.row.eshopId"
-                  :href="`https://vide.twinauto.lv/eshop/order/view/${scope.row.eshopId}`"
+                  :href="`https://vide-jauns.twinauto.lv/eshop/order/view/${scope.row.eshopId}`"
                   class="text-info fw-bold"
                   target="_blank"
                   >Atvērt dokumentu</a

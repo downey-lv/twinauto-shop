@@ -5,7 +5,7 @@
       <div class="card-toolbar">
         <a
           v-if="documentData.links?.repair"
-          :href="`https://vide.twinauto.lv/service/repair/info/${documentData.links.repair}`"
+          :href="`https://vide-jauns.twinauto.lv/service/repair/info/${documentData.links.repair}`"
           target="_blank"
           class="btn btn-sm btn-light me-2"
         >
@@ -22,7 +22,7 @@
           <div class="btn-group me-2" role="group">
             <a
               v-if="documentData.links?.invoice"
-              :href="`https://vide.twinauto.lv/shop/invoice/${documentData.links.invoice}`"
+              :href="`https://vide-jauns.twinauto.lv/pavadzimes/veikals/${documentData.links.invoice}`"
               target="_blank"
               class="btn btn-sm btn-light"
             >
@@ -30,7 +30,7 @@
             </a>
             <a
               v-if="documentData.links?.prepaid"
-              :href="`https://vide.twinauto.lv/shop/documents/?document_id=${$route.params.documentId}`"
+              :href="`https://vide-jauns.twinauto.lv/shop/documents/?document_id=${$route.params.documentId}`"
               target="_blank"
               class="btn btn-sm btn-light"
             >
@@ -53,7 +53,7 @@
                 <a
                   v-if="!documentData.links?.invoice"
                   class="dropdown-item"
-                  :href="`https://vide.twinauto.lv/shop/invoice/new_${$route.params.documentId}`"
+                  :href="`https://vide-jauns.twinauto.lv/pavadzimes/veikals/jauna?dokuments=${$route.params.documentId}`"
                   target="_blank"
                   >{{
                     documentData.ordertypeid === "8"
@@ -70,7 +70,7 @@
                     documentData.ordertypeid !== '8'
                   "
                   class="dropdown-item"
-                  :href="`https://vide.twinauto.lv/shop/documents/?document_id=${$route.params.documentId}`"
+                  :href="`https://vide-jauns.twinauto.lv/shop/documents/?document_id=${$route.params.documentId}`"
                   target="_blank"
                   >Rēķins</a
                 >
