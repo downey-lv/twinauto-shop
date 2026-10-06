@@ -108,11 +108,22 @@
                     />
                   </el-form-item>
                   <SelectComponent
-                    :model-value="formData.country"
+                    v-model="formData.country"
                     :options="countries"
                     prop="country"
                     label="Valsts"
+                    @change="countryChanged"
                   />
+                  <el-form-item v-if="exportCountry" label="Bez PVN (eksports)">
+                    <el-switch
+                      v-model="formData.vat_excluded"
+                      active-text="Jā"
+                      inactive-text="Nē"
+                    />
+                    <div class="fs-7 text-muted">
+                      Pārdošanas dokumenti šim klientam būs bez PVN
+                    </div>
+                  </el-form-item>
                   <el-form-item prop="account" label="Bankas konts">
                     <el-input v-model="formData.account" />
                   </el-form-item>
@@ -178,7 +189,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
+import { computed, defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import SelectComponent from "@/components/core/form/SelectComponent.vue";
 import ApiService from "@/core/services/ApiService";
 import { push } from "@/main";
@@ -340,11 +351,28 @@ export default defineComponent({
       ],
     });
 
-    // Remove VAT values
+    // Remove VAT values (an export customer's "without VAT" does not depend on the VAT number)
     function invalidateVAT() {
       formData.value.vat_validated = null;
-      formData.value.vat_excluded = false;
+      if (!exportCountry.value) formData.value.vat_excluded = false;
       vatComment.value = "<span class='text-warning'>Nav pārbaudīts</span>";
+    }
+
+    // Outside the EU: without VAT is set by hand (export); in the EU only by a valid VIES check, never in Latvia
+    const exportCountry = computed(() => {
+      const country = countries.value.find(
+        (c: { id: string; eu?: boolean }) => c.id === formData.value.country
+      ) as { id: string; eu?: boolean } | undefined;
+      return !!country && !country.eu;
+    });
+
+    function countryChanged() {
+      const country = formData.value.country;
+      if (!country || country.toUpperCase() === "LV") {
+        formData.value.vat_excluded = false;
+      } else if (!exportCountry.value && !formData.value.vat_validated) {
+        formData.value.vat_excluded = false;
+      }
     }
 
     // Set permissions
@@ -363,6 +391,8 @@ export default defineComponent({
       countries,
       vatComment,
       invalidateVAT,
+      exportCountry,
+      countryChanged,
       creditAllowed,
       companySearchRequestId,
     };
@@ -463,7 +493,8 @@ export default defineComponent({
           if (data.isValid) {
             this.vatComment = "<span class='text-success'>Derīgs</span>";
             this.formData.vat_validated = data.requestDate;
-            this.formData.country = data.country;
+            // VIES calls Greece "EL"
+            this.formData.country = data.country === "EL" ? "GR" : data.country;
 
             if (data.address) this.formData.address = data.address;
             if (data.name) this.formData.companyname = data.name;

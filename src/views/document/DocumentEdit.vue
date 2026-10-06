@@ -199,7 +199,16 @@
                 <div class="p-2">{{ totalPrice.toFixed(2) }} €</div>
               </div>
               <div class="d-flex">
-                <div class="p-2 flex-grow-1">PVN, {{ document.vat }}%</div>
+                <div class="p-2 flex-grow-1">
+                  PVN, {{ document.vat }}%
+                  <span
+                    v-if="vatExcluded && Number(document.vat) === 0"
+                    class="badge badge-light-warning ms-2"
+                    title="Klients bez PVN: ES uzņēmums ar derīgu PVN numuru vai eksports"
+                    v-tooltip
+                    >Bez PVN</span
+                  >
+                </div>
                 <div class="p-2">{{ totalVAT.toFixed(2) }} €</div>
               </div>
               <div class="d-flex fw-bold">
@@ -1176,15 +1185,41 @@ export default defineComponent({
       checkClient();
     };
 
+    // Sales to a customer without VAT (EU company validated in VIES, or export) are without VAT; the API decides the same on save
+    const VAT_FREE_ORDER_TYPES = ["2", "7", "8", "11", "15"];
+    const vatExcluded = ref(false);
+    const applyVat = () => {
+      if (document.value.islocked) return;
+      if (!VAT_FREE_ORDER_TYPES.includes(String(document.value.ordertypeid)))
+        return;
+      const vat = vatExcluded.value ? 0 : 21;
+      if (Number(document.value.vat) !== vat) document.value.vat = vat;
+    };
+    const vWatcher = watch(
+      () => document.value.ordertypeid,
+      () => applyVat()
+    );
+    watcherHandles.push(vWatcher);
+
     // Check client
     const client_status = ref<null | ClientStatus>(null);
     const checkClient = () => {
       const company_id = document.value.companyid;
       client_status.value = null;
+      if (!company_id) {
+        vatExcluded.value = false;
+        applyVat();
+      }
       if (company_id) {
         ApiService.get("company", company_id)
           .then((response) => {
             client_status.value = response.data[0].status;
+            const company = response.data[0];
+            vatExcluded.value =
+              !!company.vat_excluded &&
+              !!company.country &&
+              String(company.country).toUpperCase() !== "LV";
+            applyVat();
           })
           .catch(() => {
             push.error("Neizdevās ielādēt klienta statusu");
@@ -1277,6 +1312,7 @@ export default defineComponent({
       timestampNew,
       companyChanged,
       client_status,
+      vatExcluded,
     };
   },
   async mounted() {

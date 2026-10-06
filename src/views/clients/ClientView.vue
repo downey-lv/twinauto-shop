@@ -33,13 +33,15 @@
                       })`"
                       v-tooltip
                     ></i>
-                    <i
-                      v-if="client.vat_excluded"
-                      class="fa-solid fa-money-bill-transfer text-warning ms-2"
-                      title="Bez PVN"
-                      v-tooltip
-                    ></i>
                   </template>
+                  <i
+                    v-if="client.vat_excluded"
+                    class="fa-solid fa-money-bill-transfer text-warning ms-2"
+                    :title="
+                      client.vat_validated ? 'Bez PVN' : 'Bez PVN (eksports)'
+                    "
+                    v-tooltip
+                  ></i>
                 </div>
               </div>
               <div class="row">
