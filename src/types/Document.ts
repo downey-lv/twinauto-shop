@@ -61,6 +61,17 @@ export interface Document {
   paymentRecipient?: string;
   paymentType?: string;
   cartId?: string | null;
+  confirmed?: ConfirmedInvoice | null;
+  confirmed_due_date?: string | null;
+  confirmed_amount?: string | number | null;
+  confirmed_source?: string | null;
+}
+
+// Supplier-confirmed invoice values from import
+export interface ConfirmedInvoice {
+  dueDate: string | null;
+  amount: number | null;
+  source?: string | null;
 }
 
 interface DocumentLinks {
@@ -81,6 +92,7 @@ export interface Imported {
   term: string;
   shipping: number;
   comment: string;
+  confirmed?: ConfirmedInvoice | null;
   items: ImportedProduct[];
 }
 

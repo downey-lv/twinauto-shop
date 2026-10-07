@@ -149,6 +149,12 @@
                       @keydown.enter.prevent
                       class="w-100"
                     />
+                    <div
+                      v-if="confirmedDueDateDiffers"
+                      class="fs-7 fw-semibold text-warning"
+                    >
+                      Piegādātāja termiņš: {{ confirmedDueDate }}
+                    </div>
                   </el-form-item>
                 </div>
                 <div class="fv-row" v-else-if="!document.orderid">
@@ -215,6 +221,21 @@
                 <div class="p-2 flex-grow-1">Summa ar PVN</div>
                 <div class="p-2">{{ totalPriceVAT.toFixed(2) }} €</div>
               </div>
+              <template v-if="confirmedAmount !== null">
+                <div class="d-flex">
+                  <div class="p-2 flex-grow-1">Rēķina summa (piegādātājs)</div>
+                  <div class="p-2">{{ confirmedAmount.toFixed(2) }} €</div>
+                </div>
+                <el-alert
+                  v-if="confirmedAmountDifference !== null"
+                  type="warning"
+                  :closable="false"
+                  show-icon
+                  :title="`Dokumenta summa nesakrīt ar piegādātāja rēķinu (starpība ${confirmedAmountDifference.toFixed(
+                    2
+                  )} €)`"
+                />
+              </template>
             </div>
           </div>
         </div>
@@ -592,6 +613,7 @@ export default defineComponent({
       paymentRecipient: "",
       paymentType: "",
       cartId: null,
+      confirmed: null,
       grouping: String(route.params.type),
     };
 
@@ -820,6 +842,30 @@ export default defineComponent({
       calculateTotalVAT(totalPriceVAT.value, totalPrice.value)
     );
 
+    // Supplier-confirmed invoice values
+    const confirmedAmount = computed(() => {
+      const amount = document.value.confirmed?.amount;
+      return amount === null || amount === undefined
+        ? null
+        : new Decimal(amount);
+    });
+    const confirmedAmountDifference = computed(() => {
+      if (confirmedAmount.value === null) return null;
+      const difference = totalPriceVAT.value.minus(confirmedAmount.value);
+      return difference.abs().greaterThan(0.01) ? difference : null;
+    });
+    const confirmedDueDate = computed(() => {
+      const dueDate = document.value.confirmed?.dueDate;
+      return dueDate ? DateTime.fromISO(dueDate).toISODate() : null;
+    });
+    const confirmedDueDateDiffers = computed(
+      () =>
+        !!confirmedDueDate.value &&
+        !!document.value.payterm &&
+        DateTime.fromJSDate(document.value.payterm).toISODate() !==
+          confirmedDueDate.value
+    );
+
     // Delete buttons
     const state = reactive({
       loadingProduct: document.value.products.map(() => false),
@@ -977,6 +1023,7 @@ export default defineComponent({
           document.value.orderdate = DateTime.fromISO(data.date).toJSDate();
           document.value.payterm = DateTime.fromISO(data.term).toJSDate();
           document.value.comment = data.comment ?? "";
+          document.value.confirmed = data.confirmed ?? null;
           updatePayterm(data.term);
 
           products = [];
@@ -1073,6 +1120,20 @@ export default defineComponent({
           response.data.payterm = DateTime.fromISO(
             response.data.payterm
           ).toJSDate();
+
+          // Supplier-confirmed invoice values
+          response.data.confirmed =
+            response.data.confirmed_due_date ||
+            response.data.confirmed_amount != null
+              ? {
+                  dueDate: response.data.confirmed_due_date,
+                  amount:
+                    response.data.confirmed_amount == null
+                      ? null
+                      : parseFloat(response.data.confirmed_amount),
+                  source: response.data.confirmed_source,
+                }
+              : null;
 
           // Format products
           response.data.products.forEach((product) => {
@@ -1290,6 +1351,10 @@ export default defineComponent({
       blankProduct,
       totalPrice,
       totalPriceVAT,
+      confirmedAmount,
+      confirmedAmountDifference,
+      confirmedDueDate,
+      confirmedDueDateDiffers,
       totalVAT,
       ...stateRefs,
       debouncedSearch: {} as any,
@@ -1442,6 +1507,10 @@ export default defineComponent({
           if (!data.orderdate || !data.payterm) return;
           data.orderdate = DateTime.fromJSDate(data.orderdate).toISODate();
           data.payterm = DateTime.fromJSDate(data.payterm).toISODate();
+          if (data.confirmed?.dueDate)
+            data.confirmed.dueDate = DateTime.fromISO(
+              data.confirmed.dueDate
+            ).toISODate();
 
           this.loading = true;
           ApiService.post("document/", data)

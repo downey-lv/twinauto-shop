@@ -261,6 +261,10 @@
               {{ String(documentData.payterm).split("T")[0] }}
             </div>
           </div>
+          <div class="row" v-if="confirmedDueDate">
+            <div class="col-5 fw-bold">Piegādātāja termiņš</div>
+            <div class="col">{{ confirmedDueDate }}</div>
+          </div>
           <div class="row">
             <div class="col-5 fw-bold">Apmaksāts</div>
             <div class="col">
@@ -299,6 +303,20 @@
           <div class="row">
             <div class="col-5 fw-bold">Summa ar PVN</div>
             <div class="col">{{ totalPriceVAT }} €</div>
+          </div>
+          <div class="row" v-if="confirmedAmount !== null">
+            <div class="col-5 fw-bold">Piegādātāja summa</div>
+            <div class="col">
+              {{ confirmedAmount.toFixed(2) }} €
+              <span
+                v-if="confirmedAmountDifference !== null"
+                class="badge badge-danger ms-2"
+                title="Dokumenta summa nesakrīt ar piegādātāja rēķinu"
+                v-tooltip
+                >Starpība {{ confirmedAmountDifference.toFixed(2) }} €</span
+              >
+              <span v-else class="badge badge-success ms-2">Sakrīt</span>
+            </div>
           </div>
           <template v-if="(documentData.balance_due ?? 0) > 0">
             <div class="separator my-2"></div>
@@ -580,6 +598,23 @@ export default defineComponent({
       calculateTotalVAT(totalPriceVAT.value, totalPrice.value)
     );
 
+    // Supplier-confirmed invoice values
+    const confirmedAmount = computed(() => {
+      const amount = documentData.value.confirmed_amount;
+      return amount === null || amount === undefined
+        ? null
+        : new Decimal(amount);
+    });
+    const confirmedAmountDifference = computed(() => {
+      if (confirmedAmount.value === null) return null;
+      const difference = totalPriceVAT.value.minus(confirmedAmount.value);
+      return difference.abs().greaterThan(0.01) ? difference : null;
+    });
+    const confirmedDueDate = computed(() => {
+      const dueDate = documentData.value.confirmed_due_date;
+      return dueDate ? DateTime.fromISO(dueDate).toISODate() : null;
+    });
+
     // Tooltips for table
     const initializeTooltips = () => {
       nextTick(() => {
@@ -682,6 +717,9 @@ export default defineComponent({
       loading,
       documentData,
       totalPrice,
+      confirmedAmount,
+      confirmedAmountDifference,
+      confirmedDueDate,
       totalPriceVAT,
       totalVAT,
       fetchDocument,
