@@ -195,6 +195,45 @@
                     />
                   </el-form-item>
                 </div>
+                <div class="fv-row" v-if="$route.params.type === 'in'">
+                  <label class="fs-6" :class="{ required: invoicePdfRequired }"
+                    >Rēķina PDF</label
+                  >
+                  <el-form-item>
+                    <div class="d-flex align-items-center gap-3 w-100">
+                      <el-upload
+                        :show-file-list="false"
+                        :http-request="uploadInvoicePdf"
+                        :before-upload="checkInvoicePdf"
+                        accept=".pdf,application/pdf"
+                      >
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-light-primary"
+                          :disabled="uploadingPdf"
+                        >
+                          <i class="fa-solid fa-file-pdf"></i>
+                          {{ invoicePdfName ? "Aizstāt" : "Pievienot" }}
+                        </button>
+                      </el-upload>
+                      <span v-if="document.pendingFile" class="text-truncate">
+                        {{ document.pendingFile.fileName }}
+                        <span class="badge badge-light-warning ms-1"
+                          >Tiks saglabāts</span
+                        >
+                      </span>
+                      <a
+                        v-else-if="document.invoice_file"
+                        href="#"
+                        class="text-truncate"
+                        @click.prevent="openInvoicePdf"
+                        ><i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        {{ document.invoice_file.fileName }}</a
+                      >
+                      <span v-else class="text-muted">Nav pievienots</span>
+                    </div>
+                  </el-form-item>
+                </div>
               </div>
             </div>
           </div>
@@ -648,6 +687,68 @@ export default defineComponent({
     const newDocument = computed(() =>
       String(route.params.editId).startsWith("new")
     );
+
+    // Invoice PDF: required on new incoming documents from marked suppliers
+    const invoicePdfRequired = computed(() => {
+      if (route.params.type !== "in" || !newDocument.value) return false;
+      const company = companies.value.find(
+        (company) => company.id === document.value.companyid
+      );
+      return !!company?.require_invoice_pdf;
+    });
+    const invoicePdfName = computed(
+      () =>
+        document.value.pendingFile?.fileName ??
+        document.value.invoice_file?.fileName ??
+        null
+    );
+    const uploadingPdf = ref(false);
+    const checkInvoicePdf = (file: File) => {
+      const isPdf =
+        file.type === "application/pdf" ||
+        file.name.toLowerCase().endsWith(".pdf");
+      if (!isPdf) {
+        push.error("Fails nav PDF");
+        return false;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        push.error("PDF ir lielāks par 10 MB");
+        return false;
+      }
+      return true;
+    };
+    const uploadInvoicePdf = (upload) => {
+      uploadingPdf.value = true;
+
+      const data = new FormData();
+      data.append("file", upload.file);
+
+      return ApiService.post("document/file/", data)
+        .then((response) => {
+          const { fileId, fileName, size, duplicateOf } = response.data;
+          document.value.pendingFile = { fileId, fileName, size };
+
+          if (
+            duplicateOf &&
+            String(duplicateOf.orderid) !== document.value.orderid
+          )
+            push.warning(
+              `Šis PDF jau pievienots dokumentam ${
+                duplicateOf.waybillno || duplicateOf.orderid
+              }`
+            );
+        })
+        .catch((err) => {
+          push.error(err.response?.data?.message ?? "Neizdevās pievienot PDF");
+        })
+        .finally(() => {
+          uploadingPdf.value = false;
+        });
+    };
+    const openInvoicePdf = () => {
+      if (document.value.orderid)
+        ApiService.pdf("document/file", String(document.value.orderid));
+    };
 
     // Custom validators
     const validateWaybillno = async (rule, value, callback) => {
@@ -1355,6 +1456,12 @@ export default defineComponent({
       confirmedAmountDifference,
       confirmedDueDate,
       confirmedDueDateDiffers,
+      invoicePdfRequired,
+      invoicePdfName,
+      uploadingPdf,
+      checkInvoicePdf,
+      uploadInvoicePdf,
+      openInvoicePdf,
       totalVAT,
       ...stateRefs,
       debouncedSearch: {} as any,
@@ -1499,9 +1606,22 @@ export default defineComponent({
         (product) => !isEqual(product, this.blankProduct)
       );
 
+      // Invoice PDF
+      if (
+        this.invoicePdfRequired &&
+        !this.document.pendingFile &&
+        !this.document.invoice_file
+      ) {
+        push.warning("Pievieno rēķina PDF");
+        return;
+      }
+
       (this.$refs.formRef as FormInstance).validate((valid: boolean) => {
         if (valid) {
           const data = cloneDeep(this.document) as any;
+          data.pendingFileId = data.pendingFile?.fileId ?? null;
+          delete data.pendingFile;
+          delete data.invoice_file;
 
           // Format dates
           if (!data.orderdate || !data.payterm) return;

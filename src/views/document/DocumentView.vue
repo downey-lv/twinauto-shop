@@ -290,6 +290,22 @@
             <div class="col-5 fw-bold">Komentārs</div>
             <div class="col">{{ documentData.comment }}</div>
           </div>
+          <div
+            class="row"
+            v-if="documentData.invoice_file || documentData.require_invoice_pdf"
+          >
+            <div class="col-5 fw-bold">Rēķina PDF</div>
+            <div class="col">
+              <a
+                v-if="documentData.invoice_file"
+                href="#"
+                @click.prevent="openInvoicePdf"
+                ><i class="fa-solid fa-file-pdf"></i>
+                {{ documentData.invoice_file.fileName }}</a
+              >
+              <span v-else class="badge badge-danger">Nav pievienots</span>
+            </div>
+          </div>
         </div>
         <div class="col-lg">
           <div class="row">
@@ -598,6 +614,11 @@ export default defineComponent({
       calculateTotalVAT(totalPriceVAT.value, totalPrice.value)
     );
 
+    // Invoice PDF
+    const openInvoicePdf = () => {
+      ApiService.pdf("document/file", String(documentData.value.orderid));
+    };
+
     // Supplier-confirmed invoice values
     const confirmedAmount = computed(() => {
       const amount = documentData.value.confirmed_amount;
@@ -720,6 +741,7 @@ export default defineComponent({
       confirmedAmount,
       confirmedAmountDifference,
       confirmedDueDate,
+      openInvoicePdf,
       totalPriceVAT,
       totalVAT,
       fetchDocument,

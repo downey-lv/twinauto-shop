@@ -55,6 +55,20 @@
                       >
                     </el-radio-group>
                   </el-form-item>
+                  <el-form-item
+                    v-if="formData.is_supplier"
+                    label="Obligāts rēķina PDF"
+                  >
+                    <el-switch
+                      v-model="formData.require_invoice_pdf"
+                      active-text="Jā"
+                      inactive-text="Nē"
+                    />
+                    <div class="fs-7 text-muted">
+                      Jaunus ienākošos dokumentus nevarēs saglabāt bez rēķina
+                      PDF
+                    </div>
+                  </el-form-item>
                   <el-form-item prop="companyname" label="Nosaukums">
                     <el-autocomplete
                       class="w-100"
@@ -246,6 +260,7 @@ export default defineComponent({
       vat_validated: null,
       vat_excluded: false,
       is_supplier: false,
+      require_invoice_pdf: false,
       credit: null,
     };
     const formData = ref({ ...blankForm });

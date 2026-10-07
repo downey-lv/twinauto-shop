@@ -4,6 +4,7 @@ export interface Company {
   id: string;
   name: string;
   default_payterm: string;
+  require_invoice_pdf?: boolean;
 }
 
 export interface Type {
@@ -65,6 +66,16 @@ export interface Document {
   confirmed_due_date?: string | null;
   confirmed_amount?: string | number | null;
   confirmed_source?: string | null;
+  invoice_file?: InvoiceFile | null;
+  pendingFile?: InvoiceFile | null;
+  require_invoice_pdf?: boolean | null;
+}
+
+// Supplier invoice PDF
+export interface InvoiceFile {
+  fileId: number;
+  fileName: string;
+  size: number;
 }
 
 // Supplier-confirmed invoice values from import

@@ -13,6 +13,7 @@ export interface Client {
   vat_validated: any;
   vat_excluded: boolean;
   is_supplier: boolean;
+  require_invoice_pdf?: boolean;
   credit?: number | null;
   comment: string;
   email: string;
