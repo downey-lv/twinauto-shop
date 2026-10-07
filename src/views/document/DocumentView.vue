@@ -321,7 +321,7 @@
             <div class="col">{{ totalPriceVAT }} €</div>
           </div>
           <div class="row" v-if="confirmedAmount !== null">
-            <div class="col-5 fw-bold">Piegādātāja summa</div>
+            <div class="col-5 fw-bold">Summa pavadzīmē</div>
             <div class="col">
               {{ confirmedAmount.toFixed(2) }} €
               <span
