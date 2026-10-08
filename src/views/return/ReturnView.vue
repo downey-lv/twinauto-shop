@@ -132,6 +132,7 @@
         </div>
       </div>
     </template>
+    <PdfModal ref="pdfModal" />
   </div>
 </template>
 
@@ -141,12 +142,13 @@ import { useRoute } from "vue-router";
 import DocumentView from "@/views/document/DocumentView.vue";
 import DocumentTable from "@/components/documents/DocumentTable.vue";
 import ApiService from "@/core/services/ApiService";
+import PdfModal from "@/components/data/PdfModal.vue";
 import { push } from "@/main";
 import type { ReturnView } from "@/types/Return";
 
 export default defineComponent({
   name: "return-view",
-  components: { DocumentTable, DocumentView },
+  components: { DocumentTable, DocumentView, PdfModal },
   setup() {
     const documentId = ref<string | null>(null);
     const route = useRoute();
@@ -214,8 +216,12 @@ export default defineComponent({
           push.error("Neizdevās izdzēst atgriešanu");
         });
     },
-    async printReturn() {
-      await ApiService.pdf("return/print", String(this.$route.params.returnId));
+    printReturn() {
+      (this.$refs.pdfModal as any).show(
+        "return/print",
+        String(this.$route.params.returnId),
+        "Atgriešana"
+      );
     },
   },
 });

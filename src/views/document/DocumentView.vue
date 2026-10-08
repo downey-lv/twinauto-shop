@@ -487,6 +487,7 @@
     logType="orders"
     :logID="String($route.params.documentId)"
   />
+  <PdfModal ref="pdfModal" />
 </template>
 
 <script lang="ts">
@@ -518,6 +519,7 @@ import { useAuthStore } from "@/stores/auth";
 import ImageHover from "@/components/product/ImageHover.vue";
 import { Tooltip } from "bootstrap";
 import LogModal from "@/components/data/LogModal.vue";
+import PdfModal from "@/components/data/PdfModal.vue";
 import { useViewHistoryStore } from "@/stores/viewHistory";
 import ClientStatusTag from "@/components/clients/ClientStatusTag.vue";
 import type { ClientStatus } from "@/types/Client";
@@ -535,6 +537,7 @@ export default defineComponent({
     DocumentRepackageModal,
     ClientStatusTag,
     LogModal,
+    PdfModal,
     ImageHover,
     PaymentModal,
     DocumentLabelsModal,
@@ -615,8 +618,13 @@ export default defineComponent({
     );
 
     // Invoice PDF
+    const pdfModal = ref<InstanceType<typeof PdfModal>>();
     const openInvoicePdf = () => {
-      ApiService.pdf("document/file", String(documentData.value.orderid));
+      pdfModal.value?.show(
+        "document/file",
+        String(documentData.value.orderid),
+        documentData.value.invoice_file?.fileName ?? "Rēķina PDF"
+      );
     };
 
     // Supplier-confirmed invoice values
@@ -748,6 +756,7 @@ export default defineComponent({
       confirmedAmountDifference,
       confirmedDueDate,
       openInvoicePdf,
+      pdfModal,
       totalPriceVAT,
       totalVAT,
       fetchDocument,
@@ -778,16 +787,18 @@ export default defineComponent({
     indexMethod(index: number) {
       return index + 1;
     },
-    async printDocument() {
-      await ApiService.pdf(
+    printDocument() {
+      (this.$refs.pdfModal as any).show(
         "document/print",
-        String(this.$route.params.documentId)
+        String(this.$route.params.documentId),
+        "Pavaddokuments"
       );
     },
-    async printPackingList() {
-      await ApiService.pdf(
+    printPackingList() {
+      (this.$refs.pdfModal as any).show(
         "document/print/packing",
-        String(this.$route.params.documentId)
+        String(this.$route.params.documentId),
+        "Iepakošanas saraksts"
       );
     },
     lockDocument(isLocked: boolean) {

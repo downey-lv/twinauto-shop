@@ -227,7 +227,7 @@
                         href="#"
                         class="text-truncate"
                         @click.prevent="openInvoicePdf"
-                        ><i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        ><i class="fa-solid fa-file-pdf"></i>
                         {{ document.invoice_file.fileName }}</a
                       >
                       <span v-else class="text-muted">Nav pievienots</span>
@@ -549,6 +549,7 @@
     :options="tourOptions"
   ></v-tour>
   <ClientModal ref="editModal" no-redirect @refresh="refreshCompany" />
+  <PdfModal ref="pdfModal" />
   <Teleport to="body">
     <div v-if="draggingPdf" class="pdf-drop-overlay">
       <div class="pdf-drop-box">
@@ -616,6 +617,7 @@ import type { Product } from "@/types/Product";
 import { DateTime } from "luxon";
 import { getOption } from "@/core/services/OptionService";
 import ClientModal from "@/components/clients/ClientModal.vue";
+import PdfModal from "@/components/data/PdfModal.vue";
 import { useDocumentStore } from "@/stores/activeDocuments";
 import ClientStatusTag from "@/components/clients/ClientStatusTag.vue";
 import type { ClientStatus } from "@/types/Client";
@@ -624,6 +626,7 @@ export default defineComponent({
   components: {
     ClientStatusTag,
     ClientModal,
+    PdfModal,
     DocumentHeader,
     SelectComponentVirtualized,
     Notice,
@@ -761,9 +764,14 @@ export default defineComponent({
           uploadingPdf.value = false;
         });
     };
+    const pdfModal = ref<InstanceType<typeof PdfModal>>();
     const openInvoicePdf = () => {
       if (document.value.orderid)
-        ApiService.pdf("document/file", String(document.value.orderid));
+        pdfModal.value?.show(
+          "document/file",
+          String(document.value.orderid),
+          document.value.invoice_file?.fileName ?? "Rēķina PDF"
+        );
     };
 
     // Drag and drop invoice PDF anywhere on the page (incoming documents only)
@@ -1534,6 +1542,7 @@ export default defineComponent({
       checkInvoicePdf,
       uploadInvoicePdf,
       openInvoicePdf,
+      pdfModal,
       totalVAT,
       ...stateRefs,
       debouncedSearch: {} as any,

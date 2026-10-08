@@ -25,18 +25,20 @@
         <!--end::Body-->
       </component>
     </div>
+    <PdfModal ref="pdfModal" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import ApiService from "@/core/services/ApiService";
+import PdfModal from "@/components/data/PdfModal.vue";
 import { push } from "@/main";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 
 export default defineComponent({
   name: "stock-dashboard",
-  components: {},
+  components: { PdfModal },
   setup() {
     const loading = ref(false);
     const menu = ref<any>([]);
@@ -223,8 +225,12 @@ export default defineComponent({
           this.loading = false;
         });
     },
-    async printStocktake() {
-      await ApiService.pdf("stocktake/print");
+    printStocktake() {
+      (this.$refs.pdfModal as any).show(
+        "stocktake/print",
+        "",
+        "Inventarizācija"
+      );
     },
     async handleClick(item) {
       if (item.action === "new_stocktake") {

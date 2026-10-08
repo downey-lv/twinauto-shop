@@ -130,14 +130,24 @@ class ApiService {
     return ApiService.vueInstance.axios.delete(resource, { data: params });
   }
 
+  /**
+   * @description Fetch a PDF and return an object URL for it (caller must revoke it)
+   */
+  public static async pdfUrl(
+    resource: string,
+    slug = "",
+    queryParams = {}
+  ): Promise<string> {
+    const response = await ApiService.get(resource, slug, queryParams, {
+      responseType: "blob",
+    });
+    const file = new Blob([response.data], { type: "application/pdf" });
+    return URL.createObjectURL(file);
+  }
+
   public static pdf(resource, slug = "", queryParams = {}) {
-    ApiService.get(resource, slug, queryParams, { responseType: "blob" })
-      .then((response) => {
-        // Create PDF
-        const file = new Blob([response.data], { type: "application/pdf" });
-        // Create URL
-        const fileURL = URL.createObjectURL(file);
-        // Open URL
+    ApiService.pdfUrl(resource, slug, queryParams)
+      .then((fileURL) => {
         window.open(fileURL);
       })
       .catch((error) => {
