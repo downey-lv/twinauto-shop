@@ -5,6 +5,7 @@ export interface Company {
   name: string;
   default_payterm: string;
   require_invoice_pdf?: boolean;
+  eu_vat_validated?: boolean;
 }
 
 export interface Type {
@@ -66,6 +67,7 @@ export interface Document {
   confirmed_due_date?: string | null;
   confirmed_amount?: string | number | null;
   confirmed_source?: string | null;
+  confirmed_without_vat?: boolean;
   invoice_file?: InvoiceFile | null;
   pendingFile?: InvoiceFile | null;
   require_invoice_pdf?: boolean | null;

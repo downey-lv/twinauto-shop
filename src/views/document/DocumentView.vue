@@ -628,8 +628,14 @@ export default defineComponent({
     });
     const confirmedAmountDifference = computed(() => {
       if (confirmedAmount.value === null) return null;
-      const difference = totalPriceVAT.value.minus(confirmedAmount.value);
-      return difference.abs().greaterThan(0.01) ? difference : null;
+      // EU suppliers with a VIES-confirmed VAT number invoice without VAT
+      const documentTotal = documentData.value.confirmed_without_vat
+        ? totalPrice.value.toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
+        : totalPriceVAT.value;
+      const difference = documentTotal
+        .minus(confirmedAmount.value)
+        .toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
+      return difference.isZero() ? null : difference;
     });
     const confirmedDueDate = computed(() => {
       const dueDate = documentData.value.confirmed_due_date;

@@ -227,6 +227,13 @@ export default defineComponent({
         },
         amount_payable: {
           width: "85px",
+          render: function (data, type, row) {
+            const difference = Number(row.invoice_difference ?? 0);
+            if (type !== "display" || difference === 0) return data;
+            return `${data} <span class="badge badge-light-danger" title="Dokumenta summa nesakrīt ar piegādātāja rēķinu">Starpība ${difference.toFixed(
+              2
+            )} €</span>`;
+          },
         },
         companyname: {
           width: "300px",
