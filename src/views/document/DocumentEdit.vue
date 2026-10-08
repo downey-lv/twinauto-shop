@@ -232,6 +232,9 @@
                       >
                       <span v-else class="text-muted">Nav pievienots</span>
                     </div>
+                    <div class="form-text">
+                      Vai ievelciet PDF failu jebkurā lapas vietā
+                    </div>
                   </el-form-item>
                 </div>
               </div>
@@ -546,6 +549,19 @@
     :options="tourOptions"
   ></v-tour>
   <ClientModal ref="editModal" no-redirect @refresh="refreshCompany" />
+  <Teleport to="body">
+    <div v-if="draggingPdf" class="pdf-drop-overlay">
+      <div class="pdf-drop-box">
+        <i class="fa-solid fa-file-pdf"></i>
+        <div class="fs-2 fw-bold mt-4">
+          Atlaidiet, lai pievienotu rēķina PDF
+        </div>
+        <div v-if="invoicePdfName" class="fs-6 text-muted mt-2">
+          Aizstās {{ invoicePdfName }}
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <script lang="ts">
@@ -749,6 +765,52 @@ export default defineComponent({
       if (document.value.orderid)
         ApiService.pdf("document/file", String(document.value.orderid));
     };
+
+    // Drag and drop invoice PDF anywhere on the page (incoming documents only)
+    const draggingPdf = ref(false);
+    let dragDepth = 0;
+    const isPdfDrag = (event: DragEvent) =>
+      route.params.type === "in" &&
+      !!event.dataTransfer?.types.includes("Files");
+    const onPdfDragEnter = (event: DragEvent) => {
+      if (!isPdfDrag(event)) return;
+      event.preventDefault();
+      dragDepth++;
+      draggingPdf.value = true;
+    };
+    const onPdfDragOver = (event: DragEvent) => {
+      if (!isPdfDrag(event)) return;
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = "copy";
+    };
+    const onPdfDragLeave = () => {
+      if (!draggingPdf.value) return;
+      dragDepth = Math.max(0, dragDepth - 1);
+      if (dragDepth === 0) draggingPdf.value = false;
+    };
+    const onPdfDrop = (event: DragEvent) => {
+      if (!isPdfDrag(event)) return;
+      event.preventDefault();
+      dragDepth = 0;
+      draggingPdf.value = false;
+
+      const files = event.dataTransfer?.files;
+      if (!files?.length || uploadingPdf.value) return;
+      if (files.length > 1) push.warning("Pievienots tikai pirmais fails");
+
+      const file = files[0];
+      if (checkInvoicePdf(file)) uploadInvoicePdf({ file });
+    };
+    window.addEventListener("dragenter", onPdfDragEnter);
+    window.addEventListener("dragover", onPdfDragOver);
+    window.addEventListener("dragleave", onPdfDragLeave);
+    window.addEventListener("drop", onPdfDrop);
+    onBeforeUnmount(() => {
+      window.removeEventListener("dragenter", onPdfDragEnter);
+      window.removeEventListener("dragover", onPdfDragOver);
+      window.removeEventListener("dragleave", onPdfDragLeave);
+      window.removeEventListener("drop", onPdfDrop);
+    });
 
     // Custom validators
     const validateWaybillno = async (rule, value, callback) => {
@@ -1467,6 +1529,7 @@ export default defineComponent({
       confirmedDueDateDiffers,
       invoicePdfRequired,
       invoicePdfName,
+      draggingPdf,
       uploadingPdf,
       checkInvoicePdf,
       uploadInvoicePdf,
@@ -1687,3 +1750,34 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.pdf-drop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+.pdf-drop-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border: 3px dashed var(--bs-primary, #3e97ff);
+  border-radius: 1rem;
+  background: var(--bs-body-bg, #fff);
+  opacity: 0.95;
+  text-align: center;
+}
+.pdf-drop-box i {
+  font-size: 5rem;
+  color: var(--bs-danger, #f1416c);
+}
+</style>
