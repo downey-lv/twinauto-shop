@@ -3,6 +3,7 @@ import { createPinia } from "pinia";
 import { Tooltip } from "bootstrap";
 import App from "./App.vue";
 import { registerProtocolLaunchConsumer, registerAutoshopProtocol } from "@/core/services/AutoshopProtocol";
+import { registerUpdateCheck } from "@/core/services/UpdateService";
 
 //imports for app initialization
 import ApiService from "@/core/services/ApiService";
@@ -92,3 +93,4 @@ export const push = createNotivue(app);
 app.mount("#app");
 registerProtocolLaunchConsumer(router);
 registerAutoshopProtocol();
+registerUpdateCheck(router, (message) => push.info(message));
