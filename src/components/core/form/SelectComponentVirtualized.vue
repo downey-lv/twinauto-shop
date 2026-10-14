@@ -40,7 +40,6 @@
 
 <script lang="ts">
 import { computed, defineComponent, type PropType, ref, watch } from "vue";
-import { cloneDeep } from "lodash";
 
 interface OptionItem {
   [key: string]: string | number;
@@ -117,34 +116,23 @@ export default defineComponent({
         return [];
       }
 
-      const options = cloneDeep(optionsOriginal);
-
-      options.forEach((item) => {
-        if (props.labelColumn != "label") {
-          item.label = item[props.labelColumn];
-          delete item[props.labelColumn];
-        }
-        if (props.keyColumn != "value") {
-          item.value = item[props.keyColumn];
-          delete item[props.keyColumn];
-        }
-      });
-
-      return options;
+      // Shallow copy per item: el-select-v2 only needs label/value
+      return optionsOriginal.map((item) => ({
+        ...item,
+        label: item[props.labelColumn],
+        value: item[props.keyColumn],
+      }));
     };
 
     const formattedOptions = computed(() => {
       if (!props.options) return [];
 
       if (props.grouped) {
-        let options = props.options as OptionGroup[];
-        if (!options) return [];
-
-        options.forEach((group) => {
-          group.options = formatOptions(group.options);
-        });
-
-        return options;
+        // Don't mutate the parent's groups in place
+        return (props.options as OptionGroup[]).map((group) => ({
+          ...group,
+          options: formatOptions(group.options),
+        }));
       }
 
       return formatOptions(props.options as OptionItem[]);
