@@ -10,7 +10,7 @@
         <!--begin::Avatar-->
         <div class="symbol symbol-50px me-5">
           <span class="symbol-label bg-primary text-inverse-primary fw-bold">{{
-            user.name.substring(0, 2)
+            user.name?.substring(0, 2)
           }}</span>
         </div>
         <!--end::Avatar-->
@@ -92,6 +92,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import ApiService from "@/core/services/ApiService";
@@ -137,7 +138,7 @@ export default defineComponent({
       saveOption,
       optionValues,
       options,
-      user: store.user,
+      user: storeToRefs(store).user,
     };
   },
 });

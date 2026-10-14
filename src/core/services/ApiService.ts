@@ -4,6 +4,7 @@ import axios from "axios";
 import VueAxios from "vue-axios";
 import JwtService from "@/core/services/JwtService";
 import { push } from "@/main";
+import { useConnectionStore } from "@/stores/connection";
 
 /**
  * @description service to call HTTP request via Axios
@@ -28,6 +29,28 @@ class ApiService {
       ApiService.vueInstance.axios.defaults.baseURL =
         import.meta.env.VITE_APP_API_URL;
     }
+
+    // Server unreachable (restarting or down): show offline overlay
+    ApiService.vueInstance.axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (ApiService.isOffline(error)) {
+          useConnectionStore().setOffline(
+            ApiService.vueInstance.axios.defaults.baseURL ?? ""
+          );
+        }
+        return Promise.reject(error);
+      }
+    );
+  }
+
+  /**
+   * @description request failed because the server could not be reached
+   */
+  public static isOffline(error: any): boolean {
+    if (axios.isCancel(error)) return false;
+    if (!error?.response) return !!error?.request;
+    return [502, 503, 504].includes(error.response.status);
   }
 
   public static getUrl(): string {

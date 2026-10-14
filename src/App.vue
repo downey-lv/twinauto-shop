@@ -1,5 +1,6 @@
 <template>
   <RouterView />
+  <ServerOffline />
 
   <Notivue v-slot="item">
     <Notifications :item="item" />
@@ -22,6 +23,7 @@ import { themeConfigValue } from "@/core/helpers/config";
 import { initializeComponents } from "@/core/plugins/keenthemes";
 import { Notivue, Notifications } from "notivue";
 import { removeTooltip } from "@/core/helpers/dom";
+import ServerOffline from "@/components/ServerOffline.vue";
 
 export default defineComponent({
   name: "app",
@@ -29,6 +31,7 @@ export default defineComponent({
     RouterView,
     Notivue,
     Notifications,
+    ServerOffline,
   },
   setup() {
     const configStore = useConfigStore();

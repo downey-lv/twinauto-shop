@@ -77,7 +77,11 @@ export const useAuthStore = defineStore("auth", () => {
         .then(({ data }) => {
           setAuth(data);
         })
-        .catch(({ response }) => {
+        .catch((error) => {
+          // Server unreachable: keep the session, offline overlay waits for the server
+          if (ApiService.isOffline(error)) return;
+
+          const response = error.response;
           if (response?.data?.errors) setError(response.data.errors);
           else setError(["Nav savienojuma ar serveri"]);
           purgeAuth(true);

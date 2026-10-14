@@ -58,7 +58,7 @@
         data-kt-menu-flip="bottom"
       >
         <span class="symbol-label bg-primary text-inverse-primary fw-bold">{{
-          user.name.substring(0, 2)
+          user.name?.substring(0, 2)
         }}</span>
       </div>
       <KTUserMenu></KTUserMenu>
@@ -88,6 +88,7 @@ import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import ViewHistory from "@/layouts/main-layout/menus/ViewHistory.vue";
 import KTUserMenu from "@/layouts/main-layout/menus/UserAccountMenu.vue";
 import KTThemeModeSwitcher from "@/layouts/main-layout/theme-mode/ThemeModeSwitcher.vue";
+import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 
 export default defineComponent({
@@ -113,7 +114,7 @@ export default defineComponent({
     });
 
     return {
-      user: store.user,
+      user: storeToRefs(store).user,
       internetStatus,
     };
   },
