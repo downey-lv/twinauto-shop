@@ -156,19 +156,6 @@
               <i class="fa-solid fa-magnifying-glass"></i>
             </button>
           </div>
-          <div class="d-flex mt-2">
-            <div
-              class="form-check form-switch form-check-custom form-check-solid me-5"
-            >
-              <input
-                class="form-check-input h-20px w-30px"
-                type="checkbox"
-                v-model="searchData.partialText"
-                @change="search('text')"
-              />
-              <label class="form-check-label"> Daļējs teksts </label>
-            </div>
-          </div>
         </div>
 
         <div class="col-md-3" v-loading="loading" v-if="groups">
@@ -239,7 +226,6 @@ export default defineComponent({
       analogues: false,
       oe: false,
       groups: null,
-      partialText: false,
       useLinks: false,
     });
 
@@ -254,7 +240,7 @@ export default defineComponent({
               ? params.query?.toString() || ""
               : "";
         } else if (
-          ["analogues", "oe", "partialText", "useLinks"].includes(key)
+          ["analogues", "oe", "useLinks"].includes(key)
         ) {
           searchData[key] = Boolean(query[key]);
         } else if (["groups"].includes(key)) {
@@ -356,8 +342,6 @@ export default defineComponent({
           if (this.searchData.analogues) query["analogues"] = 1;
           if (this.searchData.oe) query["oe"] = 1;
           if (this.searchData.useLinks) query["useLinks"] = 1;
-        } else if (field === "text") {
-          if (this.searchData.partialText) query["partialText"] = 1;
         }
 
         if (
