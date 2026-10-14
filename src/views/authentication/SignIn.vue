@@ -99,7 +99,7 @@ import { defineComponent, ref } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import { useAuthStore, type User } from "@/stores/auth";
 import { useRouter } from "vue-router";
-import Swal from "sweetalert2/dist/sweetalert2.js";
+import { push } from "@/main";
 import * as Yup from "yup";
 
 export default defineComponent({
@@ -146,18 +146,8 @@ export default defineComponent({
             : { name: "dashboard" }
         );
       } else {
-        Swal.fire({
-          text: error[0] as string,
-          icon: "error",
-          buttonsStyling: false,
-          confirmButtonText: "Mēģināt vēlreiz",
-          heightAuto: false,
-          customClass: {
-            confirmButton: "btn fw-semobold btn-light-danger",
-          },
-        }).then(() => {
-          store.errors = {};
-        });
+        push.error(error[0] as string);
+        store.errors = {};
       }
 
       //Deactivate indicator
