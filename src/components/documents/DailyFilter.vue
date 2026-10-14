@@ -80,7 +80,7 @@
             <div class="col-lg-3 mb-2 mg-lg-0 d-flex align-items-center">
               <el-form-item
                 prop="documentIssued"
-                label="Pavadzīme"
+                :label="issuedLabel"
                 style="margin-bottom: 0"
               >
                 <el-radio-group v-model="filterIssued" @change="updateParent">
@@ -168,6 +168,10 @@ export default defineComponent({
     showStateFilter: {
       type: Boolean,
       default: false,
+    },
+    issuedLabel: {
+      type: String,
+      default: "Pavadzīme",
     },
     showDateFilter: {
       type: Boolean,

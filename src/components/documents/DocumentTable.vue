@@ -207,8 +207,14 @@ export default defineComponent({
         issued: "Pavadzīme",
       };
 
+      const incomingSource = {
+        has_pdf: "PDF",
+      };
+
       if (props.type === "daily") {
         dtSource.value.documents = { ...documentSource, ...dailySource };
+      } else if (props.type === "in") {
+        dtSource.value.documents = { ...documentSource, ...incomingSource };
       } else {
         dtSource.value.documents = { ...documentSource, ...otherSource };
       }
@@ -251,6 +257,15 @@ export default defineComponent({
           },
         },
         issued: {
+          render: function (data) {
+            if (data) {
+              return '<span class="badge badge-light-success">Jā</span>';
+            } else {
+              return '<span class="badge badge-light-danger">Nē</span>';
+            }
+          },
+        },
+        has_pdf: {
           render: function (data) {
             if (data) {
               return '<span class="badge badge-light-success">Jā</span>';

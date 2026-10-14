@@ -11,6 +11,7 @@
     :show-user-filter="false"
     :show-recipient-filter="false"
     show-state-filter
+    :issued-label="documentType === 'in' ? 'PDF' : 'Pavadzīme'"
     :pre-select-date="false"
     @updateFilters="updateFilters"
   />
