@@ -404,6 +404,22 @@
                 <div class="fs-7 fw-semibold text-muted" v-if="item.data?.rest">
                   Atlikums: {{ item.data?.rest }}
                 </div>
+                <div
+                  class="fs-7 fw-semibold text-muted"
+                  v-if="item.imported?.pack"
+                >
+                  Rēķinā: {{ item.imported.packQuantity }} iep. ×
+                  {{ item.imported.pack }} gab.
+                </div>
+                <div
+                  class="fs-7 fw-semibold text-warning"
+                  v-if="packWarning(item)"
+                >
+                  {{ packWarning(item)?.text }}
+                  <a href="#" @click.prevent="toPieces(item)">{{
+                    packWarning(item)?.fix
+                  }}</a>
+                </div>
               </el-form-item>
             </div>
 
@@ -1205,6 +1221,10 @@ export default defineComponent({
           document.value.comment = data.comment ?? "";
           document.value.confirmed = data.confirmed ?? null;
           updatePayterm(data.term);
+          if (data.packsUnavailable)
+            push.warning(
+              "Iepakojumu daudzumi nav pārbaudīti: VIDe nav pieejams"
+            );
 
           products = [];
           for (const item of data.items) {
@@ -1421,6 +1441,104 @@ export default defineComponent({
     );
     watcherHandles.push(iWatcher);
 
+    // Products the supplier sells in packs (purchases): VIDe keeps them per piece, the supplier counts packs. An import
+    // converts them (shop-api applyPacks); here a line is flagged when it looks like packs were entered.
+    // Looked up by the rows' supplier codes: alphanumeric code -> pack size.
+    const supplierPacks = ref<Record<string, number>>({});
+    const alphanum = (code: string) =>
+      code.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    const supplierOffer = (product) =>
+      product.data?.suppliers?.find(
+        (supplier) =>
+          supplier.supplier_autoshop_id === Number(document.value.companyid)
+      );
+    const packCodes = computed(() =>
+      route.params.type === "in"
+        ? [
+            ...new Set(
+              document.value.products
+                .map((product) => supplierOffer(product)?.code_supplier)
+                .filter(Boolean)
+            ),
+          ].sort()
+        : []
+    );
+    const loadPacks = debounce(() => {
+      const companyId = document.value.companyid;
+      const codes = packCodes.value;
+      if (!companyId || codes.length === 0) {
+        supplierPacks.value = {};
+        return;
+      }
+      ApiService.get("purchase", `packs/${companyId}`, { codes })
+        .then((response) => {
+          // Still the same supplier
+          if (document.value.companyid === companyId)
+            supplierPacks.value = response.data;
+        })
+        .catch(() => push.warning("Neizdevās pārbaudīt iepakojumu daudzumus"));
+    }, 500);
+    const packWatcher = watch(
+      () => `${document.value.companyid}|${packCodes.value.join("|")}`,
+      () => loadPacks(),
+      { immediate: true }
+    );
+    watcherHandles.push(packWatcher);
+
+    // What looks wrong with a line of a product sold in packs: not whole packs (packs entered as pieces), or the price
+    // of a pack (nearer the supplier's pack price than its piece price)
+    const packCheck = (product) => {
+      if (route.params.type !== "in") return null;
+      const offer = supplierOffer(product);
+      const pack =
+        (offer && supplierPacks.value[alphanum(String(offer.code_supplier))]) ||
+        product.imported?.pack;
+      if (!pack) return null;
+
+      const piecePrice = Number(offer?.supplier_price) || 0;
+      return {
+        pack,
+        wholePacks: (Number(product.quantity) || 0) % pack === 0,
+        packPrice:
+          piecePrice > 0 &&
+          (Number(product.price) || 0) >= (piecePrice * pack) / 2,
+        piecePrice,
+      };
+    };
+    const piecePriceOf = (product, pack) =>
+      new Decimal(product.price || 0)
+        .dividedBy(pack)
+        .toDecimalPlaces(4)
+        .toNumber();
+    // Packs entered as pieces: the price is taken as a pack's too, unless it is already a piece's
+    const dividesPrice = (check) =>
+      check.packPrice || (!check.wholePacks && !check.piecePrice);
+    const packWarning = (product) => {
+      const check = packCheck(product);
+      if (!check || (check.wholePacks && !check.packPrice)) return null;
+      if (!check.wholePacks) {
+        const price = dividesPrice(check)
+          ? ` × ${piecePriceOf(product, check.pack)} €`
+          : "";
+        return {
+          text: `Pa ${check.pack} gab. iepakojumā, ievadi gabalos:`,
+          fix: `${Number(product.quantity) * check.pack} gab.${price}`,
+        };
+      }
+      return {
+        text: `Cena par iepakojumu (${check.pack} gab.)? Par gabalu:`,
+        fix: `${piecePriceOf(product, check.pack)} €`,
+      };
+    };
+    const toPieces = (product) => {
+      const check = packCheck(product);
+      if (!check) return;
+      if (dividesPrice(check))
+        product.price = piecePriceOf(product, check.pack);
+      if (!check.wholePacks)
+        product.quantity = Number(product.quantity) * check.pack;
+    };
+
     const companyChanged = () => {
       updatePayterm();
       checkClient();
@@ -1566,6 +1684,8 @@ export default defineComponent({
       companyChanged,
       client_status,
       vatExcluded,
+      packWarning,
+      toPieces,
     };
   },
   async mounted() {

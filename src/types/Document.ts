@@ -106,6 +106,8 @@ export interface Imported {
   shipping: number;
   comment: string;
   confirmed?: ConfirmedInvoice | null;
+  // VIDe couldn't be read: products sold in packs not converted into pieces
+  packsUnavailable?: boolean;
   items: ImportedProduct[];
 }
 
@@ -115,4 +117,7 @@ export interface ImportedProduct {
   quantity: number;
   price: number;
   matches: Product[];
+  // Sold in packs of this many: quantity and price converted into pieces, packQuantity is the invoice's
+  pack?: number;
+  packQuantity?: number;
 }
